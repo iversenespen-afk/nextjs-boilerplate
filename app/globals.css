@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0f0f14;
+  --foreground: #f5f5f5;
+  --accent: #ff3b3b;
 }
 
 body {
-  background: var(--background);
+  margin: 0;
+  background: radial-gradient(circle at top, #1a1a22, #0f0f14);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, Arial, Helvetica, sans-serif;
+}
+
+/* Litt stemning */
+h1, h2, h3 {
+  letter-spacing: 0.5px;
+}
+
+a {
+  transition: 0.2s ease;
+}
+
+a:hover {
+  transform: translateY(-2px);
 }
