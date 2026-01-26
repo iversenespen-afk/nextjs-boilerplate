@@ -61,6 +61,10 @@ export const FEARS: Fear[] = [
   { id: 54, title: "Å ikke rekke flyet", description: "Det må kunne forventes at man har kontroll på flyavgangene på Evenes, særlig når man jobber der" },
   { id: 55, title: "Kjeven ut av ledd", description: "Å få kjeven ut av ledd er ikke optimalt. Men det hjelper å ha vært borti det før" },
   { id: 56, title: "Å bli nekta adgang", description: "Unnskyld, De er fisker, De kommer ikke inn. Å bli nekta adgang fordi man er småpæra er ikke gunstig" },
+  { id: 57, title: "Dra på jordomseiling med feil fyr", description: "Jeg drar gjerne på jordomseiling. Men ikke med hvem som helst, når som helst. Med noen ferske penger" },
+  { id: 58, title: "Å få sparket inn øyehulen", description: "Øyehulen beholder jeg gjerne intakt, den er en del av ansiktet mitt. Det er bare trening" },
+  { id: 59, title: "Å ikke få bestilt pizza", description: "Når du ringer en frisørsalong midt på natten og forventer at de leverer pizza innen en halvtime" },
+  { id: 60, title: "Ingen legger merke til tødlene mine", description: "Jeg har tødler på haka. Har du sett det?" },
 ];
 
 export function randomFear() {
