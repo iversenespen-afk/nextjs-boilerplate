@@ -1,0 +1,67 @@
+export type Fear = {
+  id: number;
+  title: string;
+  description: string;
+};
+
+export const FEARS: Fear[] = [
+  { id: 1, title: "Vannliljer", description: "Det desidert farligste i hele verden. Vannliljer vil snurre seg rundt foten din og trekke deg ned i dypet" },
+  { id: 2, title: "Brette tåneglen bakover", description: "Det å sparke borti en benk i en gymsal er det nest verste i hele verden" },
+  { id: 3, title: "Bobbaner i Mellom-Europa", description: "Bobbane på is er farlig. På sommertid er det enda farligere. Stor sjanse for brannsår, garantert sykehus" },
+  { id: 4, title: "Bjørnen på Tjeldøya", description: "Vi vet hvor den var, men vi vet aldri hvor den dukker opp neste gang" },
+  { id: 5, title: "Yoghurt", description: "At noen frivillig spiser dette… Yoghurt må straks skylles bort" },
+  { id: 6, title: "At ungan går på havet", description: "At ungene truer med å gå på havet, er kanskje å forvente oppe i nord. Med Sander var frykten reell" },
+  { id: 7, title: "At ungan går i trafikken", description: "Det er ikke noe hyggelig å true sin mor med å gå i trafikken. Trafikkgrunnlaget er heldigvis lavt" },
+  { id: 8, title: "Folk som synger falskt", description: "Å høre sin egen stemme er ikke alle forunt." },
+  { id: 9, title: "Å gonke tenna i noe", description: "Nina har en veldig fin visuell presentasjon av det å gonke tenna i noe. Å leve uten fortenner er ikke noe særlig" },
+  { id: 10, title: "Snøfrie fjellsider", description: "Frihet. Freedom. Freiheit. Det verste med klimaforandringene er nok i første omgang bare fjellsider" },
+  { id: 11, title: "Se sin far i sin Skeid-drakt", description: "Dette er ingen forunt. Den drakta var ikke formsydd pappa. Kunne jeg bare fortrengt dette bildet ut av mitt hode." },
+  { id: 12, title: "Å få mark", description: "Hvis det er noe som ikke passer inn i Ninas verdensbilde, eller hvis ting går litt for sakte, så kan Nina få mark. Det er ikke bra" },
+  { id: 13, title: "Uhygiene på kjøkkenet", description: "Nina lærte tidlig i Heimkunnskapen at ting ikke må bli uhyyygiiienisk på kjøkkenet. Takk til Tori Kaarbø for lærdommen" },
+  { id: 14, title: "Stalkere", description: "De som vet mer om deg enn du vet om deg selv. Holdes best på avstand, selv om de kanskje vet flytidene dine" },
+  { id: 15, title: "Å bli Powerpoint-ansvarlig på jobb", description: "Et verv uten ære, evig fortapelse. Nina ber deg om å aldri utnevne henne til Powerpoint-ansvarlig" },
+  { id: 16, title: "Hunder som må bæres", description: "Hunder er snille, de er trøst og de er kos. Men de er også treningskamerater. Står du ikke distansen, så hold deg hjemme" },
+  { id: 17, title: "Folk som småljuger", description: "Folk som småljuger har i uminnelige tider blitt sett ned på i familien. Fakta" },
+  { id: 18, title: "At brødrene dine stjæler julepynt", description: "Den affeksjonsverdien som ligger i julepynt fra trangere tider skal aldri undervurderes. ALDRI" },
+  { id: 19, title: "Måtte kalle brødrene sine for Mester", description: "Å tape en konkurranse eller at brødrene dine har gjort deg en tjeneste. At du da må kalle dem Mester er ikke noe særlig" },
+  { id: 20, title: "Såkalte fagfolk", description: "Folk som liksom skal kunne faget sitt eller fagkravene sine, men som ikke er i nærheten" },
+  { id: 21, title: "Treige folk", description: "Kan du vær så snill å bli ferdig snart? Er det mulig å bruke så lang tid? Er du kalenderansvarlig for oss alle?" },
+  { id: 22, title: "Tafatte folk", description: "Hvor skal jeg begynne? Eller rettere sagt; Hvor skal de begynne? Etter A kommer B osv. Noen kommer liksom ikke i gang" },
+  { id: 23, title: "Hysteriske foreldre", description: "Ring 113 umiddelbart! Her skal 333-skvadronen i sving! Mitt barn skal ha særbehandling nå. OK! Hent et plaster" },
+  { id: 24, title: "Russ med vannpistol", description: "Når man løper fra russ med vannpistol må man se seg til høyre og venstre. Ellers så er det legevakta" },
+  { id: 25, title: "Elg gjennom frontruta", description: "Noen ganger er elg i solnedgang å foretrekke. Ellers kan det bli din egen solnedgang" },
+  { id: 26, title: "Uhygieniske mennesker", description: "Dusj, klut, såpe, sprit, bade, høyttykkspyler etc. Men vær så snill og opprettholde et minimumsnivå for renslighet" },
+  { id: 27, title: "Hunder som jukker", description: "De er søte, de er raske, de har råe instinkter. Men det jukkegreiene fremstår ikke særlig intelligent" },
+  { id: 28, title: "Bruksanvisninger", description: "Jeg har kjøpt en vare, den skal funke NÅ! Slutt med dette tullet. Hva er det? Et puslespill?" },
+  { id: 29, title: "Kø", description: "Jeg har bedre ting å gjøre enn dette! Kan noen vær så snill å fjerne denne køen her?" },
+  { id: 30, title: "At det ikke skjer noe", description: "Det suser i sivet, det rasler i blader, elven klukker. Men kjære vakre vene, er det noen som blir med på løpetur?" },
+  { id: 31, title: "Vente", description: "Ja? Hva skjer? Hvem har ansvaret her? Hva i alle verdens dager? Hallo? Noen hjemme?" },
+  { id: 32, title: "Folk som stirrer", description: "Når man vokser opp med en stirrer i gata, så er det klart man blir litt skeptisk" },
+  { id: 33, title: "Kysse samme trekors som tusen andre", description: "Å måtte gå gjennom en trang gang i en kirke. For så å stå i kø for å kysse et trekors tusen andre har nussa på. Nei takk!" },
+  { id: 34, title: "Dobørste i oppvaskmaskina", description: "Ja, det var den gangen. Det vil ikke skje igjen." },
+  { id: 35, title: "At noen tisser i såpedispenseren", description: "Jaja, det skjedde den gangen. Det vil aldri skje igjen." },
+  { id: 36, title: "Gladpack over doen", description: "Når du har med deg kniv på do. Ikke fordi du skal beskytte deg, men fordi doen KAN være dekket med gladpack" },
+  { id: 37, title: "Dramaqueens", description: "Ahhhhhh! Der brakk jeg en negl! Vi må avlyse! Dette går ikke! Ring Falken!" },
+  { id: 38, title: "Røyklukt", description: "Jeg trodde dette arrangementet var røykfritt? Du røyker som du eier busskuret!" },
+  { id: 39, title: "Kjøre bil i Oslo", description: "Jeg er sikker på at det ikke finnes en lovlig måte å kjøre ut av Kvadraturen på" },
+  { id: 40, title: "Bade i Klaskerudtjernet", description: "Hva som har blitt gjort eller kommer til å bli gjort i dette vannet er ikke greit å vite" },
+  { id: 41, title: "Ting som ikke kastes", description: "Legg den i boden, den klarer jeg ikke å kaste!" },
+  { id: 42, title: "Ta mandlene i voksen alder", description: "Ikke visste jeg at det å ta mandlene er så tett på en barnefødsel smertemessig!" },
+  { id: 43, title: "Å få kul i hodet", description: "Å få en kul i hodet eller høyt hårfeste er ikke optimalt. Du vil bli titulert Hans Høyskolt umiddelbart" },
+  { id: 44, title: "Flyg oppå Haugen", description: "Å fly rundt i naturen er greit, men uansett hva du finner på. Du må ikke flyg oppå Haugen" },
+  { id: 45, title: "Slumtruser", description: "De må stues vekk når man har gjester" },
+  { id: 46, title: "At noen blir lei seg hvis de kjøper feil størrelse", description: "Medium eller Small. Så stor forskjell er det ikke." },
+  { id: 47, title: "Byråkrati", description: "Kjære vakre vene! Hvorfor må ting være så forbanna tungrodd. Er det mulig?" },
+  { id: 48, title: "Dolle seg for mye opp", description: "En liten kilo foundation senere, og mysteriet er komplett" },
+  { id: 49, title: "Overdreven parfymebruk", description: "Et spray er mer enn nok" },
+  { id: 50, title: "Tafsing på utesteder", description: "Det er hyggelig å få komplimenter. Det er ikke dermed sagt at buffeten er åpen" },
+  { id: 51, title: "Karaokebarer hadde blitt forbudt", description: "Gi meg en drink og en mikrofon! I den rekkefølgen" },
+  { id: 52, title: "Bygdedyret", description: "Men ikke tro at jeg ikke passer på" },
+  { id: 53, title: "Å ikke ha noe kake tilgjengelig", description: "Vi må ha kake tilgjengelig, folk kan jo faktisk dukke uanmeldt opp på døra" },
+  { id: 54, title: "Å ikke rekke flyet", description: "Det må kunne forventes at man har kontroll på flyavgangene på Evenes" },
+  { id: 55, title: "Kjeven ut av ledd", description: "Ikke optimalt. Men det hjelper å ha vært borti det før" },
+];
+
+export function randomFear() {
+  return FEARS[Math.floor(Math.random() * FEARS.length)];
+}
