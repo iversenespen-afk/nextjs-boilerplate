@@ -45,17 +45,17 @@ const { data: matches, error } = await supabase
             borderRadius: 12,
           }}
         >
-          <h2>
-            {match.songs?.artist} - {match.songs?.title}
-          </h2>
+         <h2>
+  {match.songs?.[0]?.artist} – {match.songs?.[0]?.title}
+</h2>
 
-          <p>
-            Tema: <strong>{match.themes?.name}</strong>
-          </p>
+<p>
+  Tema: <strong>{match.themes?.[0]?.name}</strong>
+</p>
 
-          <p>
-            Riktig svar: <strong>{match.concepts?.label_no}</strong>
-          </p>
+<p>
+  Riktig svar: <strong>{match.concepts?.[0]?.label_no}</strong>
+</p>
 
           <p style={{ opacity: 0.7 }}>
             Funnet i teksten som: «{match.matched_text}»
