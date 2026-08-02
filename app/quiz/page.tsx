@@ -36,33 +36,44 @@ const { data: matches, error } = await supabase
     <main style={{ padding: 32 }}>
       <h1>Quizlix – første spørsmål</h1>
 
-      {matches?.map((match) => (
-        <article
-          key={match.id}
-          style={{
-            marginTop: 24,
-            padding: 20,
-            border: "1px solid #555",
-            borderRadius: 12,
-          }}
-        >
-         <h2>
-  {match.songs?.[0]?.artist} – {match.songs?.[0]?.title}
-</h2>
+ {matches?.map((match) => {
+  const song = Array.isArray(match.songs)
+    ? match.songs[0]
+    : match.songs;
 
-<p>
-  Tema: <strong>{match.themes?.[0]?.name}</strong>
-</p>
+  const theme = Array.isArray(match.themes)
+    ? match.themes[0]
+    : match.themes;
 
-<p>
-  Riktig svar: <strong>{match.concepts?.[0]?.label_no}</strong>
-</p>
+  const concept = Array.isArray(match.concepts)
+    ? match.concepts[0]
+    : match.concepts;
 
-          <p style={{ opacity: 0.7 }}>
-            Funnet i teksten som: «{match.matched_text}»
-          </p>
-        </article>
-      ))}
-    </main>
+  return (
+    <article
+      key={match.id}
+      style={{
+        marginTop: 24,
+        padding: 20,
+        border: "1px solid #555",
+        borderRadius: 12,
+      }}
+    >
+      <h2>
+        {song?.artist} – {song?.title}
+      </h2>
+
+      <p>
+        Tema: <strong>{theme?.name}</strong>
+      </p>
+
+      <p>
+        Riktig svar: <strong>{concept?.label_no}</strong>
+      </p>
+
+      <p style={{ opacity: 0.7 }}>
+        Funnet i teksten som: «{match.matched_text}»
+      </p>
+    </article>
   );
-}
+})}
