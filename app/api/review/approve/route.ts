@@ -1,9 +1,13 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
-type ApproveRequestBody = {
-  id?: number | string;
+type ReviewHit = {
   concept_id?: string;
   matched_text?: string;
+};
+
+type ApproveRequestBody = {
+  id?: number | string;
+  hits?: ReviewHit[];
 };
 
 function cleanConceptId(value: string): string {
@@ -20,12 +24,23 @@ function cleanConceptId(value: string): string {
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as ApproveRequestBody;
-
     const queueId = Number(body.id);
-    const matchedText = String(body.matched_text ?? "").trim();
-    const conceptId = cleanConceptId(
-      String(body.concept_id ?? matchedText),
-    );
+
+    const hits = (body.hits ?? [])
+      .map((hit) => {
+        const matchedText = String(hit.matched_text ?? "").trim();
+        const conceptId = cleanConceptId(
+          String(hit.concept_id ?? matchedText),
+        );
+
+        return {
+          concept_id: conceptId,
+          matched_text: matchedText,
+        };
+      })
+      .filter(
+        (hit) => hit.concept_id && hit.matched_text,
+      );
 
     if (!Number.isInteger(queueId) || queueId <= 0) {
       return Response.json(
@@ -37,20 +52,16 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!conceptId || !matchedText) {
+    if (hits.length === 0) {
       return Response.json(
         {
           success: false,
-          message: "Concept-ID og ordet i teksten må fylles ut.",
+          message: "Legg inn minst ett gyldig treff.",
         },
         { status: 400 },
       );
     }
 
-    /*
-     * Hent den faktiske kø-raden fra databasen.
-     * Vi stoler ikke på spotify_id eller theme_id fra nettleseren.
-     */
     const { data: queueItem, error: queueError } =
       await supabaseAdmin
         .from("match_review_queue")
@@ -93,9 +104,6 @@ export async function POST(request: Request) {
       );
     }
 
-    /*
-     * Finn sangen som tidligere ble importert til songs.
-     */
     const { data: song, error: songError } = await supabaseAdmin
       .from("songs")
       .select("id")
@@ -122,121 +130,118 @@ export async function POST(request: Request) {
       );
     }
 
-    /*
-     * Opprett concept hvis det ikke finnes.
-     * Et eksisterende concept overskrives ikke.
-     */
-    const { data: existingConcept, error: conceptLookupError } =
-      await supabaseAdmin
-        .from("concepts")
-        .select("id")
-        .eq("id", conceptId)
-        .maybeSingle();
+    for (const hit of hits) {
+      const { data: existingConcept, error: conceptLookupError } =
+        await supabaseAdmin
+          .from("concepts")
+          .select("id")
+          .eq("id", hit.concept_id)
+          .maybeSingle();
 
-    if (conceptLookupError) {
-      return Response.json(
-        {
-          success: false,
-          message:
-            `Kunne ikke kontrollere concept: ${conceptLookupError.message}`,
-        },
-        { status: 500 },
-      );
-    }
-
-    if (!existingConcept) {
-      const { error: conceptInsertError } = await supabaseAdmin
-        .from("concepts")
-        .insert({
-          id: conceptId,
-          label_no: matchedText,
-        });
-
-      if (conceptInsertError) {
+      if (conceptLookupError) {
         return Response.json(
           {
             success: false,
             message:
-              `Kunne ikke opprette concept: ${conceptInsertError.message}`,
+              `Kunne ikke kontrollere ${hit.concept_id}: ` +
+              conceptLookupError.message,
           },
           { status: 500 },
         );
       }
-    }
 
-    /*
-     * Se om koblingen allerede finnes.
-     */
-    const { data: existingMatch, error: matchLookupError } =
-      await supabaseAdmin
-        .from("song_matches")
-        .select("id")
-        .eq("song_id", song.id)
-        .eq("theme_id", queueItem.theme_id)
-        .eq("concept_id", conceptId)
-        .maybeSingle();
+      if (!existingConcept) {
+        const { error: conceptInsertError } = await supabaseAdmin
+          .from("concepts")
+          .insert({
+            id: hit.concept_id,
+            label_no: hit.matched_text,
+          });
 
-    if (matchLookupError) {
-      return Response.json(
-        {
-          success: false,
-          message:
-            `Kunne ikke kontrollere sangtreff: ${matchLookupError.message}`,
-        },
-        { status: 500 },
-      );
-    }
+        if (conceptInsertError) {
+          return Response.json(
+            {
+              success: false,
+              message:
+                `Kunne ikke opprette ${hit.concept_id}: ` +
+                conceptInsertError.message,
+            },
+            { status: 500 },
+          );
+        }
+      }
 
-    if (existingMatch) {
-      const { error: matchUpdateError } = await supabaseAdmin
-        .from("song_matches")
-        .update({
-          matched_text: matchedText,
-          verified: true,
-        })
-        .eq("id", existingMatch.id);
+      const { data: existingMatch, error: matchLookupError } =
+        await supabaseAdmin
+          .from("song_matches")
+          .select("id")
+          .eq("song_id", song.id)
+          .eq("theme_id", queueItem.theme_id)
+          .eq("concept_id", hit.concept_id)
+          .maybeSingle();
 
-      if (matchUpdateError) {
+      if (matchLookupError) {
         return Response.json(
           {
             success: false,
             message:
-              `Kunne ikke oppdatere sangtreffet: ${matchUpdateError.message}`,
+              `Kunne ikke kontrollere treffet ${hit.concept_id}: ` +
+              matchLookupError.message,
           },
           { status: 500 },
         );
       }
-    } else {
-      const { error: matchInsertError } = await supabaseAdmin
-        .from("song_matches")
-        .insert({
-          song_id: song.id,
-          theme_id: queueItem.theme_id,
-          concept_id: conceptId,
-          matched_text: matchedText,
-          verified: true,
-        });
 
-      if (matchInsertError) {
-        return Response.json(
-          {
-            success: false,
-            message:
-              `Kunne ikke opprette sangtreffet: ${matchInsertError.message}`,
-          },
-          { status: 500 },
-        );
+      if (existingMatch) {
+        const { error: matchUpdateError } = await supabaseAdmin
+          .from("song_matches")
+          .update({
+            matched_text: hit.matched_text,
+            verified: true,
+          })
+          .eq("id", existingMatch.id);
+
+        if (matchUpdateError) {
+          return Response.json(
+            {
+              success: false,
+              message:
+                `Kunne ikke oppdatere ${hit.concept_id}: ` +
+                matchUpdateError.message,
+            },
+            { status: 500 },
+          );
+        }
+      } else {
+        const { error: matchInsertError } = await supabaseAdmin
+          .from("song_matches")
+          .insert({
+            song_id: song.id,
+            theme_id: queueItem.theme_id,
+            concept_id: hit.concept_id,
+            matched_text: hit.matched_text,
+            verified: true,
+          });
+
+        if (matchInsertError) {
+          return Response.json(
+            {
+              success: false,
+              message:
+                `Kunne ikke lagre ${hit.concept_id}: ` +
+                matchInsertError.message,
+            },
+            { status: 500 },
+          );
+        }
       }
     }
 
-    /*
-     * Marker køelementet som godkjent.
-     */
     const { error: queueUpdateError } = await supabaseAdmin
       .from("match_review_queue")
       .update({
-        concept_id: conceptId,
-        matched_text: matchedText,
+        concept_id: hits[0].concept_id,
+        matched_text: hits[0].matched_text,
         verified: true,
         review_status: "approved",
         reviewed_at: new Date().toISOString(),
@@ -249,7 +254,8 @@ export async function POST(request: Request) {
         {
           success: false,
           message:
-            `Sangtreffet ble lagret, men køen kunne ikke oppdateres: ${queueUpdateError.message}`,
+            `Treffene ble lagret, men køen kunne ikke oppdateres: ` +
+            queueUpdateError.message,
         },
         { status: 500 },
       );
@@ -257,10 +263,10 @@ export async function POST(request: Request) {
 
     return Response.json({
       success: true,
-      message: "Treffet ble godkjent og lagret.",
+      message: `${hits.length} treff ble godkjent og lagret.`,
       queue_id: queueId,
       song_id: song.id,
-      concept_id: conceptId,
+      saved_hits: hits.length,
     });
   } catch (error) {
     const message =
