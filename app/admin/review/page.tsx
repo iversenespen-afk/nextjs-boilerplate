@@ -70,8 +70,6 @@ export default async function AdminReviewPage() {
         <ReviewForm
           key={item.id}
   item={item}
- suggestedConceptId=""
-suggestedMatchedText=""
 />
 
       </section>
