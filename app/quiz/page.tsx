@@ -46,15 +46,15 @@ export default async function QuizPage() {
           }}
         >
           <h2>
-            {match.songs?.artist} – {match.songs?.title}
+            {match.songs?.[0]?.artist} – {match.songs?.[0]?.title}
           </h2>
 
           <p>
-            Tema: <strong>{match.themes?.name}</strong>
+            Tema: <strong>{match.themes?.[0]?.name}</strong>
           </p>
 
           <p>
-            Riktig svar: <strong>{match.concepts?.label_no}</strong>
+            Riktig svar: <strong>{match.concepts?.[0]?.label_no}</strong>
           </p>
 
           <p style={{ opacity: 0.7 }}>
