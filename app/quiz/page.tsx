@@ -75,5 +75,8 @@ const { data: matches, error } = await supabase
         Funnet i teksten som: «{match.matched_text}»
       </p>
     </article>
+    );
+      })}
+    </main>
   );
-})}
+}
