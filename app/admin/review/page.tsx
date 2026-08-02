@@ -68,18 +68,10 @@ export default async function AdminReviewPage() {
         <p>Spilleliste: {item.source_playlist}</p>
         <p>Kø-ID: {item.id}</p>
         <ReviewForm
+          key={item.id}
   item={item}
-  suggestedConceptId={
-    item.theme_id === "artists"
-      ? item.artist
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "_")
-          .replace(/^_+|_+$/g, "")
-      : ""
-  }
-  suggestedMatchedText={
-    item.theme_id === "artists" ? item.artist : ""
-  }
+ suggestedConceptId=""
+suggestedMatchedText=""
 />
 
       </section>
