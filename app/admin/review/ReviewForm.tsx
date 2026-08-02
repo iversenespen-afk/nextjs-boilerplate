@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   rejectReview,
   skipReview,
@@ -26,6 +27,8 @@ export default function ReviewForm({
   suggestedConceptId = "",
   suggestedMatchedText = "",
 }: ReviewFormProps) {
+  const router = useRouter();
+const [isSaving, setIsSaving] = useState(false);
   const [conceptId, setConceptId] = useState(
     item.concept_id ?? suggestedConceptId,
   );
@@ -34,22 +37,37 @@ export default function ReviewForm({
     item.matched_text ?? suggestedMatchedText,
   );
 
-  async function testApproveApi() {
-  const response = await fetch("/api/review/approve", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: item.id,
-      concept_id: conceptId,
-      matched_text: matchedText,
-    }),
-  });
+ async function approveAndContinue() {
+  if (isSaving) return;
 
-  const result = await response.json();
+  setIsSaving(true);
 
-  alert(result.message);
+  try {
+    const response = await fetch("/api/review/approve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: item.id,
+        concept_id: conceptId,
+        matched_text: matchedText,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      alert(result.message ?? "Kunne ikke lagre.");
+      return;
+    }
+
+    router.refresh();
+  } catch {
+    alert("Noe gikk galt.");
+  } finally {
+    setIsSaving(false);
+  }
 }
   
   return (
@@ -140,21 +158,13 @@ export default function ReviewForm({
           gap: 12,
         }}
       >
-      <button
+     <button
   type="button"
-  onClick={testApproveApi}
-          style={{
-            padding: "12px 18px",
-            border: 0,
-            borderRadius: 10,
-            background: "#16803a",
-            color: "#fff",
-            cursor: "pointer",
-            fontSize: 16,
-          }}
-        >
-          Godkjenn
-        </button>
+  onClick={approveAndContinue}
+  disabled={isSaving}
+>
+  {isSaving ? "Lagrer..." : "Godkjenn"}
+</button>
 
         <button
           type="submit"
