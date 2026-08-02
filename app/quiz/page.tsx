@@ -21,6 +21,7 @@ const { data: matches, error } = await supabase
   )
 `)
 .order("id");
+  console.dir(matches, { depth: null });
 
   if (error) {
     return (
