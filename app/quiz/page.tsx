@@ -5,9 +5,22 @@ export const dynamic = "force-dynamic";
 export default async function QuizPage() {
 const { data: matches, error } = await supabase
 .from("song_matches")
-.select("*")
+.select(`
+  id,
+  matched_text,
+  verified,
+  songs!song_matches_song_id_fkey (
+    artist,
+    title
+  ),
+  themes!song_matches_theme_id_fkey (
+    name
+  ),
+  concepts!song_matches_concept_id_fkey (
+    label_no
+  )
+`)
 .order("id");
-  console.log(matches);
 
   if (error) {
     return (
@@ -33,15 +46,15 @@ const { data: matches, error } = await supabase
           }}
         >
           <h2>
-            {match.songs?.[0]?.artist} – {match.songs?.[0]?.title}
+            {match.songs?.artist} - {match.songs?.title}
           </h2>
 
           <p>
-            Tema: <strong>{match.themes?.[0]?.name}</strong>
+            Tema: <strong>{match.themes?.name}</strong>
           </p>
 
           <p>
-            Riktig svar: <strong>{match.concepts?.[0]?.label_no}</strong>
+            Riktig svar: <strong>{match.concepts?.label_no}</strong>
           </p>
 
           <p style={{ opacity: 0.7 }}>
