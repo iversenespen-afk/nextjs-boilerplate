@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  approveReview,
   rejectReview,
   skipReview,
 } from "./actions";
@@ -35,6 +34,24 @@ export default function ReviewForm({
     item.matched_text ?? suggestedMatchedText,
   );
 
+  async function testApproveApi() {
+  const response = await fetch("/api/review/approve", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: item.id,
+      concept_id: conceptId,
+      matched_text: matchedText,
+    }),
+  });
+
+  const result = await response.json();
+
+  alert(result.message);
+}
+  
   return (
     <form
       style={{
@@ -123,9 +140,9 @@ export default function ReviewForm({
           gap: 12,
         }}
       >
-        <button
-          type="submit"
-          formAction={approveReview}
+      <button
+  type="button"
+  onClick={testApproveApi}
           style={{
             padding: "12px 18px",
             border: 0,
