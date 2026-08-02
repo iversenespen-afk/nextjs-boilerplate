@@ -66,6 +66,13 @@ export default async function AdminReviewPage() {
 
         <p>Spilleliste: {item.source_playlist}</p>
         <p>Kø-ID: {item.id}</p>
+        <p>
+  AI-forslag: <strong>{item.matched_text ?? "Ingen"}</strong>
+</p>
+
+<p>
+  Concept: <strong>{item.concept_id ?? "Ingen"}</strong>
+</p>
       </section>
     </main>
   );
