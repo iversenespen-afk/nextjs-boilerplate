@@ -170,11 +170,11 @@ export default async function QuizPage() {
   ]);
 
   return (
-    <QuizGame
-      artist={song.artist}
-      title={song.title}
-      theme={theme.name}
-      options={options}
-    />
-  );
-}
+  <QuizGame
+    key={firstMatch.id}
+    artist={song.artist}
+    title={song.title}
+    theme={theme.name}
+    options={options}
+  />
+);
