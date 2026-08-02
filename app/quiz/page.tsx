@@ -169,7 +169,7 @@ export default async function QuizPage() {
     })),
   ]);
 
-  return (
+return (
   <QuizGame
     key={firstMatch.id}
     artist={song.artist}
@@ -178,3 +178,4 @@ export default async function QuizPage() {
     options={options}
   />
 );
+}
