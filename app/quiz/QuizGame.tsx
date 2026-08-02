@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 type AnswerOption = {
   id: string;
@@ -24,6 +24,15 @@ export default function QuizGame({
 }: QuizGameProps) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  
+  function nextQuestion() {
+  setSelectedId(null);
+
+  startTransition(() => {
+    router.refresh();
+  });
+}
 
   const answered = selectedId !== null;
 
@@ -137,7 +146,8 @@ export default function QuizGame({
 
           <button
             type="button"
-            onClick={() => router.refresh()}
+            onClick={nextQuestion}
+            disabled={isPending}
             style={{
               marginTop: 12,
               padding: "12px 18px",
@@ -147,7 +157,7 @@ export default function QuizGame({
               fontSize: 16,
             }}
           >
-            Nytt spørsmål
+            {isPending ? "Henter nytt spørsmål …" : "Nytt spørsmål"}
           </button>
         </section>
       )}
