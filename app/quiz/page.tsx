@@ -3,24 +3,11 @@ import { supabase } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 
 export default async function QuizPage() {
-  const { data: matches, error } = await supabase
-    .from("song_matches")
-    .select(`
-      id,
-      matched_text,
-      verified,
-      songs (
-        artist,
-        title
-      ),
-      themes (
-        name
-      ),
-      concepts (
-        label_no
-      )
-    `)
-    .order("id");
+const { data: matches, error } = await supabase
+.from("song_matches")
+.select("*")
+.order("id");
+  console.log(matches);
 
   if (error) {
     return (
