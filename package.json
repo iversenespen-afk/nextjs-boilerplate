@@ -8,11 +8,12 @@
     "start": "next start",
     "lint": "eslint"
   },
-  "dependencies": {
-    "next": "16.1.4",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
-  },
+"dependencies": {
+  "@supabase/supabase-js": "^2.57.0",
+  "next": "16.1.4",
+  "react": "19.2.3",
+  "react-dom": "19.2.3"
+},
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
