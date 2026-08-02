@@ -1,3 +1,4 @@
+import ReviewForm from "./ReviewForm";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
@@ -66,13 +67,21 @@ export default async function AdminReviewPage() {
 
         <p>Spilleliste: {item.source_playlist}</p>
         <p>Kø-ID: {item.id}</p>
-        <p>
-  AI-forslag: <strong>{item.matched_text ?? "Ingen"}</strong>
-</p>
+        <ReviewForm
+  item={item}
+  suggestedConceptId={
+    item.theme_id === "artists"
+      ? item.artist
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "")
+      : ""
+  }
+  suggestedMatchedText={
+    item.theme_id === "artists" ? item.artist : ""
+  }
+/>
 
-<p>
-  Concept: <strong>{item.concept_id ?? "Ingen"}</strong>
-</p>
       </section>
     </main>
   );
