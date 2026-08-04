@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit-concepts": "node scripts/audit-concepts.mjs"
   },
 "dependencies": {
   "@supabase/supabase-js": "^2.57.0",
