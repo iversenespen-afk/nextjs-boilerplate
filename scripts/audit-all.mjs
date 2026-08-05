@@ -6,6 +6,10 @@ const audits = [
     command: "scripts/audit-concepts.mjs",
   },
   {
+    name: "Songs",
+    command: "scripts/audit-songs.mjs",
+  },
+  {
     name: "Song matches",
     command: "scripts/audit-song-matches.mjs",
   },
