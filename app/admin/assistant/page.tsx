@@ -94,6 +94,17 @@ async function analyzeItem() {
   setSuggestions([]);
 
   try {
+    const conceptsResponse = await fetch(
+  `/api/assistant/concepts?themeId=${encodeURIComponent(item.theme_id)}`
+);
+
+const conceptsResult = await conceptsResponse.json();
+
+if (!conceptsResponse.ok || !conceptsResult.success) {
+  setMessage("Kunne ikke hente concepts.");
+  setIsAnalyzing(false);
+  return;
+}
     const response = await fetch("/api/assistant/analyze", {
       method: "POST",
       headers: {
@@ -105,7 +116,7 @@ async function analyzeItem() {
         title: item.title,
         themeId: item.theme_id,
         themeName: item.theme_name,
-        concepts: [],
+        concepts: conceptsResult.concepts,
       }),
     });
 
