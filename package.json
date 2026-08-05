@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "audit-concepts": "node scripts/audit-concepts.mjs",
+    "audit-song-matches": "node scripts/audit-song-matches.mjs",
     "audit": "node scripts/audit-all.mjs"
   },
 "dependencies": {
