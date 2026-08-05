@@ -23,11 +23,30 @@ type NextItemResponse = {
   item?: QueueItem | null;
   message?: string;
 };
+type AssistantSuggestion = {
+  concept_id: string;
+  matched_text: string;
+  display_name: string;
+  confidence: number;
+  existing_concept: boolean;
+  explanation: string;
+};
+
+type AnalyzeResponse = {
+  success: boolean;
+  suggestions?: AssistantSuggestion[];
+  message?: string;
+};
 
 export default function AssistantPage() {
   const [item, setItem] = useState<QueueItem | null>(null);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<
+  AssistantSuggestion[]
+>([]);
+
+const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   async function fetchNextItem() {
     if (isLoading) return;
@@ -67,7 +86,51 @@ export default function AssistantPage() {
       setIsLoading(false);
     }
   }
+async function analyzeItem() {
+  if (!item || isAnalyzing) return;
 
+  setIsAnalyzing(true);
+  setMessage("");
+  setSuggestions([]);
+
+  try {
+    const response = await fetch("/api/assistant/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        spotifyId: item.spotify_id,
+        artist: item.artist,
+        title: item.title,
+        themeId: item.theme_id,
+        themeName: item.theme_name,
+        concepts: [],
+      }),
+    });
+
+    const result = (await response.json()) as AnalyzeResponse;
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke analysere sangen.",
+      );
+      return;
+    }
+
+    setSuggestions(result.suggestions ?? []);
+
+    if (!result.suggestions?.length) {
+      setMessage(
+        "AI fant ingen sikre treff for dette temaet.",
+      );
+    }
+  } catch {
+    setMessage("Noe gikk galt under AI-analysen.");
+  } finally {
+    setIsAnalyzing(false);
+  }
+}
   return (
     <main
       style={{
@@ -148,8 +211,66 @@ export default function AssistantPage() {
           <p>
             <strong>Spotify-ID:</strong> {item.spotify_id}
           </p>
+          <button
+  type="button"
+  onClick={analyzeItem}
+  disabled={isAnalyzing}
+  style={{
+    marginTop: 18,
+    padding: "12px 18px",
+    border: 0,
+    borderRadius: 10,
+    background: isAnalyzing ? "#333" : "#2563eb",
+    color: "#fff",
+    cursor: isAnalyzing ? "default" : "pointer",
+    fontSize: 16,
+  }}
+>
+  {isAnalyzing
+    ? "Analyserer ..."
+    : "Analyser med AI"}
+</button>
         </section>
       )}
+      {suggestions.length > 0 && (
+  <section
+    style={{
+      marginTop: 28,
+      maxWidth: 800,
+    }}
+  >
+    <h2>AI-forslag</h2>
+
+    {suggestions.map((suggestion) => (
+      <article
+        key={`${suggestion.concept_id}-${suggestion.matched_text}`}
+        style={{
+          marginTop: 12,
+          padding: 18,
+          border: "1px solid #555",
+          borderRadius: 12,
+        }}
+      >
+        <strong>{suggestion.display_name}</strong>
+
+        <p>
+          Synges: <strong>{suggestion.matched_text}</strong>
+        </p>
+
+        <p>Concept-ID: {suggestion.concept_id}</p>
+
+        <p>
+          Sikkerhet:{" "}
+          {Math.round(suggestion.confidence * 100)} %
+        </p>
+
+        <p style={{ opacity: 0.75 }}>
+          {suggestion.explanation}
+        </p>
+      </article>
+    ))}
+  </section>
+)}
     </main>
   );
 }
