@@ -14,7 +14,11 @@ export async function getLyrics(
 ): Promise<LyricsResult> {
   void request;
 
-  throw new Error(
-    "Ingen lyrics-leverandør er konfigurert ennå.",
-  );
+  return {
+    provider: "mock",
+    lyrics: `
+You and me baby ain't nothing but mammals
+So let's do it like they do on the Discovery Channel
+    `.trim(),
+  };
 }
