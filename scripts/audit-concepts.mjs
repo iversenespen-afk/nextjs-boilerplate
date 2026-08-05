@@ -30,6 +30,12 @@ function normalize(value) {
     .replace(/[^a-z0-9]+/g, "");
 }
 
+function normalizeLabel(value) {
+  return String(value ?? "")
+    .trim()
+    .toLocaleLowerCase("nb-NO");
+}
+
 function singularizeSimple(value) {
   if (value.endsWith("ies")) {
     return `${value.slice(0, -3)}y`;
@@ -92,6 +98,16 @@ const sameLabelShouldBeReviewedFor = new Set([
   "color",
   "tree",
   "vehicle",
+  "instrument",
+]);
+
+// Concepts where the Norwegian and English labels are intentionally identical.
+
+const identicalTranslations = new Set([
+  "finger",
+  "helium",
+  "hickory",
+  "titanium",
 ]);
 
 for (const concept of concepts ?? []) {
@@ -109,9 +125,11 @@ if (
 if (
   concept.is_proper_noun === false &&
   sameLabelShouldBeReviewedFor.has(concept.concept_class) &&
+  !identicalTranslations.has(concept.id) &&
   concept.label_no?.trim() &&
   concept.label_en?.trim() &&
-  normalize(concept.label_no) === normalize(concept.label_en)
+  normalizeLabel(concept.label_no) ===
+  normalizeLabel(concept.label_en)
 ) {
   commonNounsSameLanguage.push(concept.id);
 }
