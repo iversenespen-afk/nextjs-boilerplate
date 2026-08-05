@@ -174,49 +174,61 @@ Regler:
     },
   );
 
-  const result = await openAiResponse.json();
-  return NextResponse.json(result);
-  /*
-  console.log(
-  "OpenAI response:",
-  JSON.stringify(result, null, 2),
+ const result = await openAiResponse.json();
+
+if (!openAiResponse.ok) {
+  console.error("OpenAI error:", result);
+
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        result?.error?.message ??
+        "OpenAI-kallet feilet.",
+    },
+    { status: openAiResponse.status },
+  );
+}
+
+const message = result.output?.find(
+  (item: { type?: string }) => item.type === "message",
 );
 
-  if (!openAiResponse.ok) {
-    console.error("OpenAI error:", result);
+const outputContent = message?.content?.find(
+  (item: { type?: string }) => item.type === "output_text",
+);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          result?.error?.message ??
-          "OpenAI-kallet feilet.",
-      },
-      { status: openAiResponse.status },
-    );
-  }
+const outputText = outputContent?.text;
 
-  const outputText = result.output_text;
+if (!outputText) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "OpenAI returnerte ikke noe strukturert svar.",
+    },
+    { status: 502 },
+  );
+}
 
-  return NextResponse.json(result);
+try {
+  const parsed = JSON.parse(outputText);
 
-  try {
-    const parsed = JSON.parse(outputText);
+  return NextResponse.json({
+    success: true,
+    suggestions: parsed.suggestions ?? [],
+  });
+} catch {
+  console.error(
+    "Kunne ikke lese OpenAI-svaret:",
+    outputText,
+  );
 
-    return NextResponse.json({
-      success: true,
-      suggestions: parsed.suggestions ?? [],
-    });
-  } catch {
-    console.error("Kunne ikke lese OpenAI-svaret:", outputText);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Kunne ikke tolke svaret fra OpenAI.",
-      },
-      { status: 502 },
-    );
-  }
-  */
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Kunne ikke tolke svaret fra OpenAI.",
+    },
+    { status: 502 },
+  );
+}
 }
