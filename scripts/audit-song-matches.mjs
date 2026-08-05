@@ -83,7 +83,8 @@ const missingMatchedText = [];
 const invalidSongReferences = [];
 const invalidThemeReferences = [];
 const invalidConceptReferences = [];
-
+const duplicateKeys = new Set();
+const duplicateMatches = [];
 for (const match of matches ?? []) {
   if (!match.song_id) {
     missingSong.push(match.id);
@@ -114,12 +115,25 @@ for (const match of matches ?? []) {
     invalidThemeReferences.push(match.id);
   }
   
-  if (
-    match.concept_id &&
-    !conceptIds.has(match.concept_id)
-  ) {
-    invalidConceptReferences.push(match.id);
-  }
+ if (
+  match.concept_id &&
+  !conceptIds.has(match.concept_id)
+) {
+  invalidConceptReferences.push(match.id);
+}
+
+const key = [
+  match.song_id,
+  match.theme_id,
+  match.concept_id,
+  match.matched_text?.trim().toLowerCase(),
+].join("|");
+
+if (duplicateKeys.has(key)) {
+  duplicateMatches.push(match.id);
+} else {
+  duplicateKeys.add(key);
+}
 }
 console.log("\nMangler song_id:");
 console.log(
@@ -166,6 +180,12 @@ console.log("\nUgyldig concept_id-referanse:");
 console.log(
   invalidConceptReferences.length
     ? invalidConceptReferences.join("\n")
+    : "Ingen",
+);
+console.log("\nDuplikate song_matches:");
+console.log(
+  duplicateMatches.length
+    ? duplicateMatches.join("\n")
     : "Ingen",
 );
 console.log("\nAudit ferdig.\n");
