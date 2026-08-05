@@ -1,4 +1,4 @@
-name: Audit concepts
+name: Audit database
 
 on:
   workflow_dispatch:
@@ -20,8 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run concept audit
-        run: npm run audit-concepts
+- name: Run database audit
+  run: npm run audit
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
