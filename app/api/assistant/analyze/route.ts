@@ -116,7 +116,7 @@ Regler:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-5.6-mini",
+        model: "gpt-5-mini",
         input: prompt,
         text: {
           format: {
