@@ -9,6 +9,7 @@
     "lint": "eslint",
     "audit-concepts": "node scripts/audit-concepts.mjs",
     "audit-song-matches": "node scripts/audit-song-matches.mjs",
+    "audit-review-queue": "node scripts/audit-review-queue.mjs",
     "audit": "node scripts/audit-all.mjs"
   },
 "dependencies": {
