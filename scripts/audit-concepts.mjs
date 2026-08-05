@@ -87,6 +87,13 @@ const commonNounsSameLanguage = [];
 const unused = [];
 const duplicateGroups = new Map();
 
+const sameLabelShouldBeReviewedFor = new Set([
+  "body_part",
+  "color",
+  "tree",
+  "vehicle",
+]);
+
 for (const concept of concepts ?? []) {
   if (!concept.concept_class?.trim()) {
   missingConceptClass.push(concept.id);
@@ -101,6 +108,7 @@ if (
 
 if (
   concept.is_proper_noun === false &&
+  sameLabelShouldBeReviewedFor.has(concept.concept_class) &&
   concept.label_no?.trim() &&
   concept.label_en?.trim() &&
   normalize(concept.label_no) === normalize(concept.label_en)
@@ -182,7 +190,7 @@ console.log(
 );
 
 console.log(
-  "\nVanlige begreper der label_no og label_en er like:",
+  "\nBegreper med mulig manglende oversettelse:",
 );
 console.log(
   commonNounsSameLanguage.length
