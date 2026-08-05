@@ -175,6 +175,8 @@ Regler:
   );
 
   const result = await openAiResponse.json();
+  return NextResponse.json(result);
+  /*
   console.log(
   "OpenAI response:",
   JSON.stringify(result, null, 2),
@@ -216,4 +218,5 @@ Regler:
       { status: 502 },
     );
   }
+  */
 }
