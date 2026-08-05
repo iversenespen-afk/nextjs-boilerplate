@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "audit-concepts": "node scripts/audit-concepts.mjs"
+    "audit-concepts": "node scripts/audit-concepts.mjs",
+    "audit": "node scripts/audit-all.mjs"
   },
 "dependencies": {
   "@supabase/supabase-js": "^2.57.0",
