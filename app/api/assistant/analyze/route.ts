@@ -1,8 +1,10 @@
+import { getLyrics } from "@/lib/lyrics-provider";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 type AnalyzeRequest = {
+  spotifyId?: string;
   artist?: string;
   title?: string;
   themeId?: string;
@@ -47,29 +49,24 @@ export async function POST(request: Request) {
   const title = body.title?.trim();
   const themeId = body.themeId?.trim();
   const themeName = body.themeName?.trim();
-  const lyrics = body.lyrics?.trim();
-
   if (!artist || !title || !themeId || !themeName) {
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "artist, title, themeId og themeName må være med.",
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "artist, title, themeId og themeName må være med.",
       },
       { status: 400 },
     );
   }
 
-  if (!lyrics) {
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Ingen sangtekst ble sendt inn. Assistenten trenger lyrics for å finne faktiske treff.",
-      },
-      { status: 400 },
-    );
-  }
+  const lyricsResult = await getLyrics({
+    spotifyId: body.spotifyId ?? "",
+    artist,
+    title,
+  });
+
+  const lyrics = lyricsResult.lyrics;
 
   const existingConcepts = (body.concepts ?? [])
     .slice(0, 500)
