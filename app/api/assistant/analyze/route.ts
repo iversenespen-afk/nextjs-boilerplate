@@ -175,6 +175,10 @@ Regler:
   );
 
   const result = await openAiResponse.json();
+  console.log(
+  "OpenAI response:",
+  JSON.stringify(result, null, 2),
+);
 
   if (!openAiResponse.ok) {
     console.error("OpenAI error:", result);
@@ -192,15 +196,7 @@ Regler:
 
   const outputText = result.output_text;
 
-  if (!outputText) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "OpenAI returnerte ikke noe strukturert svar.",
-      },
-      { status: 502 },
-    );
-  }
+  return NextResponse.json(result);
 
   try {
     const parsed = JSON.parse(outputText);
