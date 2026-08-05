@@ -1,8 +1,18 @@
 import { spawnSync } from "node:child_process";
 
 const audits = [
-  { name: "Concepts", command: "scripts/audit-concepts.mjs" },
-  { name: "Song matches", command: "scripts/audit-song-matches.mjs" },
+  {
+    name: "Concepts",
+    command: "scripts/audit-concepts.mjs",
+  },
+  {
+    name: "Song matches",
+    command: "scripts/audit-song-matches.mjs",
+  },
+  {
+    name: "Review queue",
+    command: "scripts/audit-review-queue.mjs",
+  },
 ];
 
 let failed = 0;
@@ -12,6 +22,7 @@ console.log("======================");
 
 for (const audit of audits) {
   console.log(`\n▶ ${audit.name}`);
+  console.log("-".repeat(audit.name.length + 2));
 
   const result = spawnSync(
     process.execPath,
@@ -25,10 +36,9 @@ for (const audit of audits) {
   if (result.status !== 0) {
     failed++;
     console.log(`✗ ${audit.name} feilet.`);
-  } else {
-    console.log(`\n▶ ${audit.name}`);
-    console.log("-".repeat(audit.name.length + 2));
-  }
+} else {
+    console.log(`✓ ${audit.name} OK`);
+}
 }
 
 console.log("\n======================");
