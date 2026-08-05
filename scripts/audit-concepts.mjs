@@ -48,7 +48,13 @@ function singularizeSimple(value) {
 const { data: concepts, error: conceptsError } =
   await supabase
     .from("concepts")
-    .select("id, label_no, label_en")
+   .select(`
+  id,
+  label_no,
+  label_en,
+  is_proper_noun,
+  concept_class
+`)
     .order("id");
 
 if (conceptsError) {
@@ -75,10 +81,32 @@ for (const match of matches ?? []) {
 
 const missingNorwegian = [];
 const missingEnglish = [];
+const missingConceptClass = [];
+const properNounsMissingEnglish = [];
+const commonNounsSameLanguage = [];
 const unused = [];
 const duplicateGroups = new Map();
 
 for (const concept of concepts ?? []) {
+  if (!concept.concept_class?.trim()) {
+  missingConceptClass.push(concept.id);
+}
+
+if (
+  concept.is_proper_noun === true &&
+  !concept.label_en?.trim()
+) {
+  properNounsMissingEnglish.push(concept.id);
+}
+
+if (
+  concept.is_proper_noun === false &&
+  concept.label_no?.trim() &&
+  concept.label_en?.trim() &&
+  normalize(concept.label_no) === normalize(concept.label_en)
+) {
+  commonNounsSameLanguage.push(concept.id);
+}
   if (!concept.label_no?.trim()) {
     missingNorwegian.push(concept.id);
   }
@@ -139,6 +167,29 @@ console.log(
     : "Ingen",
 );
 
+console.log("\nMangler concept_class:");
+console.log(
+  missingConceptClass.length
+    ? missingConceptClass.join("\n")
+    : "Ingen",
+);
+
+console.log("\nEgennavn uten label_en:");
+console.log(
+  properNounsMissingEnglish.length
+    ? properNounsMissingEnglish.join("\n")
+    : "Ingen",
+);
+
+console.log(
+  "\nVanlige begreper der label_no og label_en er like:",
+);
+console.log(
+  commonNounsSameLanguage.length
+    ? commonNounsSameLanguage.join("\n")
+    : "Ingen",
+);
+
 console.log("\nMulige duplikater:");
 
 if (!possibleDuplicates.length) {
@@ -155,5 +206,22 @@ console.log(
     ? unused.join("\n")
     : "Ingen",
 );
+
+const issueCount =
+  missingNorwegian.length +
+  missingEnglish.length +
+  missingConceptClass.length +
+  properNounsMissingEnglish.length +
+  possibleDuplicates.length;
+
+const healthScore = Math.max(
+  0,
+  Math.round(
+    100 -
+      (issueCount / Math.max(concepts?.length ?? 1, 1)) * 100,
+  ),
+);
+
+console.log(`\nConcept health score: ${healthScore}/100`);
 
 console.log("\nAudit ferdig.\n");
