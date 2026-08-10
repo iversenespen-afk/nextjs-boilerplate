@@ -12,12 +12,28 @@ export type LyricsResult = {
 export async function getLyrics(
   request: LyricsRequest,
 ): Promise<LyricsResult> {
-  void request;
+  const mockLyricsBySpotifyId: Record<string, string> = {
+    // Bloodhound Gang – The Bad Touch
+    "5EYdTPdJD74r9EVZBztqGG": `
+I was listening to Tool on the radio last night.
+    `.trim(),
+
+    // D.D.E. – Vinsjan på kaia
+    "3XaBeTulQEhTcELhfNch7Q": `
+I heard Dr. Dre, Eminem, Tommy Lee and Tom Green on the radio.
+    `.trim(),
+  };
+
+  const lyrics = mockLyricsBySpotifyId[request.spotifyId];
+
+  if (!lyrics) {
+    throw new Error(
+      `Ingen mock-lyrics finnes for Spotify-ID ${request.spotifyId}.`,
+    );
+  }
 
   return {
-  provider: "mock",
-  lyrics: `
-I was listening to Tool on the radio last night.
-  `.trim(),
-};
+    provider: "mock",
+    lyrics,
+  };
 }
