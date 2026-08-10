@@ -20,7 +20,7 @@ I was listening to Tool on the radio last night.
 
    // D.D.E. – Vinsjan på kaia
 "3XaBeTuIQEhTcELhfNch7Q": `
-She kissed the prince and became a queen.
+I listened to Prince, Queen and KISS all night.
 `.trim(),
   };
 
