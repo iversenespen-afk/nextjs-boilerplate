@@ -172,6 +172,11 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     }
 
     setMessage(result.message ?? "Forslaget er godkjent.");
+
+    setSuggestions([]);
+    setItem(null);
+
+    await fetchNextItem();
   } catch {
     setMessage("Noe gikk galt under godkjenning.");
   }
