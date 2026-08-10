@@ -18,9 +18,9 @@ export async function getLyrics(
 I was listening to Tool on the radio last night.
     `.trim(),
 
-    // D.D.E. – Vinsjan på kaia
+   // D.D.E. – Vinsjan på kaia
 "3XaBeTuIQEhTcELhfNch7Q": `
-I was listening to Eminem, Tool and Beatles on the radio.
+I kissed her under the California sun while listening to Tool.
 `.trim(),
   };
 
