@@ -15,10 +15,9 @@ export async function getLyrics(
   void request;
 
   return {
-    provider: "mock",
-    lyrics: `
-You and me baby ain't nothing but mammals
-So let's do it like they do on the Discovery Channel
-    `.trim(),
-  };
+  provider: "mock",
+  lyrics: `
+I was listening to Prince on the radio last night.
+  `.trim(),
+};
 }
