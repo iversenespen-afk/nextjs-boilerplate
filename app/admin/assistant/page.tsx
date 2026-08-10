@@ -176,6 +176,34 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     setMessage("Noe gikk galt under godkjenning.");
   }
 }
+  async function rejectSuggestion() {
+  if (!item) return;
+
+  try {
+    const response = await fetch("/api/assistant/reject", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        queueId: item.id,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke avvise forslaget.",
+      );
+      return;
+    }
+
+    setMessage(result.message ?? "Forslaget er avvist.");
+  } catch {
+    setMessage("Noe gikk galt under avvisning.");
+  }
+}
   return (
     <main
       style={{
@@ -336,6 +364,7 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
 
   <button
     type="button"
+    onClick={rejectSuggestion}
     style={{
       padding: "10px 16px",
       border: "1px solid #666",
