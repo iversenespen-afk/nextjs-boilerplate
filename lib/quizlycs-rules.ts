@@ -37,13 +37,16 @@ QUIZLYCS-REGLER
 - En sang kan ha flere gyldige treff for samme tema.
 - Returner alle sikre treff, ikke bare det første.
 
-8. PRESISJON FREMFOR RECALL
-- Ved tvil: ikke foreslå treffet.
-- Tom suggestions-liste er et gyldig og ønskelig resultat.
-- False negatives er bedre enn spekulative false positives.
+8. PRESISJON OG REVIEW
+- Vær konservativ, men returner også plausible treff som kan være interessante for menneskelig review.
+- Ikke skjul et plausibelt treff bare fordi det er usikkert.
+- Spekulative treff uten reell støtte i sangteksten skal fortsatt utelates.
+- Tom suggestions-liste er et gyldig resultat når ingen plausible treff finnes.
 
 9. CONFIDENCE
-- 0.95-1.00: tydelig og eksplisitt treff.
-- 0.70-0.94: mulig treff som krever menneskelig vurdering.
-- Under 0.70: skal normalt ikke foreslås.
+- 0.90-1.00: svært sikkert treff.
+- 0.70-0.89: sannsynlig treff som bør vurderes av menneske.
+- 0.50-0.69: usikkert, men plausibelt treff som kan være interessant i review.
+- Under 0.50: skal normalt ikke foreslås.
+- Confidence skal uttrykke hvor sikker analysen er, ikke brukes til å skjule plausible treff.
 `;
