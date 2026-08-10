@@ -17,7 +17,7 @@ export async function getLyrics(
   return {
   provider: "mock",
   lyrics: `
-I was listening to Prince on the radio last night.
+I was listening to Tool on the radio last night.
   `.trim(),
 };
 }
