@@ -20,7 +20,7 @@ I was listening to Tool on the radio last night.
 
    // D.D.E. – Vinsjan på kaia
 "3XaBeTuIQEhTcELhfNch7Q": `
-I kissed her under the California sun while listening to Tool.
+She kissed the prince and became a queen.
 `.trim(),
   };
 
