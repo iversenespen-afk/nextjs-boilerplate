@@ -1,5 +1,6 @@
 import { getLyrics } from "@/lib/lyrics-provider";
 import { NextResponse } from "next/server";
+import { QUIZLYCS_ASSISTANT_RULES } from "@/lib/quizlycs-rules";
 
 export const runtime = "nodejs";
 
@@ -96,19 +97,9 @@ ${lyrics}
 Eksisterende concepts:
 ${JSON.stringify(existingConcepts)}
 
-Regler:
-- Du skal KUN foreslå concepts fra listen "Eksisterende concepts" ovenfor.
-- Du har IKKE lov til å opprette, finne på eller foreslå nye concept_id-er.
-- concept_id må være nøyaktig lik en id som finnes i "Eksisterende concepts".
-- Et forslag er bare gyldig dersom matched_text faktisk forekommer i sangteksten.
-- matched_text skal være nøyaktig slik teksten står i sangen.
-- Treffet må passe til det oppgitte temaet.
-- Ikke gjett ut fra artistnavn, sangtittel eller generell kunnskap om sangen.
-- Ikke tolk vanlige ord som navn på artister, band, steder eller andre egennavn bare fordi et slikt navn eksisterer.
-- For egennavn må sangteksten faktisk referere til den aktuelle personen, artisten, gruppen eller stedet.
-- Vær konservativ. Ved tvil skal du IKKE foreslå treffet.
-- Hvis ingen eksisterende concepts gir et sikkert treff, returner suggestions som en tom liste.
-- Returner maksimalt 10 forslag.
+${QUIZLYCS_ASSISTANT_RULES}
+
+Returner maksimalt 10 forslag.
 `;
 
   const openAiResponse = await fetch(
