@@ -49,8 +49,132 @@ export async function POST(request: Request) {
     );
   }
 
+  // 1. Finn intern song_id fra Spotify-ID
+  const { data: song, error: songError } = await supabaseAdmin
+    .from("songs")
+    .select("id")
+    .eq("spotify_id", spotifyId.trim())
+    .maybeSingle();
+
+  if (songError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: songError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  if (!song) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Fant ikke sangen i songs-tabellen.",
+      },
+      { status: 404 },
+    );
+  }
+
+  // 2. Kontroller at concept faktisk finnes
+  const { data: concept, error: conceptError } = await supabaseAdmin
+    .from("concepts")
+    .select("id")
+    .eq("id", conceptId.trim())
+    .maybeSingle();
+
+  if (conceptError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: conceptError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  if (!concept) {
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          `Concept "${conceptId}" finnes ikke ennå. ` +
+          "Nye concepts må opprettes før de kan godkjennes.",
+      },
+      { status: 409 },
+    );
+  }
+
+  // 3. Sjekk om samme match allerede finnes
+  const { data: existingMatch, error: existingMatchError } =
+    await supabaseAdmin
+      .from("song_matches")
+      .select("id")
+      .eq("song_id", song.id)
+      .eq("theme_id", themeId.trim())
+      .eq("concept_id", conceptId.trim())
+      .eq("matched_text", matchedText.trim())
+      .maybeSingle();
+
+  if (existingMatchError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: existingMatchError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  // 4. Opprett song_match hvis den ikke finnes
+  if (!existingMatch) {
+    const { error: insertError } = await supabaseAdmin
+      .from("song_matches")
+      .insert({
+        song_id: song.id,
+        theme_id: themeId.trim(),
+        concept_id: conceptId.trim(),
+        matched_text: matchedText.trim(),
+        verified: true,
+      });
+
+    if (insertError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: insertError.message,
+        },
+        { status: 500 },
+      );
+    }
+  }
+
+  // 5. Marker review-raden som godkjent
+  const { error: queueError } = await supabaseAdmin
+    .from("match_review_queue")
+    .update({
+      concept_id: conceptId.trim(),
+      matched_text: matchedText.trim(),
+      verified: true,
+      review_status: "approved",
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", queueId);
+
+  if (queueError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: queueError.message,
+      },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({
     success: true,
-    message: "Godkjenn-routen fungerer.",
+    message: existingMatch
+      ? "Treffet fantes allerede. Review-raden er godkjent."
+      : "Forslaget er godkjent og lagret.",
   });
 }
