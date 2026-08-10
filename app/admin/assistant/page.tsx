@@ -278,6 +278,41 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
         <p style={{ opacity: 0.75 }}>
           {suggestion.explanation}
         </p>
+        <div
+  style={{
+    display: "flex",
+    gap: 12,
+    marginTop: 16,
+  }}
+>
+  <button
+    type="button"
+    style={{
+      padding: "10px 16px",
+      border: 0,
+      borderRadius: 8,
+      background: "#16803a",
+      color: "#fff",
+      cursor: "pointer",
+    }}
+  >
+    Godkjenn
+  </button>
+
+  <button
+    type="button"
+    style={{
+      padding: "10px 16px",
+      border: "1px solid #666",
+      borderRadius: 8,
+      background: "transparent",
+      color: "#fff",
+      cursor: "pointer",
+    }}
+  >
+    Avvis
+  </button>
+</div>
       </article>
     ))}
   </section>
