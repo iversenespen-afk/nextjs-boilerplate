@@ -142,6 +142,40 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     setIsAnalyzing(false);
   }
 }
+  async function approveSuggestion(
+  suggestion: AssistantSuggestion,
+) {
+  if (!item) return;
+
+  try {
+    const response = await fetch("/api/assistant/approve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        queueId: item.id,
+        spotifyId: item.spotify_id,
+        themeId: item.theme_id,
+        conceptId: suggestion.concept_id,
+        matchedText: suggestion.matched_text,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke godkjenne forslaget.",
+      );
+      return;
+    }
+
+    setMessage(result.message ?? "Forslaget er godkjent.");
+  } catch {
+    setMessage("Noe gikk galt under godkjenning.");
+  }
+}
   return (
     <main
       style={{
@@ -287,6 +321,7 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
 >
   <button
     type="button"
+    onClick={() => approveSuggestion(suggestion)}
     style={{
       padding: "10px 16px",
       border: 0,
