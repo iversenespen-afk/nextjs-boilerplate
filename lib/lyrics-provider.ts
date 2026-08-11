@@ -20,7 +20,7 @@ I was listening to Tool on the radio last night.
 
    // D.D.E. – Vinsjan på kaia
 "3XaBeTuIQEhTcELhfNch7Q": `
-I listened to KISS all night.
+I kissed her under the California sun while listening to Tool.
 `.trim(),
   };
 
