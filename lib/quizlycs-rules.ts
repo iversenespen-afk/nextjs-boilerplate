@@ -6,10 +6,15 @@ QUIZLYCS-REGLER
 - matched_text skal gjengi den relevante teksten nøyaktig.
 - Sangtittel og artistnavn er ikke lyric-evidence.
 
-2. EKSISTERENDE CONCEPTS
-- Bruk kun concept_id-er som finnes i listen over eksisterende concepts.
-- Ikke opprett eller finn på nye concept_id-er.
-- Bruk canonical concept_id nøyaktig slik den er oppgitt.
+2. EKSISTERENDE OG NYE CONCEPTS
+- Sjekk alltid eksisterende concepts først.
+- Hvis et eksisterende concept representerer treffet, SKAL dette brukes.
+- Ikke foreslå et nytt concept dersom et passende eksisterende concept finnes.
+- Hvis sangteksten inneholder et tydelig og relevant treff som ikke finnes blant eksisterende concepts, kan du foreslå et NYTT concept.
+- Nye concepts skal markeres med existing_concept = false.
+- Eksisterende concepts skal markeres med existing_concept = true.
+- For nye concepts skal concept_id være et kort canonical id i små bokstaver med underscore, for eksempel dr_dre eller tommy_lee.
+- Et nytt concept er kun et forslag. Det skal aldri behandles som allerede godkjent eller eksisterende.
 
 3. TEMA OG CONCEPT CLASS
 - Et concept må passe til temaet som analyseres.
