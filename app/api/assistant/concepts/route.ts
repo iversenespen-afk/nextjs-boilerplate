@@ -1,22 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
 
 export const dynamic = "force-dynamic";
-
-const classByTheme: Record<string, string[]> = {
-  artists: ["person", "band"],
-  artister: ["person", "band"],
-  body_parts: ["body_part"],
-  kroppsdeler: ["body_part"],
-  colors: ["color"],
-  farger: ["color"],
-  trees: ["tree"],
-  treslag: ["tree"],
-  instruments: ["instrument"],
-  instrumenter: ["instrument"],
-  planets: ["planet", "fictional_planet"],
-  planeter: ["planet", "fictional_planet"],
-};
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -32,7 +18,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const conceptClasses = classByTheme[themeId] ?? [];
+  const conceptClasses = THEME_CONCEPT_CLASSES[themeId] ?? [];
 
   let query = supabaseAdmin
     .from("concepts")
