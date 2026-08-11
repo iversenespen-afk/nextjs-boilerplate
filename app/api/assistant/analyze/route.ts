@@ -18,7 +18,22 @@ type AnalyzeRequest = {
     concept_class?: string | null;
   }>;
 };
+function containsExactText(
+  lyrics: string,
+  matchedText: string,
+): boolean {
+  const escaped = matchedText.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
 
+  const pattern = new RegExp(
+    `(^|[^\\p{L}\\p{N}])${escaped}([^\\p{L}\\p{N}]|$)`,
+    "iu",
+  );
+
+  return pattern.test(lyrics);
+}
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
@@ -212,8 +227,6 @@ const validConceptIds = new Set(
   existingConcepts.map((concept) => concept.id),
 );
 
-const lyricsLower = lyrics.toLowerCase();
-
 const validatedSuggestions = (
   parsed.suggestions ?? []
 ).filter(
@@ -234,7 +247,7 @@ const validatedSuggestions = (
       return false;
     }
 
-    if (!lyricsLower.includes(matchedText.toLowerCase())) {
+    if (!containsExactText(lyrics, matchedText)) {
       return false;
     }
 
