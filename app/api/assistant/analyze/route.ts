@@ -282,15 +282,6 @@ if (isExistingConcept) {
   }
 }
 
-if (
-  allowedConceptClasses.length > 0 &&
-  !allowedConceptClasses.includes(
-    concept.concept_class ?? "",
-  )
-) {
-  return false;
-}
-
     if (!containsExactText(lyrics, matchedText)) {
       return false;
     }
