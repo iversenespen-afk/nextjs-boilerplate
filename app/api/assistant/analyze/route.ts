@@ -162,6 +162,9 @@ Returner maksimalt 10 forslag.
                       existing_concept: {
                         type: "boolean",
                       },
+                      concept_class: {
+                        type: "string",
+                      },
                       explanation: {
                         type: "string",
                       },
@@ -172,6 +175,7 @@ Returner maksimalt 10 forslag.
                       "display_name",
                       "confidence",
                       "existing_concept",
+                      "concept_class",
                       "explanation",
                     ],
                   },
@@ -245,6 +249,7 @@ const validatedSuggestions = (
   matched_text?: string;
   confidence?: number;
   existing_concept?: boolean;
+  concept_class?: string;  
 }) => {
     const conceptId = suggestion.concept_id?.trim();
     const matchedText = suggestion.matched_text?.trim();
