@@ -334,6 +334,22 @@ await fetchNextItem();
         }}
       >
         <strong>{suggestion.display_name}</strong>
+        <div
+  style={{
+    marginTop: 8,
+    marginBottom: 12,
+    display: "inline-block",
+    padding: "4px 8px",
+    borderRadius: 999,
+    border: "1px solid #666",
+    fontSize: 12,
+    fontWeight: 700,
+  }}
+>
+  {suggestion.existing_concept
+    ? "EKSISTERENDE"
+    : "NYTT CONCEPT"}
+</div>
 
         <p>
           Synges: <strong>{suggestion.matched_text}</strong>
@@ -358,7 +374,15 @@ await fetchNextItem();
 >
   <button
     type="button"
-    onClick={() => approveSuggestion(suggestion)}
+    onClick={() => {
+  if (suggestion.existing_concept) {
+    approveSuggestion(suggestion);
+  } else {
+    setMessage(
+      "Oppretting av nye concepts er ikke koblet til backend ennå.",
+    );
+  }
+}}
     style={{
       padding: "10px 16px",
       border: 0,
@@ -368,7 +392,9 @@ await fetchNextItem();
       cursor: "pointer",
     }}
   >
-    Godkjenn
+    {suggestion.existing_concept
+  ? "Godkjenn"
+  : "Opprett og godkjenn"}
   </button>
 
   <button
