@@ -193,9 +193,13 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          queueId: item?.id,
+          spotifyId: item?.spotify_id,
+          themeId: item?.theme_id,
           conceptId: suggestion.concept_id,
           displayName: suggestion.display_name,
           conceptClass: suggestion.concept_class,
+          matchedText: suggestion.matched_text,
         }),
       },
     );
