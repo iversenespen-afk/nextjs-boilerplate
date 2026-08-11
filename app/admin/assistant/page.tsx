@@ -173,10 +173,18 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
 
     setMessage(result.message ?? "Forslaget er godkjent.");
 
-    setSuggestions([]);
-    setItem(null);
+const remainingSuggestions = suggestions.filter(
+  (currentSuggestion) =>
+    currentSuggestion.concept_id !== suggestion.concept_id,
+);
 
-    await fetchNextItem();
+if (remainingSuggestions.length > 0) {
+  setSuggestions(remainingSuggestions);
+} else {
+  setSuggestions([]);
+  setItem(null);
+  await fetchNextItem();
+}
   } catch {
     setMessage("Noe gikk galt under godkjenning.");
   }
@@ -214,17 +222,28 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     }
 
     setMessage(
-      result.message ?? "Nytt concept er opprettet.",
-    );
-    setSuggestions([]);
-    setItem(null);
+  result.message ?? "Nytt concept er opprettet.",
+);
 
-    await fetchNextItem();
+const remainingSuggestions = suggestions.filter(
+  (currentSuggestion) =>
+    currentSuggestion.concept_id !== suggestion.concept_id,
+);
+
+if (remainingSuggestions.length > 0) {
+  setSuggestions(remainingSuggestions);
+} else {
+  setSuggestions([]);
+  setItem(null);
+  await fetchNextItem();
+}
   } catch {
     setMessage("Noe gikk galt under oppretting av concept.");
   }
 }
-  async function rejectSuggestion() {
+  async function rejectSuggestion(
+  suggestion: AssistantSuggestion,
+) {
   if (!item) return;
 
   try {
@@ -249,10 +268,18 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
 
     setMessage(result.message ?? "Forslaget er avvist.");
 
-setSuggestions([]);
-setItem(null);
+const remainingSuggestions = suggestions.filter(
+  (currentSuggestion) =>
+    currentSuggestion.concept_id !== suggestion.concept_id,
+);
 
-await fetchNextItem();
+if (remainingSuggestions.length > 0) {
+  setSuggestions(remainingSuggestions);
+} else {
+  setSuggestions([]);
+  setItem(null);
+  await fetchNextItem();
+}
   } catch {
     setMessage("Noe gikk galt under avvisning.");
   }
@@ -441,7 +468,7 @@ await fetchNextItem();
 
   <button
     type="button"
-    onClick={rejectSuggestion}
+    onClick={() => rejectSuggestion(suggestion)}
     style={{
       padding: "10px 16px",
       border: "1px solid #666",
