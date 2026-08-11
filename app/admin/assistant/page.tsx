@@ -29,6 +29,7 @@ type AssistantSuggestion = {
   display_name: string;
   confidence: number;
   existing_concept: boolean;
+  concept_class: string;
   explanation: string;
 };
 
