@@ -241,9 +241,11 @@ const validatedSuggestions = (
   parsed.suggestions ?? []
 ).filter(
   (suggestion: {
-    concept_id?: string;
-    matched_text?: string;
-    confidence?: number;
+  concept_id?: string;
+  matched_text?: string;
+  confidence?: number;
+  existing_concept?: boolean;
+}) => {
   }) => {
     const conceptId = suggestion.concept_id?.trim();
     const matchedText = suggestion.matched_text?.trim();
