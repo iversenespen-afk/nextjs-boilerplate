@@ -56,7 +56,7 @@ async function getWebLyricsEvidence(
         tools: [
           {
             type: "web_search",
-            search_context_size: "low",
+            search_context_size: "medium",
           },
         ],
         tool_choice: "required",
@@ -71,16 +71,20 @@ The purpose is a music quiz.
 Do NOT reproduce the full lyrics.
 Do NOT return long lyric passages.
 
-Return only a compact evidence block containing short individual words,
-names or very short phrases that reliable web results indicate actually
-occur in the song lyrics.
+Find ALL distinct candidate words, names, places, objects, and very short phrases
+that reliable web results indicate actually occur in the song lyrics.
 
 Important:
+- Do not stop after finding one strong candidate.
+- Search broadly enough to identify multiple distinct candidates when they exist.
+- Return every supported candidate you find.
 - Do not guess from the song title.
 - Do not guess from the artist name.
-- Prefer evidence supported by actual lyric/search sources.
-- Keep the total response short.
+- Do not infer words that are not actually supported by lyric/search evidence.
+- Prefer direct lyric evidence over summaries or commentary.
+- Keep each candidate short.
 - One candidate per line.
+- Keep the total response compact.
         `.trim(),
       }),
     },
