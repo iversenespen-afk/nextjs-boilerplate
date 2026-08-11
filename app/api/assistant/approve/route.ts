@@ -113,7 +113,6 @@ export async function POST(request: Request) {
       .eq("song_id", song.id)
       .eq("theme_id", themeId.trim())
       .eq("concept_id", conceptId.trim())
-      .eq("matched_text", matchedText.trim())
       .maybeSingle();
 
   if (existingMatchError) {
