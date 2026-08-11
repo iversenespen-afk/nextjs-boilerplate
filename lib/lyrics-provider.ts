@@ -19,8 +19,8 @@ I was listening to Tool on the radio last night.
     `.trim(),
 
    // D.D.E. – Vinsjan på kaia
-"3XaBeTuIQEhTcELhfNch7Q": `
-I kissed her under the California sun while listening to Tool.
+"5EYdTPdJD74r9EVZBztqGG": `
+I was listening to Prince on the radio last night.
 `.trim(),
   };
 
