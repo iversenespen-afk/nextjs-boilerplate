@@ -1,3 +1,4 @@
+import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
 import { getLyrics } from "@/lib/lyrics-provider";
 import { NextResponse } from "next/server";
 import { QUIZLYCS_ASSISTANT_RULES } from "@/lib/quizlycs-rules";
@@ -226,6 +227,15 @@ try {
 const validConceptIds = new Set(
   existingConcepts.map((concept) => concept.id),
 );
+  const conceptsById = new Map(
+  existingConcepts.map((concept) => [
+    concept.id,
+    concept,
+  ]),
+);
+
+const allowedConceptClasses =
+  THEME_CONCEPT_CLASSES[themeId] ?? [];
 
 const validatedSuggestions = (
   parsed.suggestions ?? []
@@ -246,6 +256,20 @@ const validatedSuggestions = (
     if (!validConceptIds.has(conceptId)) {
       return false;
     }
+    const concept = conceptsById.get(conceptId);
+
+if (!concept) {
+  return false;
+}
+
+if (
+  allowedConceptClasses.length > 0 &&
+  !allowedConceptClasses.includes(
+    concept.concept_class ?? "",
+  )
+) {
+  return false;
+}
 
     if (!containsExactText(lyrics, matchedText)) {
       return false;
