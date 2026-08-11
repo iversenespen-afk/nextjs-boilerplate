@@ -14,8 +14,8 @@ export async function getLyrics(
 ): Promise<LyricsResult> {
   const mockLyricsBySpotifyId: Record<string, string> = {
     // Bloodhound Gang – The Bad Touch
- "5EYdTPdJD74r9EVZBztqGG": `
-I was listening to Prince on the radio last night.
+ "3XaBeTuIQEhTcELhfNch7Q": `
+I listened to Dr. Dre all night.
 `.trim(),
 };
   const lyrics = mockLyricsBySpotifyId[request.spotifyId];
