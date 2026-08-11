@@ -15,7 +15,7 @@ export async function getLyrics(
   const mockLyricsBySpotifyId: Record<string, string> = {
     // Bloodhound Gang – The Bad Touch
  "3XaBeTuIQEhTcELhfNch7Q": `
-I listened to Tom Green all night.
+I listened to Tommy Lee all night.
 `.trim(),
 };
   const lyrics = mockLyricsBySpotifyId[request.spotifyId];
