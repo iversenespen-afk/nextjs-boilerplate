@@ -181,6 +181,41 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     setMessage("Noe gikk galt under godkjenning.");
   }
 }
+  async function createConcept(
+  suggestion: AssistantSuggestion,
+) {
+  try {
+    const response = await fetch(
+      "/api/assistant/create-concept",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          conceptId: suggestion.concept_id,
+          displayName: suggestion.display_name,
+          conceptClass: suggestion.concept_class,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke opprette concept.",
+      );
+      return;
+    }
+
+    setMessage(
+      result.message ?? "Nytt concept er opprettet.",
+    );
+  } catch {
+    setMessage("Noe gikk galt under oppretting av concept.");
+  }
+}
   async function rejectSuggestion() {
   if (!item) return;
 
@@ -379,9 +414,7 @@ await fetchNextItem();
   if (suggestion.existing_concept) {
     approveSuggestion(suggestion);
   } else {
-    setMessage(
-      "Oppretting av nye concepts er ikke koblet til backend ennå.",
-    );
+  createConcept(suggestion);
   }
 }}
     style={{
