@@ -52,7 +52,6 @@ const [isAnalyzing, setIsAnalyzing] = useState(false);
     if (isLoading) return;
 
     setIsLoading(true);
-    setMessage("");
 
     try {
       const response = await fetch("/api/assistant/next", {
