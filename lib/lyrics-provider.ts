@@ -17,7 +17,7 @@ export async function getLyrics(
  "5EYdTPdJD74r9EVZBztqGG": `
 I was listening to Prince on the radio last night.
 `.trim(),
-
+};
   const lyrics = mockLyricsBySpotifyId[request.spotifyId];
 
   if (!lyrics) {
