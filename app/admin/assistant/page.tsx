@@ -216,6 +216,10 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
     setMessage(
       result.message ?? "Nytt concept er opprettet.",
     );
+    setSuggestions([]);
+    setItem(null);
+
+    await fetchNextItem();
   } catch {
     setMessage("Noe gikk galt under oppretting av concept.");
   }
