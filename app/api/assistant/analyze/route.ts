@@ -246,7 +246,6 @@ const validatedSuggestions = (
   confidence?: number;
   existing_concept?: boolean;
 }) => {
-  }) => {
     const conceptId = suggestion.concept_id?.trim();
     const matchedText = suggestion.matched_text?.trim();
     const confidence = suggestion.confidence ?? 0;
