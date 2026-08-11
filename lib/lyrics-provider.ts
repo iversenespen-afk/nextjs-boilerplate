@@ -20,7 +20,7 @@ I was listening to Tool on the radio last night.
 
    // D.D.E. – Vinsjan på kaia
 "3XaBeTuIQEhTcELhfNch7Q": `
-I listened to Prince, Queen and KISS all night.
+I listened to Prince and KISS all night.
 `.trim(),
   };
 
