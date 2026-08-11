@@ -208,10 +208,48 @@ if (!outputText) {
 try {
   const parsed = JSON.parse(outputText);
 
-  return NextResponse.json({
-    success: true,
-    suggestions: parsed.suggestions ?? [],
-  });
+const validConceptIds = new Set(
+  existingConcepts.map((concept) => concept.id),
+);
+
+const lyricsLower = lyrics.toLowerCase();
+
+const validatedSuggestions = (
+  parsed.suggestions ?? []
+).filter(
+  (suggestion: {
+    concept_id?: string;
+    matched_text?: string;
+    confidence?: number;
+  }) => {
+    const conceptId = suggestion.concept_id?.trim();
+    const matchedText = suggestion.matched_text?.trim();
+    const confidence = suggestion.confidence ?? 0;
+
+    if (!conceptId || !matchedText) {
+      return false;
+    }
+
+    if (!validConceptIds.has(conceptId)) {
+      return false;
+    }
+
+    if (!lyricsLower.includes(matchedText.toLowerCase())) {
+      return false;
+    }
+
+    if (confidence < 0.5) {
+      return false;
+    }
+
+    return true;
+  },
+);
+
+return NextResponse.json({
+  success: true,
+  suggestions: validatedSuggestions,
+});
 } catch {
   console.error(
     "Kunne ikke lese OpenAI-svaret:",
