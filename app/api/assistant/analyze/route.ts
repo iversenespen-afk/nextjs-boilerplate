@@ -253,13 +253,32 @@ const validatedSuggestions = (
       return false;
     }
 
-    if (!validConceptIds.has(conceptId)) {
-      return false;
-    }
-    const concept = conceptsById.get(conceptId);
+    const isExistingConcept =
+  suggestion.existing_concept === true;
 
-if (!concept) {
-  return false;
+if (isExistingConcept) {
+  if (!validConceptIds.has(conceptId)) {
+    return false;
+  }
+
+  const concept = conceptsById.get(conceptId);
+
+  if (!concept) {
+    return false;
+  }
+
+  if (
+    allowedConceptClasses.length > 0 &&
+    !allowedConceptClasses.includes(
+      concept.concept_class ?? "",
+    )
+  ) {
+    return false;
+  }
+} else {
+  if (validConceptIds.has(conceptId)) {
+    return false;
+  }
 }
 
 if (
