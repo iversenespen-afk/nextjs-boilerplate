@@ -2,10 +2,12 @@ import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
 import { getLyrics } from "@/lib/lyrics-provider";
 import { NextResponse } from "next/server";
 import { QUIZLYCS_ASSISTANT_RULES } from "@/lib/quizlycs-rules";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const runtime = "nodejs";
 
 type AnalyzeRequest = {
+  queueId?: number;
   spotifyId?: string;
   artist?: string;
   title?: string;
@@ -62,16 +64,23 @@ export async function POST(request: Request) {
     );
   }
 
+  const queueId = body.queueId;
   const artist = body.artist?.trim();
   const title = body.title?.trim();
   const themeId = body.themeId?.trim();
   const themeName = body.themeName?.trim();
-  if (!artist || !title || !themeId || !themeName) {
+  if (
+  !queueId ||
+  !artist ||
+  !title ||
+  !themeId ||
+  !themeName
+) {
   return NextResponse.json(
     {
       success: false,
       message:
-        "artist, title, themeId og themeName må være med.",
+        "queueId, artist, title, themeId og themeName må være med.",
       },
       { status: 400 },
     );
@@ -249,7 +258,9 @@ const validatedSuggestions = (
   matched_text?: string;
   confidence?: number;
   existing_concept?: boolean;
-  concept_class?: string;  
+  concept_class?: string;
+  display_name?: string;
+  explanation?: string;
 }) => {
     const conceptId = suggestion.concept_id?.trim();
     const matchedText = suggestion.matched_text?.trim();
@@ -298,7 +309,48 @@ if (isExistingConcept) {
     return true;
   },
 );
+  const { error: deleteSuggestionsError } = await supabaseAdmin
+  .from("assistant_suggestions")
+  .delete()
+  .eq("queue_id", queueId)
+  .eq("status", "pending");
 
+if (deleteSuggestionsError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: deleteSuggestionsError.message,
+    },
+    { status: 500 },
+  );
+}
+if (validatedSuggestions.length > 0) {
+  const suggestionRows = validatedSuggestions.map((suggestion) => ({
+    queue_id: queueId,
+    concept_id: suggestion.concept_id,
+    matched_text: suggestion.matched_text,
+    display_name: suggestion.display_name,
+    confidence: suggestion.confidence,
+    existing_concept: suggestion.existing_concept,
+    concept_class: suggestion.concept_class ?? null,
+    explanation: suggestion.explanation ?? null,
+    status: "pending",
+  }));
+
+  const { error: insertSuggestionsError } = await supabaseAdmin
+    .from("assistant_suggestions")
+    .insert(suggestionRows);
+
+  if (insertSuggestionsError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: insertSuggestionsError.message,
+      },
+      { status: 500 },
+    );
+  }
+}
 return NextResponse.json({
   success: true,
   suggestions: validatedSuggestions,
