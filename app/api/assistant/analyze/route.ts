@@ -324,8 +324,36 @@ if (deleteSuggestionsError) {
     { status: 500 },
   );
 }
-if (validatedSuggestions.length > 0) {
-  const suggestionRows = validatedSuggestions.map(
+const { data: reviewedSuggestions, error: reviewedSuggestionsError } =
+  await supabaseAdmin
+    .from("assistant_suggestions")
+    .select("concept_id")
+    .eq("queue_id", queueId)
+    .in("status", ["approved", "rejected"]);
+
+if (reviewedSuggestionsError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: reviewedSuggestionsError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const reviewedConceptIds = new Set(
+  (reviewedSuggestions ?? []).map(
+    (suggestion: { concept_id: string }) => suggestion.concept_id,
+  ),
+);
+
+const reviewableSuggestions = validatedSuggestions.filter(
+  (suggestion: { concept_id?: string }) =>
+    suggestion.concept_id &&
+    !reviewedConceptIds.has(suggestion.concept_id),
+);
+if (reviewableSuggestions.length > 0) {
+  const suggestionRows = reviewableSuggestions.map(
   (suggestion: {
     concept_id?: string;
     matched_text?: string;
@@ -362,7 +390,7 @@ if (validatedSuggestions.length > 0) {
 }
 return NextResponse.json({
   success: true,
-  suggestions: validatedSuggestions,
+  suggestions: reviewableSuggestions,
 });
 } catch {
   console.error(
