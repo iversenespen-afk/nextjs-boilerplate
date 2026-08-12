@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 type RejectRequest = {
   queueId?: number;
+  conceptId?: string;
 };
 
 export async function POST(request: Request) {
