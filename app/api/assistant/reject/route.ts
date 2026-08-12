@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { error } = await supabaseAdmin
+  const { error: queueError } = await supabaseAdmin
     .from("match_review_queue")
     .update({
       verified: false,
