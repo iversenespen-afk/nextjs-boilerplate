@@ -273,8 +273,9 @@ if (remainingSuggestions.length > 0) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        queueId: item.id,
-      }),
+  queueId: item.id,
+  conceptId: suggestion.concept_id,
+}),
     });
 
     const result = await response.json();
