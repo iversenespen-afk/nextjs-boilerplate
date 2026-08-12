@@ -20,13 +20,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const { queueId } = body;
+  const { queueId, conceptId } = body;
 
-  if (!queueId) {
+  if (!queueId || !conceptId) {
     return NextResponse.json(
       {
         success: false,
-        message: "queueId må være med.",
+        message: "queueId og conceptId må være med.",
       },
       { status: 400 },
     );
@@ -39,17 +39,35 @@ export async function POST(request: Request) {
       review_status: "rejected",
       reviewed_at: new Date().toISOString(),
     })
-    .eq("id", queueId);
+  .eq("id", queueId);
+if (queueError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: queueError.message,
+    },
+    { status: 500 },
+  );
+}
+const { error: suggestionError } = await supabaseAdmin
+  .from("assistant_suggestions")
+  .update({
+    status: "rejected",
+    reviewed_at: new Date().toISOString(),
+  })
+  .eq("queue_id", queueId)
+  .eq("concept_id", conceptId.trim())
+  .eq("status", "pending");
 
-  if (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: error.message,
-      },
-      { status: 500 },
-    );
-  }
+if (suggestionError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: suggestionError.message,
+    },
+    { status: 500 },
+  );
+}
 
   return NextResponse.json({
     success: true,
