@@ -169,7 +169,25 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+  const { error: suggestionError } = await supabaseAdmin
+  .from("assistant_suggestions")
+  .update({
+    status: "approved",
+    reviewed_at: new Date().toISOString(),
+  })
+  .eq("queue_id", queueId)
+  .eq("concept_id", conceptId.trim())
+  .eq("status", "pending");
 
+if (suggestionError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: suggestionError.message,
+    },
+    { status: 500 },
+  );
+}
   return NextResponse.json({
     success: true,
     message: existingMatch
