@@ -325,7 +325,16 @@ if (deleteSuggestionsError) {
   );
 }
 if (validatedSuggestions.length > 0) {
-  const suggestionRows = validatedSuggestions.map((suggestion) => ({
+  const suggestionRows = validatedSuggestions.map(
+  (suggestion: {
+    concept_id?: string;
+    matched_text?: string;
+    confidence?: number;
+    existing_concept?: boolean;
+    concept_class?: string;
+    display_name?: string;
+    explanation?: string;
+  }) => ({
     queue_id: queueId,
     concept_id: suggestion.concept_id,
     matched_text: suggestion.matched_text,
