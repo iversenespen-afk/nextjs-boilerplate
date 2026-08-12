@@ -111,6 +111,7 @@ if (!conceptsResponse.ok || !conceptsResult.success) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        queueId: item.id,
         spotifyId: item.spotify_id,
         artist: item.artist,
         title: item.title,
