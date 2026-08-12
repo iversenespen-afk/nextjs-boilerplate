@@ -79,6 +79,25 @@ const [isAnalyzing, setIsAnalyzing] = useState(false);
       }
 
       setItem(result.item);
+      const suggestionsResponse = await fetch(
+  `/api/assistant/suggestions?queueId=${result.item.id}`,
+  {
+    method: "GET",
+    cache: "no-store",
+  },
+);
+
+const suggestionsResult = await suggestionsResponse.json();
+
+if (
+  suggestionsResponse.ok &&
+  suggestionsResult.success &&
+  Array.isArray(suggestionsResult.suggestions)
+) {
+  setSuggestions(suggestionsResult.suggestions);
+} else {
+  setSuggestions([]);
+}
     } catch {
       setItem(null);
       setMessage("Noe gikk galt ved henting av neste sang.");
