@@ -6,22 +6,64 @@ export default function AssistantImportPage() {
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [themeId, setThemeId] = useState("");
   const [message, setMessage] = useState("");
+const [tracks, setTracks] = useState<
+  Array<{
+    spotify_id: string;
+    artist: string;
+    title: string;
+  }>
+>([]);
 
+const [isLoading, setIsLoading] = useState(false);
   async function handleImport() {
-    if (!playlistUrl.trim()) {
-      setMessage("Lim inn en Spotify-spilleliste.");
+  if (!playlistUrl.trim()) {
+    setMessage("Lim inn en Spotify-spilleliste.");
+    return;
+  }
+
+  if (!themeId) {
+    setMessage("Velg et tema.");
+    return;
+  }
+
+  setIsLoading(true);
+  setMessage("");
+  setTracks([]);
+
+  try {
+    const response = await fetch(
+      "/api/assistant/import/spotify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playlistUrl,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke hente spillelisten.",
+      );
       return;
     }
 
-    if (!themeId) {
-      setMessage("Velg et tema.");
-      return;
-    }
+    setTracks(result.tracks ?? []);
 
     setMessage(
-      "Importfunksjonen er ikke koblet til Spotify ennå.",
+      `Fant ${result.count ?? 0} sanger i spillelisten.`,
     );
+  } catch {
+    setMessage("Noe gikk galt ved henting fra Spotify.");
+  } finally {
+    setIsLoading(false);
   }
+}
 
   return (
     <main
@@ -106,6 +148,7 @@ export default function AssistantImportPage() {
 
         <button
           onClick={handleImport}
+          disabled={isLoading}
           style={{
             width: "fit-content",
             padding: "12px 20px",
@@ -113,10 +156,30 @@ export default function AssistantImportPage() {
             cursor: "pointer",
           }}
         >
-          Hent spilleliste
+          {isLoading ? "Henter..." : "Hent spilleliste"}
         </button>
 
         {message && <p>{message}</p>}
+        {tracks.length > 0 && (
+  <div style={{ marginTop: "20px" }}>
+    <h2>Preview</h2>
+
+    <p>
+      Tema: <strong>{themeId}</strong>
+    </p>
+
+    <ol>
+      {tracks.map((track) => (
+        <li
+          key={track.spotify_id}
+          style={{ marginBottom: "8px" }}
+        >
+          <strong>{track.artist}</strong> – {track.title}
+        </li>
+      ))}
+    </ol>
+  </div>
+)}
       </div>
     </main>
   );
