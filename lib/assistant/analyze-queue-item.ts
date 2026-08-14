@@ -291,8 +291,7 @@ Returner maksimalt 10 forslag.
     );
 
   if (reviewableSuggestions.length > 0) {
-    const suggestionRows = reviewableSuggestions.map(
-      (suggestion) => ({
+    (suggestion: AssistantSuggestion)
         queue_id: queueId,
         concept_id: suggestion.concept_id,
         matched_text: suggestion.matched_text,
