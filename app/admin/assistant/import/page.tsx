@@ -109,7 +109,6 @@ const [isLoading, setIsLoading] = useState(false);
             }
             placeholder="https://open.spotify.com/playlist/..."
             style={{
-              style={{
               width: "100%",
               boxSizing: "border-box",
               padding: "14px 16px",
