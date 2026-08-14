@@ -176,7 +176,6 @@ const [isLoading, setIsLoading] = useState(false);
           onClick={handleImport}
           disabled={isLoading}
           style={{
-            style={{
             width: "100%",
             boxSizing: "border-box",
             padding: "14px 16px",
