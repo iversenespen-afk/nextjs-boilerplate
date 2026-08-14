@@ -88,6 +88,14 @@ const [isLoading, setIsLoading] = useState(false);
           marginTop: "32px",
         }}
       >
+        <div
+          style={{
+            background: "#15151d",
+            border: "1px solid #444",
+            borderRadius: "14px",
+            padding: "18px",
+          }}
+        >
         <label>
           <div style={{ marginBottom: "8px" }}>
             Spotify-spilleliste
@@ -101,12 +109,21 @@ const [isLoading, setIsLoading] = useState(false);
             }
             placeholder="https://open.spotify.com/playlist/..."
             style={{
+              style={{
               width: "100%",
-              padding: "12px",
+              boxSizing: "border-box",
+              padding: "14px 16px",
               fontSize: "16px",
+              background: "#17171f",
+              color: "#fff",
+              border: "1px solid #555",
+              borderRadius: "10px",
+              outline: "none",
+              }}
             }}
           />
         </label>
+        </div>
 
         <label>
           <div style={{ marginBottom: "8px" }}>Tema</div>
@@ -122,8 +139,19 @@ const [isLoading, setIsLoading] = useState(false);
               fontSize: "16px",
             }}
           >
-            <option value="">Velg tema</option>
-            <option value="artists">Artister</option>
+            <option
+                value=""
+                style={{ background: "#17171f", color: "#fff" }}
+              >
+                Velg tema
+              </option>
+              
+              <option
+                value="artists"
+                style={{ background: "#17171f", color: "#fff" }}
+              >
+                Artister
+              </option>
             <option value="body_parts">Kroppsdeler</option>
             <option value="colors">Farger</option>
             <option value="elements">Grunnstoffer</option>
@@ -150,10 +178,16 @@ const [isLoading, setIsLoading] = useState(false);
           onClick={handleImport}
           disabled={isLoading}
           style={{
-            width: "fit-content",
-            padding: "12px 20px",
+            style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: "14px 16px",
             fontSize: "16px",
-            cursor: "pointer",
+            background: "#17171f",
+            color: "#fff",
+            border: "1px solid #555",
+            borderRadius: "10px",
+            outline: "none",
           }}
         >
           {isLoading ? "Henter..." : "Hent spilleliste"}
