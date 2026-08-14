@@ -64,6 +64,80 @@ const [isLoading, setIsLoading] = useState(false);
     setIsLoading(false);
   }
 }
+  async function handleCommitImport() {
+  if (tracks.length === 0) {
+    setMessage("Ingen sanger å importere.");
+    return;
+  }
+
+  if (!themeId) {
+    setMessage("Velg et tema.");
+    return;
+  }
+
+  const themeNames: Record<string, string> = {
+    artists: "Artister",
+    body_parts: "Kroppsdeler",
+    colors: "Farger",
+    elements: "Grunnstoffer",
+    furniture: "Møbler",
+    instruments: "Musikkinstrumenter",
+    names: "Guttenavn og jentenavn",
+    planets: "Planeter",
+    star_wars_planets: "Star Wars-planeter",
+    towns: "Byer",
+    transport: "Transportmidler",
+    tree_species: "Treslag",
+  };
+
+  const themeName = themeNames[themeId];
+
+  if (!themeName) {
+    setMessage("Ukjent tema.");
+    return;
+  }
+
+  setIsLoading(true);
+  setMessage("Importerer til kø...");
+
+  try {
+    const response = await fetch(
+      "/api/assistant/import/commit",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tracks,
+          themeId,
+          themeName,
+          sourcePlaylist: playlistUrl,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Import til kø feilet.",
+      );
+      return;
+    }
+
+    setMessage(
+      `${result.found} funnet · ` +
+        `${result.songsInserted} nye sanger · ` +
+        `${result.queueInserted} lagt i kø · ` +
+        `${result.skipped} hoppet over.`,
+    );
+  } catch {
+    setMessage("Noe gikk galt under import til kø.");
+  } finally {
+    setIsLoading(false);
+  }
+}
 
   return (
     <main
@@ -209,6 +283,23 @@ const [isLoading, setIsLoading] = useState(false);
         </li>
       ))}
     </ol>
+    <button
+  type="button"
+  onClick={handleCommitImport}
+  disabled={isLoading}
+  style={{
+    marginTop: "20px",
+    padding: "12px 20px",
+    border: "1px solid #666",
+    borderRadius: "10px",
+    background: "#16803a",
+    color: "#fff",
+    fontSize: "16px",
+    cursor: isLoading ? "default" : "pointer",
+  }}
+>
+  {isLoading ? "Importerer..." : "Importer til kø"}
+</button>
   </div>
 )}
       </div>
