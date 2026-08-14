@@ -1,10 +1,6 @@
-import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
+
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import {
-  analyzeQueueItem,
-  type AssistantConcept,
-} from "@/lib/assistant/analyze-queue-item";
 
 export const runtime = "nodejs";
 
@@ -15,108 +11,72 @@ type QueueItem = {
   title: string;
   theme_id: string;
   theme_name: string;
+  source_playlist: string | null;
 };
 
 export async function POST() {
   try {
-    // 1. Hent de neste 5 radene som venter på review
     const { data: items, error: itemsError } =
       await supabaseAdmin
         .from("match_review_queue")
         .select(
-          "id, spotify_id, artist, title, theme_id, theme_name",
+          "id, spotify_id, artist, title, theme_id, theme_name, source_playlist",
         )
         .eq("review_status", "to_review")
         .order("id", { ascending: true })
-        .limit(5);
+        .limit(25);
 
     if (itemsError) {
       throw new Error(itemsError.message);
     }
 
-    const queueItems = (items ?? []) as QueueItem[];
+    const candidates = (items ?? []) as QueueItem[];
 
-    if (queueItems.length === 0) {
+    if (candidates.length === 0) {
       return NextResponse.json({
         success: true,
-        processed: 0,
-        results: [],
+        items: [],
+        count: 0,
         message: "Ingen sanger venter på analyse.",
       });
     }
 
-    const results = [];
+    // Finn hvilke kø-rader som allerede har pending forslag.
+    const queueIds = candidates.map((item) => item.id);
 
-    // 2. Analyser sangene én etter én
-    for (const item of queueItems) {
-      try {
-        // Hent concepts som hører til temaet
-        const allowedConceptClasses =
-          THEME_CONCEPT_CLASSES[item.theme_id] ?? [];
-        
-        if (allowedConceptClasses.length === 0) {
-          throw new Error(
-            `Ingen concept classes er definert for tema ${item.theme_id}.`,
-          );
-        }
+    const { data: existingSuggestions, error: suggestionsError } =
+      await supabaseAdmin
+        .from("assistant_suggestions")
+        .select("queue_id")
+        .in("queue_id", queueIds)
+        .eq("status", "pending");
 
-const { data: concepts, error: conceptsError } =
-  await supabaseAdmin
-    .from("concepts")
-    .select(
-      "id, label_no, label_en, concept_class",
-    )
-    .in("concept_class", allowedConceptClasses)
-    .limit(500);
-
-        if (conceptsError) {
-          throw new Error(conceptsError.message);
-        }
-
-        const suggestions = await analyzeQueueItem({
-          queueId: item.id,
-          spotifyId: item.spotify_id ?? "",
-          artist: item.artist,
-          title: item.title,
-          themeId: item.theme_id,
-          themeName: item.theme_name,
-          concepts: (concepts ?? []) as AssistantConcept[],
-        });
-
-        results.push({
-          queueId: item.id,
-          artist: item.artist,
-          title: item.title,
-          success: true,
-          suggestionCount: suggestions.length,
-        });
-      } catch (error) {
-        console.error(
-          `Batch analysis failed for queue ${item.id}:`,
-          error,
-        );
-
-        results.push({
-          queueId: item.id,
-          artist: item.artist,
-          title: item.title,
-          success: false,
-          suggestionCount: 0,
-          message:
-            error instanceof Error
-              ? error.message
-              : "Analyse feilet.",
-        });
-      }
+    if (suggestionsError) {
+      throw new Error(suggestionsError.message);
     }
+
+    const queueIdsWithPending = new Set(
+      (existingSuggestions ?? []).map(
+        (suggestion: { queue_id: number }) =>
+          suggestion.queue_id,
+      ),
+    );
+
+    // Ikke bruk AI på nytt på sanger som allerede har
+    // pending forslag klare til review.
+    const itemsToAnalyze = candidates
+      .filter(
+        (item) => !queueIdsWithPending.has(item.id),
+      )
+      .slice(0, 5);
 
     return NextResponse.json({
       success: true,
-      processed: results.length,
-      results,
+      items: itemsToAnalyze,
+      count: itemsToAnalyze.length,
     });
   } catch (error) {
-    console.error("Assistant batch error:", error);
+    console.error("Assistant batch selector error:", error);
 
     return NextResponse.json(
       {
@@ -124,7 +84,7 @@ const { data: concepts, error: conceptsError } =
         message:
           error instanceof Error
             ? error.message
-            : "Batch-analyse feilet.",
+            : "Kunne ikke hente batch.",
       },
       { status: 500 },
     );
