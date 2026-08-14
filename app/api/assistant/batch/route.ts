@@ -1,3 +1,4 @@
+import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import {
@@ -50,14 +51,23 @@ export async function POST() {
     for (const item of queueItems) {
       try {
         // Hent concepts som hører til temaet
-        const { data: concepts, error: conceptsError } =
-          await supabaseAdmin
-            .from("concepts")
-            .select(
-              "id, label_no, label_en, concept_class",
-            )
-            .eq("theme_id", item.theme_id)
-            .limit(500);
+        const allowedConceptClasses =
+          THEME_CONCEPT_CLASSES[item.theme_id] ?? [];
+        
+        if (allowedConceptClasses.length === 0) {
+          throw new Error(
+            `Ingen concept classes er definert for tema ${item.theme_id}.`,
+          );
+        }
+
+const { data: concepts, error: conceptsError } =
+  await supabaseAdmin
+    .from("concepts")
+    .select(
+      "id, label_no, label_en, concept_class",
+    )
+    .in("concept_class", allowedConceptClasses)
+    .limit(500);
 
         if (conceptsError) {
           throw new Error(conceptsError.message);
