@@ -321,7 +321,6 @@ Returner maksimalt 10 forslag.
     if (insertSuggestionsError) {
       throw new Error(insertSuggestionsError.message);
     }
-  }
 
   return reviewableSuggestions;
 }
