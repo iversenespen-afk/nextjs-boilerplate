@@ -105,6 +105,52 @@ if (
       setIsLoading(false);
     }
   }
+async function analyzeNextBatch() {
+  setMessage("Analyserer neste sang...");
+
+  try {
+    const response = await fetch("/api/assistant/batch", {
+      method: "POST",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Batch-analyse feilet.",
+      );
+      return;
+    }
+
+    if (result.processed === 0) {
+      setMessage("Ingen sanger venter på analyse.");
+      return;
+    }
+
+    const firstResult = result.results?.[0];
+
+    if (!firstResult) {
+      setMessage("Batchen kjørte, men returnerte ikke noe resultat.");
+      return;
+    }
+
+    if (!firstResult.success) {
+      setMessage(
+        `Analyse feilet for ${firstResult.artist} – ${firstResult.title}: ${
+          firstResult.message ?? "Ukjent feil"
+        }`,
+      );
+      return;
+    }
+
+    setMessage(
+      `Batch ferdig: ${firstResult.artist} – ${firstResult.title}. ` +
+        `${firstResult.suggestionCount} forslag lagret.`,
+    );
+  } catch {
+    setMessage("Noe gikk galt under batch-analysen.");
+  }
+}  
 async function analyzeItem() {
   if (!item || isAnalyzing) return;
 
@@ -336,6 +382,12 @@ if (remainingSuggestions.length > 0) {
         }}
       >
         {isLoading ? "Henter ..." : "Hent neste sang"}
+      </button>
+      <button
+        onClick={analyzeNextBatch}
+        style={{ marginLeft: "12px" }}
+        >
+        Analyser neste 1
       </button>
 
       {message && (
