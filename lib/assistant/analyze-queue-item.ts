@@ -290,37 +290,6 @@ Returner maksimalt 10 forslag.
         !reviewedConceptIds.has(suggestion.concept_id),
     );
 
-  if (reviewableSuggestions.length > 0) {
-  const suggestionRows = reviewableSuggestions.map(
-    (suggestion: AssistantSuggestion) => ({
-      queue_id: queueId,
-      concept_id: suggestion.concept_id,
-      matched_text: suggestion.matched_text,
-      display_name: suggestion.display_name,
-      confidence: suggestion.confidence,
-      existing_concept: suggestion.existing_concept,
-      concept_class: suggestion.concept_class ?? null,
-      explanation: suggestion.explanation ?? null,
-      status: "pending",
-    }),
-  );
-
-  const { error: insertSuggestionsError } =
-    await supabaseAdmin
-      .from("assistant_suggestions")
-      .insert(suggestionRows);
-
-  if (insertSuggestionsError) {
-    throw new Error(insertSuggestionsError.message);
-  }
-}
-      await supabaseAdmin
-        .from("assistant_suggestions")
-        .insert(suggestionRows);
-
-    if (insertSuggestionsError) {
-      throw new Error(insertSuggestionsError.message);
-    }
-
-  return reviewableSuggestions;
-}
+  await supabaseAdmin
+  .from("assistant_suggestions")
+  .insert(suggestionRows);
