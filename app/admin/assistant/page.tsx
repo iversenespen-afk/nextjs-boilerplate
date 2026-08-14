@@ -106,51 +106,111 @@ if (
     }
   }
 async function analyzeNextBatch() {
-  setMessage("Analyserer neste sang...");
+  if (isLoading || isAnalyzing) return;
+
+  setIsLoading(true);
+  setMessage("Henter neste batch...");
 
   try {
-    const response = await fetch("/api/assistant/batch", {
+    const batchResponse = await fetch("/api/assistant/batch", {
       method: "POST",
     });
 
-    const result = await response.json();
+    const batchResult = await batchResponse.json();
 
-    if (!response.ok || !result.success) {
+    if (!batchResponse.ok || !batchResult.success) {
       setMessage(
-        result.message ?? "Batch-analyse feilet.",
+        batchResult.message ?? "Kunne ikke hente batch.",
       );
       return;
     }
 
-    if (result.processed === 0) {
-      setMessage("Ingen sanger venter på analyse.");
+    const items = batchResult.items ?? [];
+
+    if (items.length === 0) {
+      setMessage("Ingen nye sanger trenger analyse.");
       return;
     }
 
-    const firstResult = result.results?.[0];
+    let completed = 0;
+    let failed = 0;
 
-    if (!firstResult) {
-      setMessage("Batchen kjørte, men returnerte ikke noe resultat.");
-      return;
-    }
-
-    if (!firstResult.success) {
+    for (const batchItem of items) {
       setMessage(
-        `Analyse feilet for ${firstResult.artist} – ${firstResult.title}: ${
-          firstResult.message ?? "Ukjent feil"
-        }`,
+        `Analyserer ${completed + 1} av ${items.length}: ` +
+          `${batchItem.artist} – ${batchItem.title}`,
       );
-      return;
+
+      try {
+        const conceptsResponse = await fetch(
+          `/api/assistant/concepts?themeId=${encodeURIComponent(
+            batchItem.theme_id,
+          )}`,
+        );
+
+        const conceptsResult = await conceptsResponse.json();
+
+        if (
+          !conceptsResponse.ok ||
+          !conceptsResult.success
+        ) {
+          failed += 1;
+          completed += 1;
+          continue;
+        }
+
+        const analyzeResponse = await fetch(
+          "/api/assistant/analyze",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              queueId: batchItem.id,
+              spotifyId: batchItem.spotify_id,
+              artist: batchItem.artist,
+              title: batchItem.title,
+              themeId: batchItem.theme_id,
+              themeName: batchItem.theme_name,
+              concepts: conceptsResult.concepts,
+            }),
+          },
+        );
+
+        const analyzeResult = await analyzeResponse.json();
+
+        if (
+          !analyzeResponse.ok ||
+          !analyzeResult.success
+        ) {
+          failed += 1;
+        }
+      } catch {
+        failed += 1;
+      }
+
+      completed += 1;
     }
 
-    setMessage(
-      `Batch ferdig: ${firstResult.artist} – ${firstResult.title}. ` +
-        `${firstResult.suggestionCount} forslag lagret.`,
-    );
+    if (failed > 0) {
+      setMessage(
+        `Batch ferdig: ${completed - failed} analysert, ` +
+          `${failed} feilet.`,
+      );
+    } else {
+      setMessage(
+        `Batch ferdig: ${completed} av ${completed} analysert.`,
+      );
+    }
+
+    await fetchNextItem();
   } catch {
     setMessage("Noe gikk galt under batch-analysen.");
+  } finally {
+    setIsLoading(false);
   }
-}  
+} 
 async function analyzeItem() {
   if (!item || isAnalyzing) return;
 
