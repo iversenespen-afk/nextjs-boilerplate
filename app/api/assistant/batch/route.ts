@@ -27,7 +27,7 @@ export async function POST() {
         )
         .eq("review_status", "to_review")
         .order("id", { ascending: true })
-        .limit(5);
+        .limit(1);
 
     if (itemsError) {
       throw new Error(itemsError.message);
