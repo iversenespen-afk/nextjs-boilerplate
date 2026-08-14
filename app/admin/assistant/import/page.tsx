@@ -118,7 +118,6 @@ const [isLoading, setIsLoading] = useState(false);
               border: "1px solid #555",
               borderRadius: "10px",
               outline: "none",
-              }}
             }}
           />
         </label>
