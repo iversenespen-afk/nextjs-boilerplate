@@ -387,7 +387,7 @@ if (remainingSuggestions.length > 0) {
         onClick={analyzeNextBatch}
         style={{ marginLeft: "12px" }}
         >
-        Analyser neste 1
+        Analyser neste 5
       </button>
 
       {message && (
