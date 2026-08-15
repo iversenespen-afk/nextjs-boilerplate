@@ -134,6 +134,7 @@ async function analyzeNextBatch() {
 
     let completed = 0;
     let failed = 0;
+    const failures: string[] = [];
 
     for (const batchItem of items) {
       setMessage(
@@ -185,18 +186,33 @@ async function analyzeNextBatch() {
           !analyzeResult.success
         ) {
           failed += 1;
+        
+          failures.push(
+            `${batchItem.artist} – ${batchItem.title}: ${
+              analyzeResult.message ?? "Ukjent feil"
+            }`,
+          );
         }
-      } catch {
-        failed += 1;
-      }
+      } catch (error) {
+  failed += 1;
+
+  failures.push(
+    `${batchItem.artist} – ${batchItem.title}: ${
+      error instanceof Error
+        ? error.message
+        : "Ukjent feil"
+    }`,
+  );
+}
 
       completed += 1;
     }
 
     if (failed > 0) {
       setMessage(
-        `Batch ferdig: ${completed - failed} analysert, ` +
-          `${failed} feilet.`,
+        `Batch ferdig: ${completed - failed} analysert, ${failed} feilet.\n\n` +
+          failures.join("\n"),
+    );
       );
     } else {
       setMessage(
