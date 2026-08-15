@@ -213,7 +213,6 @@ async function analyzeNextBatch() {
         `Batch ferdig: ${completed - failed} analysert, ${failed} feilet.\n\n` +
           failures.join("\n"),
     );
-      );
     } else {
       setMessage(
         `Batch ferdig: ${completed} av ${completed} analysert.`,
