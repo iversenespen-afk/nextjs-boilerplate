@@ -284,11 +284,22 @@ Returner maksimalt 10 forslag.
     ),
   );
 
-    const reviewableSuggestions =
-    validatedSuggestions.filter(
-      (suggestion: AssistantSuggestion) =>
-        !reviewedConceptIds.has(suggestion.concept_id),
-    );
+    const uniqueSuggestions = Array.from(
+  new Map(
+    validatedSuggestions.map(
+      (suggestion: AssistantSuggestion) => [
+        suggestion.concept_id,
+        suggestion,
+      ],
+    ),
+  ).values(),
+);
+
+const reviewableSuggestions =
+  uniqueSuggestions.filter(
+    (suggestion: AssistantSuggestion) =>
+      !reviewedConceptIds.has(suggestion.concept_id),
+  );
 
   if (reviewableSuggestions.length > 0) {
     const suggestionRows = reviewableSuggestions.map(
