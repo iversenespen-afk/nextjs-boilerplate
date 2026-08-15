@@ -285,7 +285,7 @@ Returner maksimalt 10 forslag.
   );
 
     const uniqueSuggestions = Array.from(
-  new Map(
+  new Map<string, AssistantSuggestion>(
     validatedSuggestions.map(
       (suggestion: AssistantSuggestion) => [
         suggestion.concept_id,
