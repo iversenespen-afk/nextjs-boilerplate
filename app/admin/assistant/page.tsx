@@ -333,6 +333,34 @@ if (remainingSuggestions.length > 0) {
   async function createConcept(
   suggestion: AssistantSuggestion,
 ) {
+  if (!item) return;
+
+  let groupId: string | undefined;
+
+  if (item.theme_id === "names") {
+    const selectedGroup = window.prompt(
+      "Velg gruppe:\n\n" +
+        "1 = Guttenavn\n" +
+        "2 = Jentenavn\n" +
+        "3 = Unisex-navn",
+    );
+
+    if (!selectedGroup) {
+      return;
+    }
+
+    if (selectedGroup === "1") {
+      groupId = "male_names";
+    } else if (selectedGroup === "2") {
+      groupId = "female_names";
+    } else if (selectedGroup === "3") {
+      groupId = "unisex_names";
+    } else {
+      setMessage("Ugyldig gruppevalg.");
+      return;
+    }
+  }
+
   try {
     const response = await fetch(
       "/api/assistant/create-concept",
@@ -342,13 +370,14 @@ if (remainingSuggestions.length > 0) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          queueId: item?.id,
-          spotifyId: item?.spotify_id,
-          themeId: item?.theme_id,
+          queueId: item.id,
+          spotifyId: item.spotify_id,
+          themeId: item.theme_id,
           conceptId: suggestion.concept_id,
           displayName: suggestion.display_name,
           conceptClass: suggestion.concept_class,
           matchedText: suggestion.matched_text,
+          groupId,
         }),
       },
     );
@@ -363,21 +392,22 @@ if (remainingSuggestions.length > 0) {
     }
 
     setMessage(
-  result.message ?? "Nytt concept er opprettet.",
-);
+      result.message ?? "Nytt concept er opprettet.",
+    );
 
-const remainingSuggestions = suggestions.filter(
-  (currentSuggestion) =>
-    currentSuggestion.concept_id !== suggestion.concept_id,
-);
+    const remainingSuggestions = suggestions.filter(
+      (currentSuggestion) =>
+        currentSuggestion.concept_id !==
+        suggestion.concept_id,
+    );
 
-if (remainingSuggestions.length > 0) {
-  setSuggestions(remainingSuggestions);
-} else {
-  setSuggestions([]);
-  setItem(null);
-  await fetchNextItem();
-}
+    if (remainingSuggestions.length > 0) {
+      setSuggestions(remainingSuggestions);
+    } else {
+      setSuggestions([]);
+      setItem(null);
+      await fetchNextItem();
+    }
   } catch {
     setMessage("Noe gikk galt under oppretting av concept.");
   }
