@@ -1,4 +1,3 @@
-import { THEME_CONCEPT_CLASSES } from "@/lib/theme-concept-classes";
 import { getLyrics } from "@/lib/lyrics-provider";
 import { QUIZLYCS_ASSISTANT_RULES } from "@/lib/quizlycs-rules";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -202,9 +201,6 @@ Returner maksimalt 10 forslag.
     ]),
   );
 
-  const allowedConceptClasses =
-    THEME_CONCEPT_CLASSES[themeId] ?? [];
-
   const validatedSuggestions = (
     parsed.suggestions ?? []
   ).filter(
@@ -224,18 +220,9 @@ Returner maksimalt 10 forslag.
 
         const concept = conceptsById.get(conceptId);
 
-        if (!concept) {
+      if (!concept) {
           return false;
-        }
-
-        if (
-          allowedConceptClasses.length > 0 &&
-          !allowedConceptClasses.includes(
-            concept.concept_class ?? "",
-          )
-        ) {
-          return false;
-        }
+      }
       } else {
         if (validConceptIds.has(conceptId)) {
           return false;
