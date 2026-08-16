@@ -604,11 +604,24 @@ if (remainingSuggestions.length > 0) {
         {isLoading ? "Henter ..." : "Hent neste sang"}
       </button>
       <button
-        onClick={analyzeNextBatch}
-        style={{ marginLeft: "12px" }}
-        >
-        Analyser neste 5
-      </button>
+  type="button"
+  onClick={analyzeNextBatch}
+  disabled={isLoading || isAnalyzing}
+  style={{
+    marginLeft: 12,
+    padding: "12px 18px",
+    border: "1px solid #2563eb",
+    borderRadius: 10,
+    background: isAnalyzing ? "#333" : "#2563eb",
+    color: "#fff",
+    cursor:
+      isLoading || isAnalyzing ? "default" : "pointer",
+    fontSize: 16,
+    fontWeight: 600,
+  }}
+>
+  {isAnalyzing ? "Analyserer ..." : "Analyser neste 5"}
+</button>
 
       {message && (
         <p
