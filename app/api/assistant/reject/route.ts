@@ -32,24 +32,6 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-
-  const { error: queueError } = await supabaseAdmin
-    .from("match_review_queue")
-    .update({
-      verified: false,
-      review_status: "rejected",
-      reviewed_at: new Date().toISOString(),
-    })
-  .eq("id", queueId);
-if (queueError) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: queueError.message,
-    },
-    { status: 500 },
-  );
-}
 const { error: suggestionError } = await supabaseAdmin
   .from("assistant_suggestions")
   .update({
@@ -68,6 +50,63 @@ if (suggestionError) {
     },
     { status: 500 },
   );
+}
+  const { count: pendingCount, error: pendingError } =
+  await supabaseAdmin
+    .from("assistant_suggestions")
+    .select("id", { count: "exact", head: true })
+    .eq("queue_id", queueId)
+    .eq("status", "pending");
+
+if (pendingError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: pendingError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if ((pendingCount ?? 0) === 0) {
+  const { count: approvedCount, error: approvedCountError } =
+    await supabaseAdmin
+      .from("assistant_suggestions")
+      .select("id", { count: "exact", head: true })
+      .eq("queue_id", queueId)
+      .eq("status", "approved");
+
+  if (approvedCountError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: approvedCountError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  const finalStatus =
+    (approvedCount ?? 0) > 0 ? "approved" : "rejected";
+
+  const { error: queueError } = await supabaseAdmin
+    .from("match_review_queue")
+    .update({
+      verified: finalStatus === "approved",
+      review_status: finalStatus,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", queueId);
+
+  if (queueError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: queueError.message,
+      },
+      { status: 500 },
+    );
+  }
 }
 
   return NextResponse.json({
