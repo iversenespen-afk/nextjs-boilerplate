@@ -163,26 +163,86 @@ if (!existingMatch) {
     );
   }
 }
-// 6. Marker review-raden som godkjent
-const { error: queueError } = await supabaseAdmin
-  .from("match_review_queue")
+const { error: suggestionError } = await supabaseAdmin
+  .from("assistant_suggestions")
   .update({
-    concept_id: conceptId,
-    matched_text: matchedText,
-    verified: true,
-    review_status: "approved",
+    status: "approved",
     reviewed_at: new Date().toISOString(),
   })
-  .eq("id", queueId);
+  .eq("queue_id", queueId)
+  .eq("concept_id", conceptId)
+  .eq("status", "pending");
 
-if (queueError) {
+if (suggestionError) {
   return NextResponse.json(
     {
       success: false,
-      message: queueError.message,
+      message: suggestionError.message,
     },
     { status: 500 },
   );
+}
+
+const { count: pendingCount, error: pendingError } =
+  await supabaseAdmin
+    .from("assistant_suggestions")
+    .select("id", { count: "exact", head: true })
+    .eq("queue_id", queueId)
+    .eq("status", "pending");
+
+if (pendingError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: pendingError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if ((pendingCount ?? 0) === 0) {
+  const { count: approvedCount, error: approvedCountError } =
+    await supabaseAdmin
+      .from("assistant_suggestions")
+      .select("id", { count: "exact", head: true })
+      .eq("queue_id", queueId)
+      .eq("status", "approved");
+
+  if (approvedCountError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: approvedCountError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  const finalStatus =
+    (approvedCount ?? 0) > 0 ? "approved" : "rejected";
+
+  const { error: queueError } = await supabaseAdmin
+    .from("match_review_queue")
+    .update({
+      concept_id:
+        finalStatus === "approved" ? conceptId : null,
+      matched_text:
+        finalStatus === "approved" ? matchedText : null,
+      verified: finalStatus === "approved",
+      review_status: finalStatus,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", queueId);
+
+  if (queueError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: queueError.message,
+      },
+      { status: 500 },
+    );
+  }
 }
   return NextResponse.json({
   success: true,
