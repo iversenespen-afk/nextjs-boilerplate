@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type QueueItem = {
   id: number;
@@ -39,6 +39,13 @@ type AnalyzeResponse = {
   message?: string;
 };
 
+type AssistantStats = {
+  queue: number;
+  pendingSuggestions: number;
+  approved: number;
+  rejected: number;
+};
+
 export default function AssistantPage() {
   const [item, setItem] = useState<QueueItem | null>(null);
   const [message, setMessage] = useState("");
@@ -49,6 +56,33 @@ export default function AssistantPage() {
 
 const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+  const [stats, setStats] = useState<AssistantStats | null>(
+  null,
+);
+
+async function fetchStats() {
+  try {
+    const response = await fetch("/api/assistant/stats", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setStats(result.stats);
+  } catch {
+    // Dashboard-statistikk skal ikke stoppe review-siden.
+  }
+}
+
+useEffect(() => {
+  fetchStats();
+}, []);
+  
   async function fetchNextItem() {
     if (isLoading) return;
 
@@ -471,6 +505,84 @@ if (remainingSuggestions.length > 0) {
       <p style={{ opacity: 0.75 }}>
         AI-assistent for behandling av review queue.
       </p>
+
+      {stats && (
+  <section
+    style={{
+      marginTop: 24,
+      marginBottom: 24,
+      display: "grid",
+      gridTemplateColumns:
+        "repeat(auto-fit, minmax(160px, 1fr))",
+      gap: 12,
+      maxWidth: 800,
+    }}
+  >
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid #444",
+        borderRadius: 12,
+        background: "#17171f",
+      }}
+    >
+      <div style={{ opacity: 0.65, marginBottom: 6 }}>
+        I kø
+      </div>
+      <strong style={{ fontSize: 28 }}>
+        {stats.queue}
+      </strong>
+    </div>
+
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid #444",
+        borderRadius: 12,
+        background: "#17171f",
+      }}
+    >
+      <div style={{ opacity: 0.65, marginBottom: 6 }}>
+        Pending forslag
+      </div>
+      <strong style={{ fontSize: 28 }}>
+        {stats.pendingSuggestions}
+      </strong>
+    </div>
+
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid #444",
+        borderRadius: 12,
+        background: "#17171f",
+      }}
+    >
+      <div style={{ opacity: 0.65, marginBottom: 6 }}>
+        Godkjent
+      </div>
+      <strong style={{ fontSize: 28 }}>
+        {stats.approved}
+      </strong>
+    </div>
+
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid #444",
+        borderRadius: 12,
+        background: "#17171f",
+      }}
+    >
+      <div style={{ opacity: 0.65, marginBottom: 6 }}>
+        Avvist
+      </div>
+      <strong style={{ fontSize: 28 }}>
+        {stats.rejected}
+      </strong>
+    </div>
+  </section>
+)}
 
       <button
         type="button"
