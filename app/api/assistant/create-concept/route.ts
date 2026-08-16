@@ -80,7 +80,52 @@ if (!song) {
   );
 }
 
-// 2. Sjekk om concept allerede finnes
+// 2. Finn concept-gruppe(r) for temaet
+const { data: groupRows, error: groupError } =
+  await supabaseAdmin
+    .from("theme_concept_groups")
+    .select("group_id")
+    .eq("theme_id", themeId);
+
+if (groupError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: groupError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const groupIds = (groupRows ?? []).map(
+  (row: { group_id: string }) => row.group_id,
+);
+
+if (groupIds.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: `Ingen concept-grupper er koblet til tema ${themeId}.`,
+    },
+    { status: 400 },
+  );
+}
+
+if (groupIds.length !== 1) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        `Tema ${themeId} har ${groupIds.length} concept-grupper. ` +
+        "Kan ikke velge group_id automatisk ennå.",
+    },
+    { status: 400 },
+  );
+}
+
+const groupId = groupIds[0];
+
+// 3. Sjekk om concept allerede finnes
 const { data: existingConcept, error: existingConceptError } =
   await supabaseAdmin
     .from("concepts")
@@ -98,7 +143,7 @@ if (existingConceptError) {
   );
 }
 
-// 3. Opprett concept hvis det ikke finnes
+// 4. Opprett concept hvis det ikke finnes
 if (!existingConcept) {
   const { error: conceptInsertError } = await supabaseAdmin
     .from("concepts")
@@ -108,6 +153,7 @@ if (!existingConcept) {
       label_en: displayName,
       is_proper_noun: true,
       concept_class: conceptClass,
+      group_id: groupId,
     });
 
   if (conceptInsertError) {
@@ -121,7 +167,7 @@ if (!existingConcept) {
   }
 }
 
-// 4. Sjekk om song_match allerede finnes
+// 5. Sjekk om song_match allerede finnes
 const { data: existingMatch, error: existingMatchError } =
   await supabaseAdmin
     .from("song_matches")
@@ -141,7 +187,7 @@ if (existingMatchError) {
   );
 }
 
-// 5. Opprett song_match hvis den ikke finnes
+// 6. Opprett song_match hvis den ikke finnes
 if (!existingMatch) {
   const { error: matchInsertError } = await supabaseAdmin
     .from("song_matches")
