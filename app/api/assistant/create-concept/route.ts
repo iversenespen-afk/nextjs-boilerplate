@@ -9,6 +9,7 @@ type CreateConceptRequest = {
   displayName?: string;
   conceptClass?: string;
   matchedText?: string;
+  groupId?: string;
 };
 
 export async function POST(request: Request) {
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
   const displayName = body.displayName?.trim();
   const conceptClass = body.conceptClass?.trim();
   const matchedText = body.matchedText?.trim();
+  const requestedGroupId = body.groupId?.trim();
 
   if (
   !queueId ||
@@ -111,16 +113,35 @@ if (groupIds.length === 0) {
   );
 }
 
-if (groupIds.length !== 1) {
-  return NextResponse.json(
-    {
-      success: false,
-      message:
-        `Tema ${themeId} har ${groupIds.length} concept-grupper. ` +
-        "Kan ikke velge group_id automatisk ennå.",
-    },
-    { status: 400 },
-  );
+let groupId: string;
+
+if (groupIds.length === 1) {
+  groupId = groupIds[0];
+} else {
+  if (!requestedGroupId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          `Tema ${themeId} har flere concept-grupper. Velg gruppe.`,
+        groupIds,
+      },
+      { status: 400 },
+    );
+  }
+
+  if (!groupIds.includes(requestedGroupId)) {
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          `Gruppen ${requestedGroupId} er ikke tillatt for tema ${themeId}.`,
+      },
+      { status: 400 },
+    );
+  }
+
+  groupId = requestedGroupId;
 }
 
 const groupId = groupIds[0];
