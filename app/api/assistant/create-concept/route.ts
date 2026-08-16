@@ -144,8 +144,6 @@ if (groupIds.length === 1) {
   groupId = requestedGroupId;
 }
 
-const groupId = groupIds[0];
-
 // 3. Sjekk om concept allerede finnes
 const { data: existingConcept, error: existingConceptError } =
   await supabaseAdmin
