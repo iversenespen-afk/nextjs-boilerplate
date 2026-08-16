@@ -359,6 +359,7 @@ if (remainingSuggestions.length > 0) {
   setSuggestions([]);
   setItem(null);
   await fetchNextItem();
+  await fetchStats();
 }
   } catch {
     setMessage("Noe gikk galt under godkjenning.");
@@ -441,6 +442,7 @@ if (remainingSuggestions.length > 0) {
       setSuggestions([]);
       setItem(null);
       await fetchNextItem();
+      await fetchStats();
     }
   } catch {
     setMessage("Noe gikk galt under oppretting av concept.");
@@ -485,6 +487,7 @@ if (remainingSuggestions.length > 0) {
   setSuggestions([]);
   setItem(null);
   await fetchNextItem();
+  await fetchStats();
 }
   } catch {
     setMessage("Noe gikk galt under avvisning.");
