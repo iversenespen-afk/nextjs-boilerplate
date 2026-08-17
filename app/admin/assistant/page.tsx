@@ -403,6 +403,7 @@ if (remainingSuggestions.length > 0) {
   setItem(null);
   await fetchNextItem();
   await fetchStats();
+  await fetchImportStats();
 }
   } catch {
     setMessage("Noe gikk galt under godkjenning.");
