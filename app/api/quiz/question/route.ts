@@ -94,12 +94,6 @@ export async function GET(request: Request) {
         themes (
           id,
           name
-        ),
-        concepts (
-          id,
-          label_no,
-          label_en,
-          group_id
         )
       `)
       .eq("id", session.current_song_match_id)
@@ -176,7 +170,9 @@ export async function GET(request: Request) {
     .sort(() => Math.random() - 0.5)
     .slice(0, ANSWER_OPTION_COUNT - 1);
 
-  const correctConcept = match.concepts;
+  const correctConcept = (candidateConcepts ?? []).find(
+  (concept) => concept.id === match.concept_id,
+);
 
   if (!correctConcept) {
     return NextResponse.json(
