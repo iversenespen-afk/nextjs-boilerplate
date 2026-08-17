@@ -71,13 +71,42 @@ export async function POST(request: Request) {
     );
   }
 
+  const { data: matchRows, error: matchError } =
+  await supabaseAdmin
+    .from("song_matches")
+    .select("id")
+    .eq("verified", true);
+
+if (matchError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: matchError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if (!matchRows || matchRows.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ingen verifiserte quiz-spørsmål.",
+    },
+    { status: 409 },
+  );
+}
+
+const randomMatch =
+  matchRows[Math.floor(Math.random() * matchRows.length)];
   const { data: updatedSession, error: updateError } =
     await supabaseAdmin
       .from("quiz_sessions")
       .update({
-        status: "playing",
-        started_at: new Date().toISOString(),
-      })
+  status: "playing",
+  started_at: new Date().toISOString(),
+  current_song_match_id: randomMatch.id,
+})
       .eq("id", sessionId)
       .eq("status", "lobby")
       .select("id, join_code, status, started_at")
