@@ -54,10 +54,21 @@ if (themesError) {
 
 const { data: concepts, error: conceptsError } = await supabase
   .from("concepts")
-  .select("id, concept_class");
+  .select("id, concept_class, group_id");
 
 if (conceptsError) {
   throw new Error(conceptsError.message);
+}
+
+const {
+  data: themeConceptGroups,
+  error: themeConceptGroupsError,
+} = await supabase
+  .from("theme_concept_groups")
+  .select("theme_id, group_id");
+
+if (themeConceptGroupsError) {
+  throw new Error(themeConceptGroupsError.message);
 }
 
 const songIds = new Set(
@@ -77,6 +88,19 @@ const conceptClassById = new Map(
     concept.id,
     concept.concept_class,
   ]),
+);
+
+const conceptGroupById = new Map(
+  (concepts ?? []).map((concept) => [
+    concept.id,
+    concept.group_id,
+  ]),
+);
+
+const allowedThemeGroupKeys = new Set(
+  (themeConceptGroups ?? []).map(
+    (row) => `${row.theme_id}|${row.group_id}`,
+  ),
 );
 
 const allowedConceptClassesByTheme = {
@@ -109,6 +133,7 @@ const invalidSongReferences = [];
 const invalidThemeReferences = [];
 const invalidConceptReferences = [];
 const invalidThemeConceptClasses = [];
+const invalidThemeConceptGroups = [];
 const duplicateKeys = new Set();
 const duplicateMatches = [];
 for (const match of matches ?? []) {
@@ -143,6 +168,28 @@ for (const match of matches ?? []) {
   invalidThemeConceptClasses.push(
     `${match.id}: ${match.theme_id} -> ${match.concept_id} (${conceptClass})`,
   );
+
+if (
+  match.theme_id &&
+  match.concept_id &&
+  conceptIds.has(match.concept_id)
+) {
+  const conceptGroup =
+    conceptGroupById.get(match.concept_id);
+
+  const themeGroupKey =
+    `${match.theme_id}|${conceptGroup}`;
+
+  if (
+    !conceptGroup ||
+    !allowedThemeGroupKeys.has(themeGroupKey)
+  ) {
+    invalidThemeConceptGroups.push(
+      `${match.id}: ${match.theme_id} -> ${match.concept_id} (${conceptGroup ?? "mangler group_id"})`,
+    );
+  }
+}
+    
 }
 }
 
@@ -234,6 +281,13 @@ console.log("\nUgyldig theme / concept_class:");
 console.log(
   invalidThemeConceptClasses.length
     ? invalidThemeConceptClasses.join("\n")
+    : "Ingen",
+);
+
+console.log("\nUgyldig theme / concept group:");
+console.log(
+  invalidThemeConceptGroups.length
+    ? invalidThemeConceptGroups.join("\n")
     : "Ingen",
 );
 
