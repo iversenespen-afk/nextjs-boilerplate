@@ -121,7 +121,7 @@ if (
   // 2. Kontroller at concept faktisk finnes
   const { data: concept, error: conceptError } = await supabaseAdmin
     .from("concepts")
-    .select("id")
+    .select("id, group_id")
     .eq("id", conceptId.trim())
     .maybeSingle();
 
@@ -146,6 +146,49 @@ if (
       { status: 409 },
     );
   }
+
+  if (!concept.group_id) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        `Concept "${conceptId}" mangler group_id og kan ikke godkjennes.`,
+    },
+    { status: 409 },
+  );
+}
+
+const {
+  data: allowedThemeGroup,
+  error: allowedThemeGroupError,
+} = await supabaseAdmin
+  .from("theme_concept_groups")
+  .select("theme_id")
+  .eq("theme_id", themeId.trim())
+  .eq("group_id", concept.group_id)
+  .maybeSingle();
+
+if (allowedThemeGroupError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: allowedThemeGroupError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if (!allowedThemeGroup) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        `Concept "${conceptId}" tilhører gruppen "${concept.group_id}", ` +
+        `som ikke er tillatt for tema "${themeId}".`,
+    },
+    { status: 409 },
+  );
+}
 
   // 3. Sjekk om samme match allerede finnes
   const { data: existingMatch, error: existingMatchError } =
