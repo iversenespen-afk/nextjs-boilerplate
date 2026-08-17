@@ -46,3 +46,62 @@ export async function POST() {
     { status: 500 },
   );
 }
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const sessionId = url.searchParams.get("sessionId");
+
+  if (!sessionId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "sessionId mangler.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const numericSessionId = Number(sessionId);
+
+  if (!Number.isInteger(numericSessionId) || numericSessionId <= 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Ugyldig sessionId.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const { data: session, error } = await supabaseAdmin
+    .from("quiz_sessions")
+    .select(
+      "id, join_code, status, created_at, started_at, ended_at",
+    )
+    .eq("id", numericSessionId)
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Fant ikke quizrommet.",
+      },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    session,
+  });
+}
