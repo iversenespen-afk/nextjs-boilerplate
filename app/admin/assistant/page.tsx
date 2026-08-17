@@ -295,6 +295,8 @@ async function analyzeNextBatch() {
     }
 
     await fetchNextItem();
+    await fetchStats();
+    await fetchImportStats();
   } catch {
     setMessage("Noe gikk galt under batch-analysen.");
   } finally {
