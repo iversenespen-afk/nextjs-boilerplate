@@ -74,9 +74,31 @@ export async function GET(request: Request) {
 
   const { data: session, error } = await supabaseAdmin
     .from("quiz_sessions")
-    .select(
-      "id, join_code, status, created_at, started_at, ended_at",
+    .select(`
+    id,
+    join_code,
+    status,
+    created_at,
+    started_at,
+    ended_at,
+    current_song_match_id,
+    song_matches (
+      id,
+      theme_id,
+      concept_id,
+      matched_text,
+        songs (
+        id,
+        artist,
+        title,
+        spotify_id
+      ),
+      themes (
+        id,
+        name
     )
+  )
+`)
     .eq("id", numericSessionId)
     .maybeSingle();
 
