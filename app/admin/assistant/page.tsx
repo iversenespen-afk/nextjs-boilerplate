@@ -653,7 +653,6 @@ if (remainingSuggestions.length > 0) {
     </div>
   </section>
 )}
-)}
 
       <button
         type="button"
