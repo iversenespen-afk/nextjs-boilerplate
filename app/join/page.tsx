@@ -19,6 +19,22 @@ type JoinResult = {
   };
 };
 
+type QuizQuestion = {
+  songMatchId: number;
+  themeId: string;
+  themeName: string;
+  song: {
+    id: number;
+    title: string;
+    artist: string;
+    spotify_id: string;
+  };
+  options: {
+    id: string;
+    label: string;
+  }[];
+};
+
 export default function JoinPage() {
   const [joinCode, setJoinCode] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -26,6 +42,7 @@ export default function JoinPage() {
   const [message, setMessage] = useState("");
   const [joinedName, setJoinedName] = useState<string | null>(
   null,
+  const [question, setQuestion] = useState<QuizQuestion | null>(null);
 );
 
 const [sessionId, setSessionId] = useState<number | null>(null);
@@ -71,6 +88,28 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
     }
   }
 
+  async function fetchQuestion(currentSessionId: number) {
+  try {
+    const response = await fetch(
+      `/api/quiz/question?sessionId=${currentSessionId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setQuestion(result.question);
+  } catch {
+    // Spørsmålshenting skal ikke krasje spillersiden.
+  }
+}
+
   useEffect(() => {
   if (!sessionId) return;
 
@@ -91,6 +130,10 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
       }
 
       setSessionStatus(result.session.status);
+
+if (result.session.status === "playing") {
+  await fetchQuestion(sessionId);
+}
     } catch {
       // Status-polling skal ikke krasje spillersiden.
     }
@@ -98,18 +141,75 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
 
   fetchSessionStatus();
 
+    if (sessionStatus === "playing") {
+  fetchQuestion(sessionId);
+}
+
   const interval = setInterval(fetchSessionStatus, 2000);
 
   return () => clearInterval(interval);
 }, [sessionId]);
 
   if (joinedName && sessionStatus === "playing") {
+  if (!question) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Quizen har startet!</h1>
+        <p>Laster spørsmål...</p>
+      </main>
+    );
+  }
+
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Quizen har startet!</h1>
-      <p>
-        Klar, <strong>{joinedName}</strong>?
-      </p>
+    <main
+      style={{
+        padding: 24,
+        maxWidth: 720,
+        margin: "0 auto",
+      }}
+    >
+      <div style={{ opacity: 0.7 }}>
+        {question.themeName}
+      </div>
+
+      <h1 style={{ marginBottom: 4 }}>
+        {question.song.artist}
+      </h1>
+
+      <div
+        style={{
+          fontSize: 20,
+          marginBottom: 24,
+        }}
+      >
+        {question.song.title}
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: 12,
+        }}
+      >
+        {question.options.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            style={{
+              padding: "16px 14px",
+              border: "1px solid #555",
+              borderRadius: 999,
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </main>
   );
 }
