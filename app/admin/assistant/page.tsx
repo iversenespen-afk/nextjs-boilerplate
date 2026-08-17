@@ -651,6 +651,27 @@ if (remainingSuggestions.length > 0) {
       {" · "}
       Avvist: <strong>{importStats.rejected}</strong>
     </div>
+    <div style={{ marginTop: 16 }}>
+  {importStats.themes.map((theme) => (
+    <div
+      key={theme.themeId}
+      style={{
+        padding: "8px 0",
+        borderTop: "1px solid #333",
+      }}
+    >
+      <strong>{theme.themeName}</strong>
+      {" · "}
+      Totalt: {theme.total}
+      {" · "}
+      Til review: {theme.toReview}
+      {" · "}
+      Godkjent: {theme.approved}
+      {" · "}
+      Avvist: {theme.rejected}
+    </div>
+  ))}
+</div>
   </section>
 )}
 
