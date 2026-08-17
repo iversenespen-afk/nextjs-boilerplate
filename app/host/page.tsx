@@ -111,44 +111,45 @@ const [participants, setParticipants] = useState<
           {isCreating ? "Oppretter..." : "Opprett quizrom"}
         </button>
       ) : (
-        <section>
-          <div>Romkode</div>
+  <>
+    <section>
+      <div>Romkode</div>
 
-          <strong
-            style={{
-              display: "block",
-              fontSize: 48,
-              letterSpacing: 8,
-              marginTop: 8,
-            }}
-          >
-            {session.join_code}
-          </strong>
-        </section>
+      <strong
+        style={{
+          display: "block",
+          fontSize: 48,
+          letterSpacing: 8,
+          marginTop: 8,
+        }}
+      >
+        {session.join_code}
+      </strong>
+    </section>
 
-<section style={{ marginTop: 24 }}>
-  <h2>Spillere</h2>
+    <section style={{ marginTop: 24 }}>
+      <h2>Spillere</h2>
 
-  {participants.length === 0 ? (
-    <p>Ingen spillere har blitt med ennå.</p>
-  ) : (
-    <div>
-      {participants.map((participant) => (
-        <div
-          key={participant.id}
-          style={{
-            padding: "8px 0",
-            borderTop: "1px solid #333",
-          }}
-        >
-          <strong>{participant.display_name}</strong>
+      {participants.length === 0 ? (
+        <p>Ingen spillere har blitt med ennå.</p>
+      ) : (
+        <div>
+          {participants.map((participant) => (
+            <div
+              key={participant.id}
+              style={{
+                padding: "8px 0",
+                borderTop: "1px solid #333",
+              }}
+            >
+              <strong>{participant.display_name}</strong>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  )}
-</section>
-      
       )}
+    </section>
+  </>
+)}
 
       {message && (
         <p style={{ marginTop: 16 }}>
