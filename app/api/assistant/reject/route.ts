@@ -106,13 +106,62 @@ if ((pendingCount ?? 0) === 0) {
   const finalStatus =
     (approvedCount ?? 0) > 0 ? "approved" : "rejected";
 
+  let representativeApprovedSuggestion:
+  | { concept_id: string; matched_text: string }
+  | null = null;
+
+if (finalStatus === "approved") {
+  const {
+    data: approvedSuggestion,
+    error: approvedSuggestionError,
+  } = await supabaseAdmin
+    .from("assistant_suggestions")
+    .select("concept_id, matched_text")
+    .eq("queue_id", queueId)
+    .eq("status", "approved")
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (approvedSuggestionError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: approvedSuggestionError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  if (!approvedSuggestion) {
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          "Review-raden er godkjent, men fant ingen godkjente forslag.",
+      },
+      { status: 409 },
+    );
+  }
+
+  representativeApprovedSuggestion = approvedSuggestion;
+}
+
   const { error: queueError } = await supabaseAdmin
     .from("match_review_queue")
     .update({
-      verified: finalStatus === "approved",
-      review_status: finalStatus,
-      reviewed_at: new Date().toISOString(),
-    })
+  concept_id:
+    finalStatus === "approved"
+      ? representativeApprovedSuggestion!.concept_id
+      : null,
+  matched_text:
+    finalStatus === "approved"
+      ? representativeApprovedSuggestion!.matched_text
+      : null,
+  verified: finalStatus === "approved",
+  review_status: finalStatus,
+  reviewed_at: new Date().toISOString(),
+})
     .eq("id", queueId);
 
   if (queueError) {
