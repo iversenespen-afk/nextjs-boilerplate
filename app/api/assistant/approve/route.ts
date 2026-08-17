@@ -49,6 +49,48 @@ export async function POST(request: Request) {
     );
   }
 
+// Kontroller at queueId faktisk tilhører samme sang og tema
+const { data: queueItem, error: queueItemError } =
+  await supabaseAdmin
+    .from("match_review_queue")
+    .select("id, spotify_id, theme_id")
+    .eq("id", queueId)
+    .maybeSingle();
+
+if (queueItemError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: queueItemError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if (!queueItem) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ikke review-raden.",
+    },
+    { status: 404 },
+  );
+}
+
+if (
+  queueItem.spotify_id !== spotifyId.trim() ||
+  queueItem.theme_id !== themeId.trim()
+) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "queueId, spotifyId og themeId samsvarer ikke med review-raden.",
+    },
+    { status: 409 },
+  );
+}
+  
   // 1. Finn intern song_id fra Spotify-ID
   const { data: song, error: songError } = await supabaseAdmin
     .from("songs")
