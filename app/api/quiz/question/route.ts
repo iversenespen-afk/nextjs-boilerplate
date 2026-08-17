@@ -215,7 +215,6 @@ if (themeError) {
       themeId: match.theme_id,
       themeName: theme?.name ?? match.theme_id,
       song: match.songs,
-      correctConceptId: match.concept_id,
       options,
     },
   });
