@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type QuizSession = {
   id: number;
@@ -9,10 +9,23 @@ type QuizSession = {
   created_at: string;
 };
 
+type QuizParticipant = {
+  id: number;
+  session_id: number;
+  display_name: string;
+  score: number;
+  joined_at: string;
+};
+
 export default function HostPage() {
   const [session, setSession] = useState<QuizSession | null>(
     null,
   );
+
+const [participants, setParticipants] = useState<
+  QuizParticipant[]
+>([]);
+  
   const [isCreating, setIsCreating] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -43,6 +56,40 @@ export default function HostPage() {
       setIsCreating(false);
     }
   }
+
+  async function fetchParticipants(sessionId: number) {
+  try {
+    const response = await fetch(
+      `/api/quiz/participants?sessionId=${sessionId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setParticipants(result.participants ?? []);
+  } catch {
+    // Deltakerlista skal ikke krasje host-siden.
+  }
+}
+
+  useEffect(() => {
+  if (!session) return;
+
+  fetchParticipants(session.id);
+
+  const interval = setInterval(() => {
+    fetchParticipants(session.id);
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, [session]);
 
   return (
     <main style={{ padding: 24 }}>
@@ -78,6 +125,29 @@ export default function HostPage() {
             {session.join_code}
           </strong>
         </section>
+
+<section style={{ marginTop: 24 }}>
+  <h2>Spillere</h2>
+
+  {participants.length === 0 ? (
+    <p>Ingen spillere har blitt med ennå.</p>
+  ) : (
+    <div>
+      {participants.map((participant) => (
+        <div
+          key={participant.id}
+          style={{
+            padding: "8px 0",
+            borderTop: "1px solid #333",
+          }}
+        >
+          <strong>{participant.display_name}</strong>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
+      
       )}
 
       {message && (
