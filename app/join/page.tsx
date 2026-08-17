@@ -136,7 +136,7 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
       setSessionStatus(result.session.status);
 
 if (result.session.status === "playing") {
-  await fetchQuestion(sessionId);
+  await fetchQuestion(currentSessionId);
 }
     } catch {
       // Status-polling skal ikke krasje spillersiden.
