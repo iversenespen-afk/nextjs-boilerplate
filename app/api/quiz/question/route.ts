@@ -91,10 +91,6 @@ export async function GET(request: Request) {
           title,
           spotify_id
         ),
-        themes (
-          id,
-          name
-        )
       `)
       .eq("id", session.current_song_match_id)
       .maybeSingle();
@@ -118,6 +114,23 @@ export async function GET(request: Request) {
       { status: 404 },
     );
   }
+
+  const { data: theme, error: themeError } =
+  await supabaseAdmin
+    .from("themes")
+    .select("id, name")
+    .eq("id", match.theme_id)
+    .maybeSingle();
+
+if (themeError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: themeError.message,
+    },
+    { status: 500 },
+  );
+}
 
   const { data: groupRows, error: groupError } =
     await supabaseAdmin
@@ -200,7 +213,7 @@ export async function GET(request: Request) {
     question: {
       songMatchId: match.id,
       themeId: match.theme_id,
-      themeName: match.themes[0]?.name ?? match.theme_id,
+      themeName: theme?.name ?? match.theme_id,
       song: match.songs,
       correctConceptId: match.concept_id,
       options,
