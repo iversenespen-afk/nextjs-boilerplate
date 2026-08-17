@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type JoinResult = {
   success: boolean;
@@ -25,7 +25,13 @@ export default function JoinPage() {
   const [isJoining, setIsJoining] = useState(false);
   const [message, setMessage] = useState("");
   const [joinedName, setJoinedName] = useState<string | null>(
-    null,
+  null,
+);
+
+const [sessionId, setSessionId] = useState<number | null>(null);
+
+const [sessionStatus, setSessionStatus] = useState<string | null>(
+  null,
   );
 
   async function joinQuiz() {
@@ -56,6 +62,8 @@ export default function JoinPage() {
       }
 
       setJoinedName(result.participant?.display_name ?? displayName);
+      setSessionId(result.session?.id ?? null);
+      setSessionStatus(result.session?.status ?? null);
     } catch {
       setMessage("Noe gikk galt da du prøvde å bli med.");
     } finally {
@@ -63,6 +71,49 @@ export default function JoinPage() {
     }
   }
 
+  useEffect(() => {
+  if (!sessionId) return;
+
+  async function fetchSessionStatus() {
+    try {
+      const response = await fetch(
+        `/api/quiz/sessions?sessionId=${sessionId}`,
+        {
+          method: "GET",
+          cache: "no-store",
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        return;
+      }
+
+      setSessionStatus(result.session.status);
+    } catch {
+      // Status-polling skal ikke krasje spillersiden.
+    }
+  }
+
+  fetchSessionStatus();
+
+  const interval = setInterval(fetchSessionStatus, 2000);
+
+  return () => clearInterval(interval);
+}, [sessionId]);
+
+  if (joinedName && sessionStatus === "playing") {
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>Quizen har startet!</h1>
+      <p>
+        Klar, <strong>{joinedName}</strong>?
+      </p>
+    </main>
+  );
+}
+  
   if (joinedName) {
     return (
       <main style={{ padding: 24 }}>
