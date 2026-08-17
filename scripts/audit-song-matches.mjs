@@ -54,7 +54,7 @@ if (themesError) {
 
 const { data: concepts, error: conceptsError } = await supabase
   .from("concepts")
-  .select("id");
+  .select("id, concept_class");
 
 if (conceptsError) {
   throw new Error(conceptsError.message);
@@ -72,6 +72,31 @@ const conceptIds = new Set(
   (concepts ?? []).map((concept) => concept.id),
 );
 
+const conceptClassById = new Map(
+  (concepts ?? []).map((concept) => [
+    concept.id,
+    concept.concept_class,
+  ]),
+);
+
+const allowedConceptClassesByTheme = {
+  us_states: ["place"],
+  artists: ["person", "band"],
+  towns: ["place"],
+  colors: ["color"],
+  elements: ["chemical_element"],
+  names: ["person"],
+  body_parts: ["body_part"],
+  furniture: ["furniture"],
+  instruments: ["instrument"],
+  planets: ["planet"],
+  star_wars_planets: ["fictional_planet"],
+  transport: ["vehicle"],
+  tree_species: ["tree"],
+};
+
+console.log("\nQUIZLIX SONG MATCH AUDIT");
+
 console.log("\nQUIZLIX SONG MATCH AUDIT");
 console.log("=========================\n");
 
@@ -83,6 +108,7 @@ const missingMatchedText = [];
 const invalidSongReferences = [];
 const invalidThemeReferences = [];
 const invalidConceptReferences = [];
+const invalidThemeConceptClasses = [];
 const duplicateKeys = new Set();
 const duplicateMatches = [];
 for (const match of matches ?? []) {
@@ -97,6 +123,27 @@ for (const match of matches ?? []) {
   if (!match.concept_id) {
     missingConcept.push(match.id);
   }
+
+  if (
+  match.theme_id &&
+  match.concept_id &&
+  conceptIds.has(match.concept_id)
+) {
+  const conceptClass =
+    conceptClassById.get(match.concept_id);
+
+  const allowedClasses =
+    allowedConceptClassesByTheme[match.theme_id];
+
+  if (
+    allowedClasses &&
+    !allowedClasses.includes(conceptClass)
+  ) {
+    invalidThemeConceptClasses.push(
+      `${match.id}: ${match.theme_id} -> ${match.concept_id} (${conceptClass})`,
+    );
+  }
+}
 
   if (!match.matched_text?.trim()) {
     missingMatchedText.push(match.id);
@@ -182,6 +229,14 @@ console.log(
     ? invalidConceptReferences.join("\n")
     : "Ingen",
 );
+
+console.log("\nUgyldig theme / concept_class:");
+console.log(
+  invalidThemeConceptClasses.length
+    ? invalidThemeConceptClasses.join("\n")
+    : "Ingen",
+);
+
 console.log("\nDuplikate song_matches:");
 console.log(
   duplicateMatches.length
