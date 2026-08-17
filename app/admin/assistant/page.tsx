@@ -654,23 +654,41 @@ if (remainingSuggestions.length > 0) {
       Avvist: <strong>{importStats.rejected}</strong>
     </div>
     <div style={{ marginTop: 16 }}>
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "minmax(180px, 1fr) 80px 90px 90px 80px",
+      gap: 12,
+      padding: "8px 0",
+      borderTop: "1px solid #333",
+      fontWeight: 700,
+      opacity: 0.75,
+    }}
+  >
+    <div>Tema</div>
+    <div>Totalt</div>
+    <div>Til review</div>
+    <div>Godkjent</div>
+    <div>Avvist</div>
+  </div>
+
   {importStats.themes.map((theme) => (
     <div
       key={theme.themeId}
       style={{
+        display: "grid",
+        gridTemplateColumns: "minmax(180px, 1fr) 80px 90px 90px 80px",
+        gap: 12,
         padding: "8px 0",
         borderTop: "1px solid #333",
+        alignItems: "center",
       }}
     >
       <strong>{theme.themeName}</strong>
-      {" · "}
-      Totalt: {theme.total}
-      {" · "}
-      Til review: {theme.toReview}
-      {" · "}
-      Godkjent: {theme.approved}
-      {" · "}
-      Avvist: {theme.rejected}
+      <div>{theme.total}</div>
+      <div>{theme.toReview}</div>
+      <div>{theme.approved}</div>
+      <div>{theme.rejected}</div>
     </div>
   ))}
 </div>
