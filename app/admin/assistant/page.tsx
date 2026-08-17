@@ -626,6 +626,32 @@ if (remainingSuggestions.length > 0) {
       </strong>
     </div>
   </section>
+
+      {importStats && (
+  <section
+    style={{
+      marginTop: 24,
+      padding: 16,
+      border: "1px solid #444",
+      borderRadius: 12,
+      background: "#171717",
+    }}
+  >
+    <h2 style={{ marginTop: 0 }}>Import-status</h2>
+
+    <div>
+      Sanger: <strong>{importStats.songs}</strong>
+      {" · "}
+      Kø: <strong>{importStats.queueTotal}</strong>
+      {" · "}
+      Til review: <strong>{importStats.toReview}</strong>
+      {" · "}
+      Godkjent: <strong>{importStats.approved}</strong>
+      {" · "}
+      Avvist: <strong>{importStats.rejected}</strong>
+    </div>
+  </section>
+)}
 )}
 
       <button
