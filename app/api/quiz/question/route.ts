@@ -90,7 +90,7 @@ export async function GET(request: Request) {
           artist,
           title,
           spotify_id
-        ),
+        )
       `)
       .eq("id", session.current_song_match_id)
       .maybeSingle();
