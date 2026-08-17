@@ -42,8 +42,10 @@ export default function JoinPage() {
   const [message, setMessage] = useState("");
   const [joinedName, setJoinedName] = useState<string | null>(
   null,
-  const [question, setQuestion] = useState<QuizQuestion | null>(null);
 );
+
+const [question, setQuestion] =
+  useState<QuizQuestion | null>(null);
 
 const [sessionId, setSessionId] = useState<number | null>(null);
 
@@ -140,10 +142,6 @@ if (result.session.status === "playing") {
   }
 
   fetchSessionStatus();
-
-    if (sessionStatus === "playing") {
-  fetchQuestion(sessionId);
-}
 
   const interval = setInterval(fetchSessionStatus, 2000);
 
