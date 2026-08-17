@@ -28,6 +28,7 @@ const [participants, setParticipants] = useState<
   
   const [isCreating, setIsCreating] = useState(false);
   const [message, setMessage] = useState("");
+  const [isStarting, setIsStarting] = useState(false);
 
   async function createSession() {
     if (isCreating) return;
@@ -79,6 +80,47 @@ const [participants, setParticipants] = useState<
   }
 }
 
+async function startQuiz() {
+  if (!session || isStarting) return;
+
+  setIsStarting(true);
+  setMessage("");
+
+  try {
+    const response = await fetch("/api/quiz/start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId: session.id,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke starte quizen.",
+      );
+      return;
+    }
+
+    setSession((currentSession) =>
+      currentSession
+        ? {
+            ...currentSession,
+            status: result.session.status,
+          }
+        : currentSession,
+    );
+  } catch {
+    setMessage("Noe gikk galt da quizen skulle startes.");
+  } finally {
+    setIsStarting(false);
+  }
+}
+  
   useEffect(() => {
   if (!session) return;
 
@@ -147,6 +189,25 @@ const [participants, setParticipants] = useState<
           ))}
         </div>
       )}
+                <button
+            type="button"
+            onClick={startQuiz}
+            disabled={isStarting || participants.length === 0}
+            style={{
+              marginTop: 24,
+              padding: "12px 18px",
+              border: 0,
+              borderRadius: 10,
+              cursor:
+                isStarting || participants.length === 0
+                  ? "default"
+                  : "pointer",
+              fontWeight: 700,
+            }}
+          >
+            {isStarting ? "Starter..." : "Start quiz"}
+          </button>
+     
     </section>
   </>
 )}
