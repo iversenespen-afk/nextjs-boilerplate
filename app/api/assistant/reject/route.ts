@@ -32,7 +32,10 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-const { error: suggestionError } = await supabaseAdmin
+const {
+  data: rejectedSuggestion,
+  error: suggestionError,
+} = await supabaseAdmin
   .from("assistant_suggestions")
   .update({
     status: "rejected",
@@ -40,7 +43,9 @@ const { error: suggestionError } = await supabaseAdmin
   })
   .eq("queue_id", queueId)
   .eq("concept_id", conceptId.trim())
-  .eq("status", "pending");
+  .eq("status", "pending")
+  .select("id")
+  .maybeSingle();
 
 if (suggestionError) {
   return NextResponse.json(
@@ -51,6 +56,18 @@ if (suggestionError) {
     { status: 500 },
   );
 }
+
+if (!rejectedSuggestion) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "Fant ikke et pending forslag med denne queueId og conceptId.",
+    },
+    { status: 409 },
+  );
+}
+  
   const { count: pendingCount, error: pendingError } =
   await supabaseAdmin
     .from("assistant_suggestions")
