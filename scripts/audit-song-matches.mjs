@@ -135,14 +135,15 @@ for (const match of matches ?? []) {
   const allowedClasses =
     allowedConceptClassesByTheme[match.theme_id];
 
-  if (
-    allowedClasses &&
-    !allowedClasses.includes(conceptClass)
-  ) {
-    invalidThemeConceptClasses.push(
-      `${match.id}: ${match.theme_id} -> ${match.concept_id} (${conceptClass})`,
-    );
-  }
+  if (!allowedClasses) {
+  invalidThemeConceptClasses.push(
+    `${match.id}: ${match.theme_id} mangler allowed concept_class-regler`,
+  );
+} else if (!allowedClasses.includes(conceptClass)) {
+  invalidThemeConceptClasses.push(
+    `${match.id}: ${match.theme_id} -> ${match.concept_id} (${conceptClass})`,
+  );
+}
 }
 
   if (!match.matched_text?.trim()) {
