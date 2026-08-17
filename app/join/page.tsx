@@ -114,6 +114,8 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
 
   useEffect(() => {
   if (!sessionId) return;
+  
+  const currentSessionId = sessionId;
 
   async function fetchSessionStatus() {
     try {
