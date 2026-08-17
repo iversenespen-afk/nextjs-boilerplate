@@ -173,7 +173,6 @@ const key = [
   match.song_id,
   match.theme_id,
   match.concept_id,
-  match.matched_text?.trim().toLowerCase(),
 ].join("|");
 
 if (duplicateKeys.has(key)) {
