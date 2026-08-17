@@ -626,6 +626,7 @@ if (remainingSuggestions.length > 0) {
       </strong>
     </div>
   </section>
+      )}
 
       {importStats && (
   <section
