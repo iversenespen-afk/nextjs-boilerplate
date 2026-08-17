@@ -200,7 +200,10 @@ export async function GET(request: Request) {
     question: {
       songMatchId: match.id,
       themeId: match.theme_id,
-      themeName: match.themes?.name ?? match.theme_id,
+      themeName:
+  Array.isArray(match.themes) && match.themes.length > 0
+    ? match.themes[0].name
+    : match.theme_id,
       song: match.songs,
       correctConceptId: match.concept_id,
       options,
