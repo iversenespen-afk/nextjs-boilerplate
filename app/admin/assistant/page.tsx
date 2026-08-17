@@ -46,6 +46,24 @@ type AssistantStats = {
   rejected: number;
 };
 
+type ImportThemeStats = {
+  themeId: string;
+  themeName: string;
+  total: number;
+  toReview: number;
+  approved: number;
+  rejected: number;
+};
+
+type ImportStats = {
+  songs: number;
+  queueTotal: number;
+  toReview: number;
+  approved: number;
+  rejected: number;
+  themes: ImportThemeStats[];
+};
+
 export default function AssistantPage() {
   const [item, setItem] = useState<QueueItem | null>(null);
   const [message, setMessage] = useState("");
@@ -59,6 +77,9 @@ const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [stats, setStats] = useState<AssistantStats | null>(
   null,
 );
+
+  const [importStats, setImportStats] =
+  useState<ImportStats | null>(null);
 
 async function fetchStats() {
   try {
@@ -79,8 +100,28 @@ async function fetchStats() {
   }
 }
 
+  async function fetchImportStats() {
+  try {
+    const response = await fetch("/api/assistant/import-stats", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setImportStats(result.stats);
+  } catch {
+    // Import-statistikk skal ikke stoppe Assistant-siden.
+  }
+}
+
 useEffect(() => {
   fetchStats();
+  fetchImportStats();
 }, []);
   
   async function fetchNextItem() {
