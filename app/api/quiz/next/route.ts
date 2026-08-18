@@ -70,6 +70,28 @@ export async function POST(request: Request) {
       { status: 409 },
     );
   }
+  const { data: historyRows, error: historyError } =
+  await supabaseAdmin
+    .from("quiz_session_questions")
+    .select("song_id, theme_id, question_number")
+    .eq("session_id", sessionId)
+    .order("question_number", { ascending: true });
+
+if (historyError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: historyError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const usedQuestionKeys = new Set(
+  (historyRows ?? []).map(
+    (row) => `${row.song_id}|${row.theme_id}`,
+  ),
+);
 
   const { data: matchRows, error: matchError } =
     await supabaseAdmin
@@ -87,9 +109,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const availableMatches = (matchRows ?? []).filter(
-    (match) => match.id !== session.current_song_match_id,
-  );
+  const availableMatches = (matchRows ?? []).filter((match) => {
+  const questionKey = `${match.song_id}|${match.theme_id}`;
+
+  return !usedQuestionKeys.has(questionKey);
+});
 
   if (availableMatches.length === 0) {
     return NextResponse.json(
@@ -105,6 +129,8 @@ export async function POST(request: Request) {
     availableMatches[
       Math.floor(Math.random() * availableMatches.length)
     ];
+  const nextQuestionNumber =
+  (historyRows?.length ?? 0) + 1;
 
   const { data: correctMatches, error: correctMatchesError } =
     await supabaseAdmin
@@ -253,7 +279,27 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+const { error: questionHistoryError } =
+  await supabaseAdmin
+    .from("quiz_session_questions")
+    .insert({
+      session_id: sessionId,
+      song_id: randomMatch.song_id,
+      theme_id: randomMatch.theme_id,
+      song_match_id: randomMatch.id,
+      question_number: nextQuestionNumber,
+      started_at: new Date().toISOString(),
+    });
 
+if (questionHistoryError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: questionHistoryError.message,
+    },
+    { status: 500 },
+  );
+}
   return NextResponse.json({
     success: true,
     session: updatedSession,
