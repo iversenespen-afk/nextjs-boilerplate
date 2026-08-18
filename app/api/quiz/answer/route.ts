@@ -134,7 +134,7 @@ export async function POST(request: Request) {
   const { data: match, error: matchError } =
     await supabaseAdmin
       .from("song_matches")
-      .select("id, concept_id")
+      .select("id, song_id, theme_id, concept_id")
       .eq("id", session.current_song_match_id)
       .maybeSingle();
 
@@ -157,6 +157,28 @@ export async function POST(request: Request) {
       { status: 404 },
     );
   }
+
+  const { data: correctMatches, error: correctMatchesError } =
+  await supabaseAdmin
+    .from("song_matches")
+    .select("concept_id")
+    .eq("song_id", match.song_id)
+    .eq("theme_id", match.theme_id)
+    .eq("verified", true);
+
+if (correctMatchesError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: correctMatchesError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const correctConceptIds = new Set(
+  (correctMatches ?? []).map((row) => row.concept_id),
+);
 
   const { data: selectedConcept, error: conceptError } =
     await supabaseAdmin
@@ -185,7 +207,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const isCorrect = selectedConceptId === match.concept_id;
+  const isCorrect = correctConceptIds.has(selectedConceptId);
 
   const { error: answerError } = await supabaseAdmin
     .from("quiz_answers")
