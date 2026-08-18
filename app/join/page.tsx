@@ -218,7 +218,29 @@ if (result.session.status === "playing") {
 
   return () => clearInterval(interval);
 }, [sessionId]);
+if (joinedName && sessionStatus === "finished") {
+  return (
+    <main
+      style={{
+        padding: 24,
+        maxWidth: 720,
+        margin: "0 auto",
+        textAlign: "center",
+      }}
+    >
+      <h1>Quizen er ferdig!</h1>
 
+      <p
+        style={{
+          marginTop: 16,
+          fontSize: 20,
+        }}
+      >
+        Takk for kampen, <strong>{joinedName}</strong>.
+      </p>
+    </main>
+  );
+}
   if (joinedName && sessionStatus === "playing") {
   if (!question) {
     return (
