@@ -402,6 +402,69 @@ const interval = setInterval(() => {
   )}
               </div>
             )}
+            {session.status === "finished" && (
+  <section style={{ marginTop: 32 }}>
+    <h2>Sluttresultat</h2>
+
+    {[...participants]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((participant, index) => (
+        <div
+          key={participant.id}
+          style={{
+            marginTop: 12,
+            padding: 16,
+            border: "1px solid #444",
+            borderRadius: 12,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 16,
+              fontSize: index === 0 ? 24 : 20,
+              fontWeight: 800,
+            }}
+          >
+            <span>
+              {index + 1}. {participant.display_name}
+            </span>
+
+            <span>{participant.score} poeng</span>
+          </div>
+        </div>
+      ))}
+
+    {participants.length > 3 && (
+      <div style={{ marginTop: 24 }}>
+        <h3>Alle resultater</h3>
+
+        {[...participants]
+          .sort((a, b) => b.score - a.score)
+          .map((participant, index) => (
+            <div
+              key={participant.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 16,
+                padding: "8px 0",
+                borderTop: "1px solid #333",
+              }}
+            >
+              <span>
+                {index + 1}. {participant.display_name}
+              </span>
+
+              <strong>{participant.score} poeng</strong>
+            </div>
+          ))}
+      </div>
+    )}
+  </section>
+)}
           </section>
         </>
       )}
