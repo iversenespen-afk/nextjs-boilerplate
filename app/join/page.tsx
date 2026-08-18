@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type JoinResult = {
   success: boolean;
@@ -44,6 +44,7 @@ export default function JoinPage() {
   useState<number | null>(null);
   const [selectedConceptId, setSelectedConceptId] =
   useState<string | null>(null);
+  const currentQuestionIdRef = useRef<number | null>(null);
 
 const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
@@ -116,9 +117,15 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
       return;
     }
 
-    setSelectedConceptId(null);
-setAnswerResult(null);
-setMessage("");
+    if (
+  currentQuestionIdRef.current !== result.question.songMatchId
+) {
+  setSelectedConceptId(null);
+  setAnswerResult(null);
+  setMessage("");
+  currentQuestionIdRef.current = result.question.songMatchId;
+}
+
 setQuestion(result.question);
   } catch {
     // Spørsmålshenting skal ikke krasje spillersiden.
