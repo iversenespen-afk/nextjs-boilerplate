@@ -261,6 +261,18 @@ if (result.session.status === "playing") {
               borderRadius: 999,
               fontSize: 16,
               fontWeight: 700,
+              background:
+                selectedConceptId === option.id
+                  ? answerResult === "correct"
+                    ? "#15803d"
+                    : answerResult === "wrong"
+                      ? "#b91c1c"
+                      : undefined
+                  : undefined,
+              color:
+                selectedConceptId === option.id && answerResult
+                  ? "#ffffff"
+                  : undefined,
               cursor:
                 isAnswering || answerResult
                   ? "default"
