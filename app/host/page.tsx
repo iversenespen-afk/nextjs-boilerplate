@@ -30,6 +30,7 @@ const [participants, setParticipants] = useState<
   const [message, setMessage] = useState("");
   const [isStarting, setIsStarting] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
+  const [questionCount, setQuestionCount] = useState(10);
   const [answerStatus, setAnswerStatus] = useState({
   answered: 0,
   total: 0,
@@ -122,6 +123,7 @@ async function startQuiz() {
       },
       body: JSON.stringify({
         sessionId: session.id,
+        questionCount,
       }),
     });
 
@@ -286,27 +288,57 @@ const interval = setInterval(() => {
               )}
 
               {session.status === "lobby" && (
-                <button
-                  type="button"
-                  onClick={startQuiz}
-                  disabled={
-                    isStarting || participants.length === 0
-                  }
-                  style={{
-                    marginTop: 24,
-                    padding: "12px 18px",
-                    border: 0,
-                    borderRadius: 10,
-                    cursor:
-                      isStarting || participants.length === 0
-                        ? "default"
-                        : "pointer",
-                    fontWeight: 700,
-                  }}
-                >
-                  {isStarting ? "Starter..." : "Start quiz"}
-                </button>
-              )}
+  <div style={{ marginTop: 24 }}>
+    <label
+      htmlFor="questionCount"
+      style={{
+        display: "block",
+        marginBottom: 6,
+        fontWeight: 700,
+      }}
+    >
+      Antall spørsmål
+    </label>
+
+    <select
+      id="questionCount"
+      value={questionCount}
+      onChange={(event) =>
+        setQuestionCount(Number(event.target.value))
+      }
+      style={{
+        padding: "10px 12px",
+        borderRadius: 8,
+        fontSize: 16,
+      }}
+    >
+      <option value={10}>10 spørsmål</option>
+      <option value={20}>20 spørsmål</option>
+      <option value={30}>30 spørsmål</option>
+    </select>
+
+    <div>
+      <button
+        type="button"
+        onClick={startQuiz}
+        disabled={isStarting || participants.length === 0}
+        style={{
+          marginTop: 16,
+          padding: "12px 18px",
+          border: 0,
+          borderRadius: 10,
+          cursor:
+            isStarting || participants.length === 0
+              ? "default"
+              : "pointer",
+          fontWeight: 700,
+        }}
+      >
+        {isStarting ? "Starter..." : "Start quiz"}
+      </button>
+    </div>
+  </div>
+)}
 
               {session.status === "playing" && (
                 <div>
