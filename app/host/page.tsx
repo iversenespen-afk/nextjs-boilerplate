@@ -175,7 +175,21 @@ async function nextQuestion() {
       return;
     }
 
-    setMessage("Neste spørsmål er klart.");
+    if (result.finished) {
+  setSession((currentSession) =>
+    currentSession
+      ? {
+          ...currentSession,
+          status: "finished",
+        }
+      : currentSession,
+  );
+
+  setMessage("Quizen er ferdig.");
+  return;
+}
+
+setMessage("Neste spørsmål er klart.");
   } catch {
     setMessage("Noe gikk galt da neste spørsmål skulle hentes.");
   } finally {
