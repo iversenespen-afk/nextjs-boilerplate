@@ -29,6 +29,7 @@ const [participants, setParticipants] = useState<
   const [isCreating, setIsCreating] = useState(false);
   const [message, setMessage] = useState("");
   const [isStarting, setIsStarting] = useState(false);
+  const [isLoadingNext, setIsLoadingNext] = useState(false);
 
   async function createSession() {
     if (isCreating) return;
@@ -120,6 +121,40 @@ async function startQuiz() {
     setIsStarting(false);
   }
 }
+
+async function nextQuestion() {
+  if (!session || isLoadingNext) return;
+
+  setIsLoadingNext(true);
+  setMessage("");
+
+  try {
+    const response = await fetch("/api/quiz/next", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId: session.id,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke hente neste spørsmål.",
+      );
+      return;
+    }
+
+    setMessage("Neste spørsmål er klart.");
+  } catch {
+    setMessage("Noe gikk galt da neste spørsmål skulle hentes.");
+  } finally {
+    setIsLoadingNext(false);
+  }
+}
   
   useEffect(() => {
   if (!session) return;
@@ -206,6 +241,23 @@ async function startQuiz() {
             }}
           >
             {isStarting ? "Starter..." : "Start quiz"}
+                  {session.status === "playing" && (
+  <button
+    type="button"
+    onClick={nextQuestion}
+    disabled={isLoadingNext}
+    style={{
+      marginTop: 12,
+      padding: "12px 18px",
+      border: 0,
+      borderRadius: 10,
+      cursor: isLoadingNext ? "default" : "pointer",
+      fontWeight: 700,
+    }}
+  >
+    {isLoadingNext ? "Henter..." : "Neste spørsmål"}
+  </button>
+)}
           </button>
      
     </section>
