@@ -203,17 +203,6 @@ const selectedDistractors = distractors.slice(
   distractorCount,
 );
 
-const options = [
-  ...correctConcepts.map((concept) => ({
-    id: concept.id,
-    label: concept.label_no,
-  })),
-  ...selectedDistractors.map((concept) => ({
-    id: concept.id,
-    label: concept.label_no,
-  })),
-].sort(() => Math.random() - 0.5);
-
   return NextResponse.json({
     success: true,
     question: {
