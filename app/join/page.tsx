@@ -334,29 +334,7 @@ if (result.session.status === "playing") {
     </div>
   </div>
 )}
-            {answerResult && (
-        <div style={{ marginTop: 24 }}>
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-            }}
-          >
-            {answerResult === "correct"
-              ? "Riktig!"
-              : "Feil."}
-          </div>
-
-          <div
-            style={{
-              marginTop: 8,
-              opacity: 0.7,
-            }}
-          >
-            Venter på neste spørsmål...
-          </div>
-        </div>
-      )}
+            
     </main>
   );
 }
