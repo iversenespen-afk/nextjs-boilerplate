@@ -116,7 +116,10 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
       return;
     }
 
-    setQuestion(result.question);
+    setSelectedConceptId(null);
+setAnswerResult(null);
+setMessage("");
+setQuestion(result.question);
   } catch {
     // Spørsmålshenting skal ikke krasje spillersiden.
   }
