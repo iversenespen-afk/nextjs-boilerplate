@@ -208,6 +208,8 @@ const correctConceptIds = new Set(
       { status: 404 },
     );
   }
+
+  const isCorrect = correctConceptIds.has(selectedConceptId);
   let pointsAwarded = 0;
 
 if (isCorrect && session.current_question_started_at) {
@@ -227,8 +229,6 @@ if (isCorrect && session.current_question_started_at) {
     100 - Math.floor(elapsedSeconds / 2),
   );
 }
-
-  const isCorrect = correctConceptIds.has(selectedConceptId);
 
   const { error: answerError } = await supabaseAdmin
     .from("quiz_answers")
