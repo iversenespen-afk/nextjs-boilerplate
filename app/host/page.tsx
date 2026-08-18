@@ -284,28 +284,35 @@ const interval = setInterval(() => {
             }}
           >
             {isStarting ? "Starter..." : "Start quiz"}
-                  {session.status === "playing" && (
-  <button
-    type="button"
-    onClick={nextQuestion}
-    disabled={isLoadingNext}
-    style={{
-      marginTop: 12,
-      padding: "12px 18px",
-      border: 0,
-      borderRadius: 10,
-      cursor: isLoadingNext ? "default" : "pointer",
-      fontWeight: 700,
-    }}
-  >
-    {isLoadingNext ? "Henter..." : "Neste spørsmål"}
-  </button>
-)}
+                        {session.status === "playing" && (
+        <div>
+          <div
+            style={{
+              marginTop: 16,
+              fontSize: 18,
+              fontWeight: 700,
+            }}
+          >
+            Svar: {answerStatus.answered} / {answerStatus.total}
+          </div>
+
+          <button
+            type="button"
+            onClick={nextQuestion}
+            disabled={isLoadingNext}
+            style={{
+              marginTop: 12,
+              padding: "12px 18px",
+              border: 0,
+              borderRadius: 10,
+              cursor: isLoadingNext ? "default" : "pointer",
+              fontWeight: 700,
+            }}
+          >
+            {isLoadingNext ? "Henter..." : "Neste spørsmål"}
           </button>
-     
-    </section>
-  </>
-)}
+        </div>
+      )}
 
       {message && (
         <p style={{ marginTop: 16 }}>
