@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const { data: session, error: sessionError } =
     await supabaseAdmin
       .from("quiz_sessions")
-      .select("id, status, current_song_match_id")
+      .select("id, status, current_song_match_id, question_count")
       .eq("id", sessionId)
       .maybeSingle();
 
@@ -92,6 +92,37 @@ const usedQuestionKeys = new Set(
     (row) => `${row.song_id}|${row.theme_id}`,
   ),
 );
+  const currentQuestionNumber = historyRows?.length ?? 0;
+
+if (currentQuestionNumber >= session.question_count) {
+  const { data: finishedSession, error: finishError } =
+    await supabaseAdmin
+      .from("quiz_sessions")
+      .update({
+        status: "finished",
+        ended_at: new Date().toISOString(),
+      })
+      .eq("id", sessionId)
+      .eq("status", "playing")
+      .select("id, status, ended_at")
+      .single();
+
+  if (finishError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: finishError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    finished: true,
+    session: finishedSession,
+  });
+}
 
   const { data: matchRows, error: matchError } =
     await supabaseAdmin
