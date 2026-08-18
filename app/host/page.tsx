@@ -338,13 +338,22 @@ const interval = setInterval(() => {
                 <button
                   type="button"
                   onClick={nextQuestion}
-                  disabled={isLoadingNext}
+                  disabled={
+                    isLoadingNext ||
+                    answerStatus.total === 0 ||
+                    answerStatus.answered < answerStatus.total
+                  }
                   style={{
                     marginTop: 12,
                     padding: "12px 18px",
                     border: 0,
                     borderRadius: 10,
-                    cursor: isLoadingNext ? "default" : "pointer",
+                    cursor:
+                      isLoadingNext ||
+                      answerStatus.total === 0 ||
+                      answerStatus.answered < answerStatus.total
+                        ? "default"
+                        : "pointer",
                     fontWeight: 700,
                   }}
                 >
