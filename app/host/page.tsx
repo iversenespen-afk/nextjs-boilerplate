@@ -211,7 +211,9 @@ async function nextQuestion() {
         <p>Ingen spillere har blitt med ennå.</p>
       ) : (
         <div>
-          {participants.map((participant) => (
+          {[...participants]
+            .sort((a, b) => b.score - a.score)
+            .map((participant, index) => (
             <div
               key={participant.id}
               style={{
@@ -219,7 +221,19 @@ async function nextQuestion() {
                 borderTop: "1px solid #333",
               }}
             >
-              <strong>{participant.display_name}</strong>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 16,
+                }}
+            >  
+              <strong>
+                {index + 1}. {participant.display_name}
+              </strong>
+            
+              <strong>{participant.score} poeng</strong>
+              </div>
             </div>
           ))}
         </div>
