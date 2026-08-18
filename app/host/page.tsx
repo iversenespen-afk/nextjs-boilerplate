@@ -298,7 +298,41 @@ const interval = setInterval(() => {
                     fontWeight: 700,
                   }}
                 >
-                  Svar: {answerStatus.answered} / {answerStatus.total}
+                  <div
+  style={{
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: 700,
+  }}
+>
+  Svar: {answerStatus.answered} / {answerStatus.total}
+
+  <div
+    style={{
+      marginTop: 6,
+      fontSize: 14,
+      fontWeight: 400,
+      opacity: 0.7,
+    }}
+  >
+    {answerStatus.total > 0 &&
+    answerStatus.answered >= answerStatus.total
+      ? "Alle har svart ✓"
+      : `Venter på ${
+          Math.max(
+            0,
+            answerStatus.total - answerStatus.answered,
+          )
+        } spiller${
+          Math.max(
+            0,
+            answerStatus.total - answerStatus.answered,
+          ) === 1
+            ? ""
+            : "e"
+        }...`}
+  </div>
+</div>
                 </div>
 
                 <button
