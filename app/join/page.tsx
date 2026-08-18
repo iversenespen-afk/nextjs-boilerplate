@@ -293,6 +293,32 @@ if (result.session.status === "playing") {
           </button>
         ))}
       </div>
+      {answerResult && (
+  <div
+    style={{
+      marginTop: 24,
+      textAlign: "center",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 24,
+        fontWeight: 800,
+      }}
+    >
+      {answerResult === "correct" ? "Riktig!" : "Feil."}
+    </div>
+
+    <div
+      style={{
+        marginTop: 8,
+        opacity: 0.7,
+      }}
+    >
+      Venter på neste spørsmål...
+    </div>
+  </div>
+)}
             {answerResult && (
         <div style={{ marginTop: 24 }}>
           <div
