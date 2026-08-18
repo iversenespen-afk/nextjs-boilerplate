@@ -83,6 +83,7 @@ export async function GET(request: Request) {
       .from("song_matches")
       .select(`
         id,
+        song_id,
         theme_id,
         concept_id,
         songs (
@@ -114,6 +115,38 @@ export async function GET(request: Request) {
       { status: 404 },
     );
   }
+
+  const { data: correctMatches, error: correctMatchesError } =
+  await supabaseAdmin
+    .from("song_matches")
+    .select("concept_id")
+    .eq("song_id", match.song_id)
+    .eq("theme_id", match.theme_id)
+    .eq("verified", true);
+
+if (correctMatchesError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: correctMatchesError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const correctConceptIds = new Set(
+  (correctMatches ?? []).map((row) => row.concept_id),
+);
+
+if (correctConceptIds.size === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ingen gyldige svar for spørsmålet.",
+    },
+    { status: 409 },
+  );
+}
 
   const { data: theme, error: themeError } =
   await supabaseAdmin
@@ -179,34 +212,43 @@ if (themeError) {
   }
 
   const distractors = (candidateConcepts ?? [])
-    .filter((concept) => concept.id !== match.concept_id)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, ANSWER_OPTION_COUNT - 1);
+    .filter((concept) => !correctConceptIds.has(concept.id))
+    .sort(() => Math.random() - 0.5);
 
-  const correctConcept = (candidateConcepts ?? []).find(
-  (concept) => concept.id === match.concept_id,
+  const correctConcepts = (candidateConcepts ?? []).filter(
+  (concept) => correctConceptIds.has(concept.id),
 );
 
-  if (!correctConcept) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Fant ikke riktig concept.",
-      },
-      { status: 409 },
-    );
-  }
-
-  const options = [
+if (correctConcepts.length === 0) {
+  return NextResponse.json(
     {
-      id: correctConcept.id,
-      label: correctConcept.label_no,
+      success: false,
+      message: "Fant ingen riktige concepts blant temaets concepts.",
     },
-    ...distractors.map((concept) => ({
-      id: concept.id,
-      label: concept.label_no,
-    })),
-  ].sort(() => Math.random() - 0.5);
+    { status: 409 },
+  );
+}
+
+const distractorCount = Math.max(
+  0,
+  ANSWER_OPTION_COUNT - correctConcepts.length,
+);
+
+const selectedDistractors = distractors.slice(
+  0,
+  distractorCount,
+);
+
+const options = [
+  ...correctConcepts.map((concept) => ({
+    id: concept.id,
+    label: concept.label_no,
+  })),
+  ...selectedDistractors.map((concept) => ({
+    id: concept.id,
+    label: concept.label_no,
+  })),
+].sort(() => Math.random() - 0.5);
 
   return NextResponse.json({
     success: true,
