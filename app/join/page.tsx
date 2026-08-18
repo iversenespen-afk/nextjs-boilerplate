@@ -40,6 +40,15 @@ export default function JoinPage() {
   const [displayName, setDisplayName] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const [message, setMessage] = useState("");
+  const [participantId, setParticipantId] =
+  useState<number | null>(null);
+  const [selectedConceptId, setSelectedConceptId] =
+  useState<string | null>(null);
+
+const [answerResult, setAnswerResult] =
+  useState<"correct" | "wrong" | null>(null);
+
+const [isAnswering, setIsAnswering] = useState(false);
   const [joinedName, setJoinedName] = useState<string | null>(
   null,
 );
@@ -81,6 +90,7 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
       }
 
       setJoinedName(result.participant?.display_name ?? displayName);
+      setParticipantId(result.participant?.id ?? null);
       setSessionId(result.session?.id ?? null);
       setSessionStatus(result.session?.status ?? null);
     } catch {
@@ -109,6 +119,52 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
     setQuestion(result.question);
   } catch {
     // Spørsmålshenting skal ikke krasje spillersiden.
+  }
+}
+
+  async function submitAnswer(selectedConceptId: string) {
+  if (
+    !sessionId ||
+    !participantId ||
+    isAnswering ||
+    answerResult
+  ) {
+    return;
+  }
+
+  setIsAnswering(true);
+  setMessage("");
+
+  try {
+    const response = await fetch("/api/quiz/answer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId,
+        participantId,
+        selectedConceptId,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke registrere svaret.",
+      );
+      return;
+    }
+
+    setSelectedConceptId(selectedConceptId);
+    setAnswerResult(
+      result.result.isCorrect ? "correct" : "wrong",
+    );
+  } catch {
+    setMessage("Noe gikk galt da svaret skulle registreres.");
+  } finally {
+    setIsAnswering(false);
   }
 }
 
@@ -197,13 +253,18 @@ if (result.session.status === "playing") {
           <button
             key={option.id}
             type="button"
+            onClick={() => submitAnswer(option.id)}
+              disabled={isAnswering || answerResult !== null}
             style={{
               padding: "16px 14px",
               border: "1px solid #555",
               borderRadius: 999,
               fontSize: 16,
               fontWeight: 700,
-              cursor: "pointer",
+              cursor:
+                isAnswering || answerResult
+                  ? "default"
+                  : "pointer",
             }}
           >
             {option.label}
