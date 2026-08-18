@@ -3,8 +3,6 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const runtime = "nodejs";
 
-const ANSWER_OPTION_COUNT = 12;
-
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("sessionId");
@@ -34,7 +32,9 @@ export async function GET(request: Request) {
   const { data: session, error: sessionError } =
     await supabaseAdmin
       .from("quiz_sessions")
-      .select("id, status, current_song_match_id, current_options")
+      .select(
+        "id, status, current_song_match_id, current_options",
+      )
       .eq("id", numericSessionId)
       .maybeSingle();
 
@@ -78,6 +78,20 @@ export async function GET(request: Request) {
     );
   }
 
+  const options = Array.isArray(session.current_options)
+    ? session.current_options
+    : [];
+
+  if (options.length === 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Quizrommet mangler lagrede svaralternativer.",
+      },
+      { status: 409 },
+    );
+  }
+
   const { data: match, error: matchError } =
     await supabaseAdmin
       .from("song_matches")
@@ -85,7 +99,6 @@ export async function GET(request: Request) {
         id,
         song_id,
         theme_id,
-        concept_id,
         songs (
           id,
           artist,
@@ -116,92 +129,22 @@ export async function GET(request: Request) {
     );
   }
 
-  const { data: correctMatches, error: correctMatchesError } =
-  await supabaseAdmin
-    .from("song_matches")
-    .select("concept_id")
-    .eq("song_id", match.song_id)
-    .eq("theme_id", match.theme_id)
-    .eq("verified", true);
-
-if (correctMatchesError) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: correctMatchesError.message,
-    },
-    { status: 500 },
-  );
-}
-
-const correctConceptIds = new Set(
-  (correctMatches ?? []).map((row) => row.concept_id),
-);
-
-if (correctConceptIds.size === 0) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: "Fant ingen gyldige svar for spørsmålet.",
-    },
-    { status: 409 },
-  );
-}
-
   const { data: theme, error: themeError } =
-  await supabaseAdmin
-    .from("themes")
-    .select("id, name")
-    .eq("id", match.theme_id)
-    .maybeSingle();
+    await supabaseAdmin
+      .from("themes")
+      .select("id, name")
+      .eq("id", match.theme_id)
+      .maybeSingle();
 
-if (themeError) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: themeError.message,
-    },
-    { status: 500 },
-  );
-}
-
-  const options = Array.isArray(session.current_options)
-  ? session.current_options
-  : [];
-
-if (options.length === 0) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: "Quizrommet mangler lagrede svaralternativer.",
-    },
-    { status: 409 },
-  );
-}
-
-  const correctConcepts = (candidateConcepts ?? []).filter(
-  (concept) => correctConceptIds.has(concept.id),
-);
-
-if (correctConcepts.length === 0) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: "Fant ingen riktige concepts blant temaets concepts.",
-    },
-    { status: 409 },
-  );
-}
-
-const distractorCount = Math.max(
-  0,
-  ANSWER_OPTION_COUNT - correctConcepts.length,
-);
-
-const selectedDistractors = distractors.slice(
-  0,
-  distractorCount,
-);
+  if (themeError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: themeError.message,
+      },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({
     success: true,
