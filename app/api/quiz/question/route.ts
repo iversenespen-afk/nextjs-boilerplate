@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   const { data: session, error: sessionError } =
     await supabaseAdmin
       .from("quiz_sessions")
-      .select("id, status, current_song_match_id")
+      .select("id, status, current_song_match_id, current_options")
       .eq("id", numericSessionId)
       .maybeSingle();
 
@@ -165,55 +165,19 @@ if (themeError) {
   );
 }
 
-  const { data: groupRows, error: groupError } =
-    await supabaseAdmin
-      .from("theme_concept_groups")
-      .select("group_id")
-      .eq("theme_id", match.theme_id);
+  const options = Array.isArray(session.current_options)
+  ? session.current_options
+  : [];
 
-  if (groupError) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: groupError.message,
-      },
-      { status: 500 },
-    );
-  }
-
-  const groupIds = (groupRows ?? []).map(
-    (row: { group_id: string }) => row.group_id,
+if (options.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Quizrommet mangler lagrede svaralternativer.",
+    },
+    { status: 409 },
   );
-
-  if (groupIds.length === 0) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Temaet har ingen tillatte concept-grupper.",
-      },
-      { status: 409 },
-    );
-  }
-
-  const { data: candidateConcepts, error: conceptsError } =
-    await supabaseAdmin
-      .from("concepts")
-      .select("id, label_no, label_en, group_id")
-      .in("group_id", groupIds);
-
-  if (conceptsError) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: conceptsError.message,
-      },
-      { status: 500 },
-    );
-  }
-
-  const distractors = (candidateConcepts ?? [])
-    .filter((concept) => !correctConceptIds.has(concept.id))
-    .sort(() => Math.random() - 0.5);
+}
 
   const correctConcepts = (candidateConcepts ?? []).filter(
   (concept) => correctConceptIds.has(concept.id),
