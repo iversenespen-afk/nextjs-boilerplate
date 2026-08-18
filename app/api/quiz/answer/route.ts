@@ -99,7 +99,7 @@ export async function POST(request: Request) {
   const { data: participant, error: participantError } =
     await supabaseAdmin
       .from("quiz_participants")
-      .select("id, session_id")
+      .select("id, session_id, score")
       .eq("id", participantId)
       .maybeSingle();
 
@@ -260,6 +260,24 @@ if (isCorrect && session.current_question_started_at) {
       { status: 500 },
     );
   }
+  if (pointsAwarded > 0) {
+  const { error: scoreError } = await supabaseAdmin
+    .from("quiz_participants")
+    .update({
+      score: participant.score + pointsAwarded,
+    })
+    .eq("id", participant.id);
+
+  if (scoreError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: scoreError.message,
+      },
+      { status: 500 },
+    );
+  }
+}
 
   return NextResponse.json({
     success: true,
