@@ -46,6 +46,8 @@ export default function JoinPage() {
   useState<string | null>(null);
   const currentQuestionIdRef = useRef<number | null>(null);
   const [pointsAwarded, setPointsAwarded] = useState<number | null>(null);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
+  const [finalRank, setFinalRank] = useState<number | null>(null);
 
 const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
@@ -133,7 +135,40 @@ setQuestion(result.question);
     // Spørsmålshenting skal ikke krasje spillersiden.
   }
 }
+async function fetchFinalResult(currentSessionId: number) {
+  if (!participantId) return;
 
+  try {
+    const response = await fetch(
+      `/api/quiz/participants?sessionId=${currentSessionId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    const sortedParticipants = [...(result.participants ?? [])].sort(
+      (a, b) => b.score - a.score,
+    );
+
+    const participantIndex = sortedParticipants.findIndex(
+      (participant) => participant.id === participantId,
+    );
+
+    if (participantIndex === -1) return;
+
+    setFinalScore(sortedParticipants[participantIndex].score);
+    setFinalRank(participantIndex + 1);
+  } catch {
+    // Sluttresultatet skal ikke krasje spillersiden.
+  }
+}
   async function submitAnswer(selectedConceptId: string) {
   if (
     !sessionId ||
@@ -203,6 +238,9 @@ setQuestion(result.question);
       }
 
       setSessionStatus(result.session.status);
+      if (result.session.status === "finished") {
+        await fetchFinalResult(currentSessionId);
+      }
 
 if (result.session.status === "playing") {
   await fetchQuestion(currentSessionId);
