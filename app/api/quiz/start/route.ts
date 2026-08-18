@@ -247,6 +247,26 @@ const currentOptions = [
       { status: 500 },
     );
   }
+  const { error: historyError } = await supabaseAdmin
+  .from("quiz_session_questions")
+  .insert({
+    session_id: sessionId,
+    song_id: randomMatch.song_id,
+    theme_id: randomMatch.theme_id,
+    song_match_id: randomMatch.id,
+    question_number: 1,
+    started_at: new Date().toISOString(),
+  });
+
+if (historyError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: historyError.message,
+    },
+    { status: 500 },
+  );
+}
 
   return NextResponse.json({
     success: true,
