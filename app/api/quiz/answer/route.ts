@@ -50,7 +50,9 @@ export async function POST(request: Request) {
   const { data: session, error: sessionError } =
     await supabaseAdmin
       .from("quiz_sessions")
-      .select("id, status, current_song_match_id")
+      .select(
+        "id, status, current_song_match_id, current_question_started_at",
+      )
       .eq("id", sessionId)
       .maybeSingle();
 
@@ -206,6 +208,25 @@ const correctConceptIds = new Set(
       { status: 404 },
     );
   }
+  let pointsAwarded = 0;
+
+if (isCorrect && session.current_question_started_at) {
+  const questionStartedAt = new Date(
+    session.current_question_started_at,
+  ).getTime();
+
+  const answeredAt = Date.now();
+
+  const elapsedSeconds = Math.max(
+    0,
+    Math.floor((answeredAt - questionStartedAt) / 1000),
+  );
+
+  pointsAwarded = Math.max(
+    50,
+    100 - Math.floor(elapsedSeconds / 2),
+  );
+}
 
   const isCorrect = correctConceptIds.has(selectedConceptId);
 
@@ -217,6 +238,7 @@ const correctConceptIds = new Set(
       song_match_id: match.id,
       selected_concept_id: selectedConceptId,
       is_correct: isCorrect,
+      points_awarded: pointsAwarded,
     });
 
   if (answerError) {
@@ -243,6 +265,7 @@ const correctConceptIds = new Set(
     success: true,
     result: {
       isCorrect,
+      pointsAwarded,
     },
   });
 }
