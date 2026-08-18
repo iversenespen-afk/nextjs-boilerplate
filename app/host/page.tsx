@@ -30,6 +30,10 @@ const [participants, setParticipants] = useState<
   const [message, setMessage] = useState("");
   const [isStarting, setIsStarting] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
+  const [answerStatus, setAnswerStatus] = useState({
+  answered: 0,
+  total: 0,
+});
 
   async function createSession() {
     if (isCreating) return;
@@ -80,7 +84,30 @@ const [participants, setParticipants] = useState<
     // Deltakerlista skal ikke krasje host-siden.
   }
 }
+async function fetchAnswerStatus(sessionId: number) {
+  try {
+    const response = await fetch(
+      `/api/quiz/answer-status?sessionId=${sessionId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
 
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setAnswerStatus({
+      answered: result.answered ?? 0,
+      total: result.total ?? 0,
+    });
+  } catch {
+    // Svarstatus skal ikke krasje host-siden.
+  }
+}
 async function startQuiz() {
   if (!session || isStarting) return;
 
@@ -160,10 +187,12 @@ async function nextQuestion() {
   if (!session) return;
 
   fetchParticipants(session.id);
+fetchAnswerStatus(session.id);
 
-  const interval = setInterval(() => {
-    fetchParticipants(session.id);
-  }, 2000);
+const interval = setInterval(() => {
+  fetchParticipants(session.id);
+  fetchAnswerStatus(session.id);
+}, 2000);
 
   return () => clearInterval(interval);
 }, [session]);
