@@ -45,6 +45,7 @@ export default function JoinPage() {
   const [selectedConceptId, setSelectedConceptId] =
   useState<string | null>(null);
   const currentQuestionIdRef = useRef<number | null>(null);
+  const [pointsAwarded, setPointsAwarded] = useState<number | null>(null);
 
 const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
@@ -122,6 +123,7 @@ const [sessionStatus, setSessionStatus] = useState<string | null>(
 ) {
   setSelectedConceptId(null);
   setAnswerResult(null);
+  setPointsAwarded(null);
   setMessage("");
   currentQuestionIdRef.current = result.question.songMatchId;
 }
@@ -171,6 +173,7 @@ setQuestion(result.question);
     setAnswerResult(
       result.result.isCorrect ? "correct" : "wrong",
     );
+    setPointsAwarded(result.result.pointsAwarded ?? 0);
   } catch {
     setMessage("Noe gikk galt da svaret skulle registreres.");
   } finally {
@@ -308,6 +311,18 @@ if (result.session.status === "playing") {
     >
       {answerResult === "correct" ? "Riktig!" : "Feil."}
     </div>
+
+    {pointsAwarded !== null && (
+  <div
+    style={{
+      marginTop: 6,
+      fontSize: 20,
+      fontWeight: 700,
+    }}
+  >
+    +{pointsAwarded} poeng
+  </div>
+)}
 
     <div
       style={{
