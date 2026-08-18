@@ -197,7 +197,7 @@ const interval = setInterval(() => {
   return () => clearInterval(interval);
 }, [session]);
 
-  return (
+    return (
     <main style={{ padding: 24 }}>
       <h1>Quizlycs Host</h1>
 
@@ -217,101 +217,109 @@ const interval = setInterval(() => {
           {isCreating ? "Oppretter..." : "Opprett quizrom"}
         </button>
       ) : (
-  <>
-    <section>
-      <div>Romkode</div>
+        <>
+          <section>
+            <div>Romkode</div>
 
-      <strong
-        style={{
-          display: "block",
-          fontSize: 48,
-          letterSpacing: 8,
-          marginTop: 8,
-        }}
-      >
-        {session.join_code}
-      </strong>
-    </section>
-
-    <section style={{ marginTop: 24 }}>
-      <h2>Spillere</h2>
-
-      {participants.length === 0 ? (
-        <p>Ingen spillere har blitt med ennå.</p>
-      ) : (
-        <div>
-          {[...participants]
-            .sort((a, b) => b.score - a.score)
-            .map((participant, index) => (
-            <div
-              key={participant.id}
+            <strong
               style={{
-                padding: "8px 0",
-                borderTop: "1px solid #333",
+                display: "block",
+                fontSize: 48,
+                letterSpacing: 8,
+                marginTop: 8,
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 16,
-                }}
-            >  
-              <strong>
-                {index + 1}. {participant.display_name}
-              </strong>
-            
-              <strong>{participant.score} poeng</strong>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-                <button
-            type="button"
-            onClick={startQuiz}
-            disabled={isStarting || participants.length === 0}
-            style={{
-              marginTop: 24,
-              padding: "12px 18px",
-              border: 0,
-              borderRadius: 10,
-              cursor:
-                isStarting || participants.length === 0
-                  ? "default"
-                  : "pointer",
-              fontWeight: 700,
-            }}
-          >
-            {isStarting ? "Starter..." : "Start quiz"}
-                        {session.status === "playing" && (
-        <div>
-          <div
-            style={{
-              marginTop: 16,
-              fontSize: 18,
-              fontWeight: 700,
-            }}
-          >
-            Svar: {answerStatus.answered} / {answerStatus.total}
-          </div>
+              {session.join_code}
+            </strong>
+          </section>
 
-          <button
-            type="button"
-            onClick={nextQuestion}
-            disabled={isLoadingNext}
-            style={{
-              marginTop: 12,
-              padding: "12px 18px",
-              border: 0,
-              borderRadius: 10,
-              cursor: isLoadingNext ? "default" : "pointer",
-              fontWeight: 700,
-            }}
-          >
-            {isLoadingNext ? "Henter..." : "Neste spørsmål"}
-          </button>
-        </div>
+          <section style={{ marginTop: 24 }}>
+            <h2>Spillere</h2>
+
+            {participants.length === 0 ? (
+              <p>Ingen spillere har blitt med ennå.</p>
+            ) : (
+              <div>
+                {[...participants]
+                  .sort((a, b) => b.score - a.score)
+                  .map((participant, index) => (
+                    <div
+                      key={participant.id}
+                      style={{
+                        padding: "8px 0",
+                        borderTop: "1px solid #333",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: 16,
+                        }}
+                      >
+                        <strong>
+                          {index + 1}. {participant.display_name}
+                        </strong>
+
+                        <strong>{participant.score} poeng</strong>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            {session.status === "lobby" && (
+              <button
+                type="button"
+                onClick={startQuiz}
+                disabled={isStarting || participants.length === 0}
+                style={{
+                  marginTop: 24,
+                  padding: "12px 18px",
+                  border: 0,
+                  borderRadius: 10,
+                  cursor:
+                    isStarting || participants.length === 0
+                      ? "default"
+                      : "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                {isStarting ? "Starter..." : "Start quiz"}
+              </button>
+            )}
+
+            {session.status === "playing" && (
+              <div>
+                <div
+                  style={{
+                    marginTop: 16,
+                    fontSize: 18,
+                    fontWeight: 700,
+                  }}
+                >
+                  Svar: {answerStatus.answered} / {answerStatus.total}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={nextQuestion}
+                  disabled={isLoadingNext}
+                  style={{
+                    marginTop: 12,
+                    padding: "12px 18px",
+                    border: 0,
+                    borderRadius: 10,
+                    cursor: isLoadingNext ? "default" : "pointer",
+                    fontWeight: 700,
+                  }}
+                >
+                  {isLoadingNext ? "Henter..." : "Neste spørsmål"}
+                </button>
+              </div>
+            )}
+          </section>
+        </>
       )}
 
       {message && (
