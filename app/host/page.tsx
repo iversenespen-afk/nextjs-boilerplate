@@ -211,7 +211,7 @@ const interval = setInterval(() => {
   return () => clearInterval(interval);
 }, [session]);
 
-    return (
+      return (
     <main style={{ padding: 24 }}>
       <h1>Quizlycs Host</h1>
 
@@ -247,225 +247,243 @@ const interval = setInterval(() => {
             </strong>
           </section>
 
-          <section style={{ marginTop: 24 }}>
-            <h2>Spillere</h2>
+          {session.status !== "finished" && (
+            <section style={{ marginTop: 24 }}>
+              <h2>Spillere</h2>
 
-            {participants.length === 0 ? (
-              <p>Ingen spillere har blitt med ennå.</p>
-            ) : (
-              <div>
-                {[...participants]
-                  .sort((a, b) => b.score - a.score)
-                  .map((participant, index) => (
-                    <div
-                      key={participant.id}
-                      style={{
-                        padding: "8px 0",
-                        borderTop: "1px solid #333",
-                      }}
-                    >
+              {participants.length === 0 ? (
+                <p>Ingen spillere har blitt med ennå.</p>
+              ) : (
+                <div>
+                  {[...participants]
+                    .sort((a, b) => b.score - a.score)
+                    .map((participant, index) => (
                       <div
+                        key={participant.id}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          gap: 16,
+                          padding: "8px 0",
+                          borderTop: "1px solid #333",
                         }}
                       >
-                        <strong>
-                          {index + 1}. {participant.display_name}
-                        </strong>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            gap: 16,
+                          }}
+                        >
+                          <strong>
+                            {index + 1}. {participant.display_name}
+                          </strong>
 
-                        <strong>{participant.score} poeng</strong>
+                          <strong>
+                            {participant.score} poeng
+                          </strong>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {session.status === "lobby" && (
-              <button
-                type="button"
-                onClick={startQuiz}
-                disabled={isStarting || participants.length === 0}
-                style={{
-                  marginTop: 24,
-                  padding: "12px 18px",
-                  border: 0,
-                  borderRadius: 10,
-                  cursor:
-                    isStarting || participants.length === 0
-                      ? "default"
-                      : "pointer",
-                  fontWeight: 700,
-                }}
-              >
-                {isStarting ? "Starter..." : "Start quiz"}
-              </button>
-            )}
-
-            {session.status === "playing" && (
-              <div>
-                <div
-                  style={{
-                    marginTop: 16,
-                    fontSize: 18,
-                    fontWeight: 700,
-                  }}
-                >
-                  <div
-  style={{
-    marginTop: 16,
-    fontSize: 18,
-    fontWeight: 700,
-  }}
->
-  Svar: {answerStatus.answered} / {answerStatus.total}
-
-  <div
-    style={{
-      marginTop: 6,
-      fontSize: 14,
-      fontWeight: 400,
-      opacity: 0.7,
-    }}
-  >
-    {answerStatus.total > 0 &&
-    answerStatus.answered >= answerStatus.total
-      ? "Alle har svart ✓"
-      : `Venter på ${
-          Math.max(
-            0,
-            answerStatus.total - answerStatus.answered,
-          )
-        } spiller${
-          Math.max(
-            0,
-            answerStatus.total - answerStatus.answered,
-          ) === 1
-            ? ""
-            : "e"
-        }...`}
-  </div>
-</div>
+                    ))}
                 </div>
+              )}
 
+              {session.status === "lobby" && (
                 <button
                   type="button"
-                  onClick={nextQuestion}
+                  onClick={startQuiz}
                   disabled={
-                    isLoadingNext ||
-                    answerStatus.total === 0 ||
-                    answerStatus.answered < answerStatus.total
+                    isStarting || participants.length === 0
                   }
                   style={{
-                    marginTop: 12,
+                    marginTop: 24,
                     padding: "12px 18px",
                     border: 0,
                     borderRadius: 10,
                     cursor:
-                      isLoadingNext ||
-                      answerStatus.total === 0 ||
-                      answerStatus.answered < answerStatus.total
+                      isStarting || participants.length === 0
                         ? "default"
                         : "pointer",
                     fontWeight: 700,
                   }}
                 >
-                  {isLoadingNext ? "Henter..." : "Neste spørsmål"}
+                  {isStarting ? "Starter..." : "Start quiz"}
                 </button>
-                {answerStatus.total > 0 &&
-  answerStatus.answered < answerStatus.total && (
-    <button
-      type="button"
-      onClick={() => {
-        const shouldContinue = window.confirm(
-          `Bare ${answerStatus.answered} av ${answerStatus.total} har svart. Gå videre likevel?`,
-        );
+              )}
 
-        if (shouldContinue) {
-          nextQuestion();
-        }
-      }}
-      disabled={isLoadingNext}
-      style={{
-        marginTop: 8,
-        padding: "10px 16px",
-        border: "1px solid #555",
-        borderRadius: 10,
-        background: "transparent",
-        cursor: isLoadingNext ? "default" : "pointer",
-        fontWeight: 700,
-      }}
-    >
-      Tving neste spørsmål
-    </button>
-  )}
-              </div>
-            )}
-            {session.status === "finished" && (
-  <section style={{ marginTop: 32 }}>
-    <h2>Sluttresultat</h2>
+              {session.status === "playing" && (
+                <div>
+                  <div
+                    style={{
+                      marginTop: 16,
+                      fontSize: 18,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Svar: {answerStatus.answered} /{" "}
+                    {answerStatus.total}
 
-    {[...participants]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
-      .map((participant, index) => (
-        <div
-          key={participant.id}
-          style={{
-            marginTop: 12,
-            padding: 16,
-            border: "1px solid #444",
-            borderRadius: 12,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 16,
-              fontSize: index === 0 ? 24 : 20,
-              fontWeight: 800,
-            }}
-          >
-            <span>
-              {index + 1}. {participant.display_name}
-            </span>
+                    <div
+                      style={{
+                        marginTop: 6,
+                        fontSize: 14,
+                        fontWeight: 400,
+                        opacity: 0.7,
+                      }}
+                    >
+                      {answerStatus.total > 0 &&
+                      answerStatus.answered >=
+                        answerStatus.total
+                        ? "Alle har svart ✓"
+                        : `Venter på ${Math.max(
+                            0,
+                            answerStatus.total -
+                              answerStatus.answered,
+                          )} spiller${
+                            Math.max(
+                              0,
+                              answerStatus.total -
+                                answerStatus.answered,
+                            ) === 1
+                              ? ""
+                              : "e"
+                          }...`}
+                    </div>
+                  </div>
 
-            <span>{participant.score} poeng</span>
-          </div>
-        </div>
-      ))}
+                  <button
+                    type="button"
+                    onClick={nextQuestion}
+                    disabled={
+                      isLoadingNext ||
+                      answerStatus.total === 0 ||
+                      answerStatus.answered <
+                        answerStatus.total
+                    }
+                    style={{
+                      marginTop: 12,
+                      padding: "12px 18px",
+                      border: 0,
+                      borderRadius: 10,
+                      cursor:
+                        isLoadingNext ||
+                        answerStatus.total === 0 ||
+                        answerStatus.answered <
+                          answerStatus.total
+                          ? "default"
+                          : "pointer",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {isLoadingNext
+                      ? "Henter..."
+                      : "Neste spørsmål"}
+                  </button>
 
-    {participants.length > 3 && (
-      <div style={{ marginTop: 24 }}>
-        <h3>Alle resultater</h3>
+                  {answerStatus.total > 0 &&
+                    answerStatus.answered <
+                      answerStatus.total && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const shouldContinue =
+                            window.confirm(
+                              `Bare ${answerStatus.answered} av ${answerStatus.total} har svart. Gå videre likevel?`,
+                            );
 
-        {[...participants]
-          .sort((a, b) => b.score - a.score)
-          .map((participant, index) => (
-            <div
-              key={participant.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 16,
-                padding: "8px 0",
-                borderTop: "1px solid #333",
-              }}
-            >
-              <span>
-                {index + 1}. {participant.display_name}
-              </span>
+                          if (shouldContinue) {
+                            nextQuestion();
+                          }
+                        }}
+                        disabled={isLoadingNext}
+                        style={{
+                          marginTop: 8,
+                          padding: "10px 16px",
+                          border: "1px solid #555",
+                          borderRadius: 10,
+                          background: "transparent",
+                          cursor: isLoadingNext
+                            ? "default"
+                            : "pointer",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Tving neste spørsmål
+                      </button>
+                    )}
+                </div>
+              )}
+            </section>
+          )}
 
-              <strong>{participant.score} poeng</strong>
-            </div>
-          ))}
-      </div>
-    )}
-  </section>
-)}
-          </section>
+          {session.status === "finished" && (
+            <section style={{ marginTop: 32 }}>
+              <h2>Sluttresultat</h2>
+
+              {[...participants]
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3)
+                .map((participant, index) => (
+                  <div
+                    key={participant.id}
+                    style={{
+                      marginTop: 12,
+                      padding: 16,
+                      border: "1px solid #444",
+                      borderRadius: 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 16,
+                        fontSize: index === 0 ? 24 : 20,
+                        fontWeight: 800,
+                      }}
+                    >
+                      <span>
+                        {index + 1}.{" "}
+                        {participant.display_name}
+                      </span>
+
+                      <span>
+                        {participant.score} poeng
+                      </span>
+                    </div>
+                  </div>
+                ))}
+
+              {participants.length > 3 && (
+                <div style={{ marginTop: 24 }}>
+                  <h3>Alle resultater</h3>
+
+                  {[...participants]
+                    .sort((a, b) => b.score - a.score)
+                    .map((participant, index) => (
+                      <div
+                        key={participant.id}
+                        style={{
+                          display: "flex",
+                          justifyContent:
+                            "space-between",
+                          gap: 16,
+                          padding: "8px 0",
+                          borderTop:
+                            "1px solid #333",
+                        }}
+                      >
+                        <span>
+                          {index + 1}.{" "}
+                          {participant.display_name}
+                        </span>
+
+                        <strong>
+                          {participant.score} poeng
+                        </strong>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </section>
+          )}
         </>
       )}
 
