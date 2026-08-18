@@ -359,6 +359,33 @@ const interval = setInterval(() => {
                 >
                   {isLoadingNext ? "Henter..." : "Neste spørsmål"}
                 </button>
+                {answerStatus.total > 0 &&
+  answerStatus.answered < answerStatus.total && (
+    <button
+      type="button"
+      onClick={() => {
+        const shouldContinue = window.confirm(
+          `Bare ${answerStatus.answered} av ${answerStatus.total} har svart. Gå videre likevel?`,
+        );
+
+        if (shouldContinue) {
+          nextQuestion();
+        }
+      }}
+      disabled={isLoadingNext}
+      style={{
+        marginTop: 8,
+        padding: "10px 16px",
+        border: "1px solid #555",
+        borderRadius: 10,
+        background: "transparent",
+        cursor: isLoadingNext ? "default" : "pointer",
+        fontWeight: 700,
+      }}
+    >
+      Tving neste spørsmål
+    </button>
+  )}
               </div>
             )}
           </section>
