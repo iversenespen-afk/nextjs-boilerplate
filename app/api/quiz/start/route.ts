@@ -74,7 +74,7 @@ export async function POST(request: Request) {
   const { data: matchRows, error: matchError } =
   await supabaseAdmin
     .from("song_matches")
-    .select("id")
+    .select("id, song_id, theme_id")
     .eq("verified", true);
 
 if (matchError) {
@@ -99,6 +99,128 @@ if (!matchRows || matchRows.length === 0) {
 
 const randomMatch =
   matchRows[Math.floor(Math.random() * matchRows.length)];
+  const { data: correctMatches, error: correctMatchesError } =
+  await supabaseAdmin
+    .from("song_matches")
+    .select("concept_id")
+    .eq("song_id", randomMatch.song_id)
+    .eq("theme_id", randomMatch.theme_id)
+    .eq("verified", true);
+
+if (correctMatchesError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: correctMatchesError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const correctConceptIds = [
+  ...new Set(
+    (correctMatches ?? []).map((row) => row.concept_id),
+  ),
+];
+
+if (correctConceptIds.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ingen gyldige svar for spørsmålet.",
+    },
+    { status: 409 },
+  );
+}
+  const { data: groupRows, error: groupError } =
+  await supabaseAdmin
+    .from("theme_concept_groups")
+    .select("group_id")
+    .eq("theme_id", randomMatch.theme_id);
+
+if (groupError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: groupError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const groupIds = (groupRows ?? []).map(
+  (row) => row.group_id,
+);
+
+if (groupIds.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Temaet har ingen tillatte concept-grupper.",
+    },
+    { status: 409 },
+  );
+}
+
+const { data: candidateConcepts, error: conceptsError } =
+  await supabaseAdmin
+    .from("concepts")
+    .select("id, label_no, group_id")
+    .in("group_id", groupIds);
+
+if (conceptsError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: conceptsError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const correctConcepts = (candidateConcepts ?? []).filter(
+  (concept) => correctConceptIds.includes(concept.id),
+);
+
+if (correctConcepts.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ingen riktige concepts blant temaets concepts.",
+    },
+    { status: 409 },
+  );
+}
+
+const distractors = (candidateConcepts ?? [])
+  .filter(
+    (concept) => !correctConceptIds.includes(concept.id),
+  )
+  .sort(() => Math.random() - 0.5);
+
+const answerOptionCount = 12;
+
+const distractorCount = Math.max(
+  0,
+  answerOptionCount - correctConcepts.length,
+);
+
+const selectedDistractors = distractors.slice(
+  0,
+  distractorCount,
+);
+
+const currentOptions = [
+  ...correctConcepts.map((concept) => ({
+    id: concept.id,
+    label: concept.label_no,
+  })),
+  ...selectedDistractors.map((concept) => ({
+    id: concept.id,
+    label: concept.label_no,
+  })),
+].sort(() => Math.random() - 0.5);
+  
   const { data: updatedSession, error: updateError } =
     await supabaseAdmin
       .from("quiz_sessions")
@@ -106,10 +228,13 @@ const randomMatch =
   status: "playing",
   started_at: new Date().toISOString(),
   current_song_match_id: randomMatch.id,
+  current_options: currentOptions,      
 })
       .eq("id", sessionId)
       .eq("status", "lobby")
-      .select("id, join_code, status, started_at")
+      .select(
+  "id, join_code, status, started_at, current_song_match_id, current_options",
+)
       .single();
 
   if (updateError) {
