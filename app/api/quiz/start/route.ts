@@ -227,8 +227,9 @@ const currentOptions = [
       .update({
   status: "playing",
   started_at: new Date().toISOString(),
+  current_question_started_at: new Date().toISOString(),
   current_song_match_id: randomMatch.id,
-  current_options: currentOptions,      
+  current_options: currentOptions,
 })
       .eq("id", sessionId)
       .eq("status", "lobby")
