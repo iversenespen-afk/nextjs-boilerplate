@@ -276,6 +276,18 @@ if (joinedName && sessionStatus === "finished") {
       >
         Takk for kampen, <strong>{joinedName}</strong>.
       </p>
+
+      {finalRank !== null && finalScore !== null && (
+        <div
+          style={{
+            marginTop: 28,
+            fontSize: 28,
+            fontWeight: 800,
+          }}
+        >
+          {finalRank}. plass · {finalScore} poeng
+        </div>
+      )}
     </main>
   );
 }
