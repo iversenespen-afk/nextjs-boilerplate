@@ -32,7 +32,6 @@ const [participants, setParticipants] = useState<
   const [showSongInfo, setShowSongInfo] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
-  const [isTestingSpotify, setIsTestingSpotify] = useState(false);
   const [answerStatus, setAnswerStatus] = useState({
   answered: 0,
   total: 0,
@@ -208,55 +207,7 @@ if (
     setIsStarting(false);
   }
 }
-async function testSpotify() {
-  if (isTestingSpotify) return;
 
-  setIsTestingSpotify(true);
-  setMessage("");
-
-  try {
-    let response = await fetch("/api/spotify/play", {
-      method: "POST",
-    });
-
-    let result = await response.json();
-
-    if (response.status === 401) {
-      const refreshResponse = await fetch("/api/spotify/refresh", {
-        method: "POST",
-      });
-
-      const refreshResult = await refreshResponse.json();
-
-      if (!refreshResponse.ok || !refreshResult.success) {
-        setMessage(
-          refreshResult.message ??
-            "Spotify må kobles til på nytt.",
-        );
-        return;
-      }
-
-      response = await fetch("/api/spotify/play", {
-        method: "POST",
-      });
-
-      result = await response.json();
-    }
-
-    if (!response.ok || !result.success) {
-      setMessage(
-        result.message ?? "Kunne ikke starte Spotify.",
-      );
-      return;
-    }
-
-    setMessage("Spotify-test startet.");
-  } catch {
-    setMessage("Noe gikk galt under Spotify-testen.");
-  } finally {
-    setIsTestingSpotify(false);
-  }
-}
 async function nextQuestion() {
   if (!session || isLoadingNext) return;
 
@@ -449,13 +400,14 @@ useEffect(() => {
       <option value={30}>30 spørsmål</option>
     </select>
     <label
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 16,
-    fontWeight: 700,
-  }}
+      style={{
+      padding: "10px 12px",
+      borderRadius: 8,
+      fontSize: 16,
+      background: "#111",
+      color: "#fff",
+      border: "1px solid #555",
+    }}
 >
   <input
     type="checkbox"
@@ -480,10 +432,12 @@ useEffect(() => {
     Spotify tilkoblet ✓
     <div
       style={{
-        marginTop: 4,
-        fontSize: 14,
-        fontWeight: 400,
-        opacity: 0.7,
+        display: "inline-block",
+        marginTop: 16,
+        padding: "10px 14px",
+        border: "1px solid #555",
+        borderRadius: 10,
+        fontWeight: 700,
       }}
     >
       {spotifyProfile.displayName ?? "Spotify-bruker"}
@@ -513,34 +467,16 @@ useEffect(() => {
 )}
 
     <div>
-  <button
-    type="button"
-    onClick={testSpotify}
-    disabled={isTestingSpotify}
-    style={{
-      marginTop: 8,
-      padding: "10px 14px",
-      border: "1px solid #555",
-      borderRadius: 10,
-      background: "transparent",
-      cursor: isTestingSpotify ? "default" : "pointer",
-      fontWeight: 700,
-    }}
-  >
-    {isTestingSpotify ? "Tester..." : "Test Spotify"}
-  </button>
-</div>
-
-    <div>
       <button
         type="button"
         onClick={startQuiz}
         disabled={isStarting || participants.length === 0}
         style={{
           marginTop: 16,
-          padding: "12px 18px",
-          border: 0,
+          padding: "12px 20px",
+          border: "1px solid #555",
           borderRadius: 10,
+          background: "transparent",
           cursor:
             isStarting || participants.length === 0
               ? "default"
