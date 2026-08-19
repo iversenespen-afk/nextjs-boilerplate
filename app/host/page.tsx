@@ -38,6 +38,14 @@ const [participants, setParticipants] = useState<
   total: 0,
 });
 
+const [spotifyConnected, setSpotifyConnected] = useState(false);
+
+const [spotifyProfile, setSpotifyProfile] = useState<{
+  displayName: string | null;
+  product: string | null;
+  country: string | null;
+} | null>(null);
+
   async function createSession() {
     if (isCreating) return;
 
@@ -109,6 +117,28 @@ async function fetchAnswerStatus(sessionId: number) {
     });
   } catch {
     // Svarstatus skal ikke krasje host-siden.
+  }
+}
+async function fetchSpotifyStatus() {
+  try {
+    const response = await fetch("/api/spotify/me", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setSpotifyConnected(false);
+      setSpotifyProfile(null);
+      return;
+    }
+
+    setSpotifyConnected(true);
+    setSpotifyProfile(result.profile ?? null);
+  } catch {
+    setSpotifyConnected(false);
+    setSpotifyProfile(null);
   }
 }
 async function startQuiz() {
@@ -312,7 +342,9 @@ const interval = setInterval(() => {
 
   return () => clearInterval(interval);
 }, [session]);
-
+useEffect(() => {
+  fetchSpotifyStatus();
+}, []);
       return (
     <main style={{ padding: 24 }}>
       <h1>Quizlycs Host</h1>
