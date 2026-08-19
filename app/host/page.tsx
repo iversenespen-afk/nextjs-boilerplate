@@ -126,6 +126,7 @@ async function startQuiz() {
       body: JSON.stringify({
         sessionId: session.id,
         questionCount,
+        showSongInfo,
       }),
     });
 
