@@ -28,8 +28,12 @@ export async function GET(request: Request) {
   .find((part) => part.startsWith("spotify_return_to="))
   ?.split("=")[1];
 
+const decodedReturnTo = returnToCookie
+  ? decodeURIComponent(returnToCookie)
+  : null;
+
 const returnTo =
-  returnToCookie === "/host"
+  decodedReturnTo === "/host"
     ? "/host"
     : "/admin/assistant/import";
 
