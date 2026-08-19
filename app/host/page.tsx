@@ -467,20 +467,50 @@ useEffect(() => {
 
   Vis artist og låttittel
 </label>
-        <a
-      href="/api/spotify/login?returnTo=host"
+        {spotifyConnected && spotifyProfile ? (
+  <div
+    style={{
+      marginTop: 16,
+      padding: "10px 14px",
+      border: "1px solid #555",
+      borderRadius: 10,
+      fontWeight: 700,
+    }}
+  >
+    Spotify tilkoblet ✓
+    <div
       style={{
-        display: "inline-block",
-        marginTop: 16,
-        padding: "10px 14px",
-        border: "1px solid #555",
-        borderRadius: 10,
-        textDecoration: "none",
-        fontWeight: 700,
+        marginTop: 4,
+        fontSize: 14,
+        fontWeight: 400,
+        opacity: 0.7,
       }}
     >
-      Koble til Spotify
-    </a>
+      {spotifyProfile.displayName ?? "Spotify-bruker"}
+      {spotifyProfile.product
+        ? ` · ${spotifyProfile.product}`
+        : ""}
+      {spotifyProfile.country
+        ? ` · ${spotifyProfile.country}`
+        : ""}
+    </div>
+  </div>
+) : (
+  <a
+    href="/api/spotify/login?returnTo=host"
+    style={{
+      display: "inline-block",
+      marginTop: 16,
+      padding: "10px 14px",
+      border: "1px solid #555",
+      borderRadius: 10,
+      textDecoration: "none",
+      fontWeight: 700,
+    }}
+  >
+    Koble til Spotify
+  </a>
+)}
 
     <div>
   <button
