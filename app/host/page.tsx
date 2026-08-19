@@ -29,6 +29,7 @@ const [participants, setParticipants] = useState<
   const [isCreating, setIsCreating] = useState(false);
   const [message, setMessage] = useState("");
   const [isStarting, setIsStarting] = useState(false);
+  const [showSongInfo, setShowSongInfo] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
   const [isTestingSpotify, setIsTestingSpotify] = useState(false);
@@ -414,6 +415,25 @@ const interval = setInterval(() => {
       <option value={20}>20 spørsmål</option>
       <option value={30}>30 spørsmål</option>
     </select>
+    <label
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 16,
+    fontWeight: 700,
+  }}
+>
+  <input
+    type="checkbox"
+    checked={showSongInfo}
+    onChange={(event) =>
+      setShowSongInfo(event.target.checked)
+    }
+  />
+
+  Vis artist og låttittel
+</label>
         <a
       href="/api/spotify/login?returnTo=host"
       style={{
