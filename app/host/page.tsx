@@ -264,7 +264,31 @@ async function nextQuestion() {
   setMessage("Quizen er ferdig.");
   return;
 }
+const questionResponse = await fetch(
+  `/api/quiz/question?sessionId=${session.id}`,
+  {
+    method: "GET",
+    cache: "no-store",
+  },
+);
 
+const questionResult = await questionResponse.json();
+
+if (
+  questionResponse.ok &&
+  questionResult.success &&
+  questionResult.question?.song?.spotify_id
+) {
+  await fetch("/api/spotify/play", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      spotifyId: questionResult.question.song.spotify_id,
+    }),
+  });
+}
 setMessage("Neste spørsmål er klart.");
   } catch {
     setMessage("Noe gikk galt da neste spørsmål skulle hentes.");
