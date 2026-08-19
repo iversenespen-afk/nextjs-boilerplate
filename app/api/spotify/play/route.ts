@@ -12,6 +12,17 @@ function getCookieValue(cookieHeader: string, name: string) {
 
 export async function POST(request: Request) {
   const cookieHeader = request.headers.get("cookie") ?? "";
+    let body: {
+    spotifyId?: string;
+  } = {};
+
+  try {
+    body = await request.json();
+  } catch {
+    // Tom body er tillatt for den eksisterende testknappen.
+  }
+
+  const spotifyId = body.spotifyId?.trim();
 
   const accessToken = getCookieValue(
     cookieHeader,
@@ -28,9 +39,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Midlertidig testlåt.
-  const spotifyUri =
-    "spotify:track:4iV5W9uYEdYUVa79Axb7Rh";
+  const spotifyUri = spotifyId
+  ? `spotify:track:${spotifyId}`
+  : "spotify:track:4iV5W9uYEdYUVa79Axb7Rh";
 
   const spotifyResponse = await fetch(
     "https://api.spotify.com/v1/me/player/play",
