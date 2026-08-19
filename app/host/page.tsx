@@ -158,11 +158,33 @@ async function testSpotify() {
   setMessage("");
 
   try {
-    const response = await fetch("/api/spotify/play", {
+    let response = await fetch("/api/spotify/play", {
       method: "POST",
     });
 
-    const result = await response.json();
+    let result = await response.json();
+
+    if (response.status === 401) {
+      const refreshResponse = await fetch("/api/spotify/refresh", {
+        method: "POST",
+      });
+
+      const refreshResult = await refreshResponse.json();
+
+      if (!refreshResponse.ok || !refreshResult.success) {
+        setMessage(
+          refreshResult.message ??
+            "Spotify må kobles til på nytt.",
+        );
+        return;
+      }
+
+      response = await fetch("/api/spotify/play", {
+        method: "POST",
+      });
+
+      result = await response.json();
+    }
 
     if (!response.ok || !result.success) {
       setMessage(
