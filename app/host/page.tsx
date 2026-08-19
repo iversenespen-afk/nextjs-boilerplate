@@ -316,6 +316,20 @@ const interval = setInterval(() => {
       <option value={20}>20 spørsmål</option>
       <option value={30}>30 spørsmål</option>
     </select>
+        <a
+      href="/api/spotify/login?returnTo=host"
+      style={{
+        display: "inline-block",
+        marginTop: 16,
+        padding: "10px 14px",
+        border: "1px solid #555",
+        borderRadius: 10,
+        textDecoration: "none",
+        fontWeight: 700,
+      }}
+    >
+      Koble til Spotify
+    </a>
 
     <div>
       <button
