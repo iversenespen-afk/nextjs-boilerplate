@@ -31,6 +31,7 @@ const [participants, setParticipants] = useState<
   const [isStarting, setIsStarting] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
+  const [isTestingSpotify, setIsTestingSpotify] = useState(false);
   const [answerStatus, setAnswerStatus] = useState({
   answered: 0,
   total: 0,
@@ -150,7 +151,33 @@ async function startQuiz() {
     setIsStarting(false);
   }
 }
+async function testSpotify() {
+  if (isTestingSpotify) return;
 
+  setIsTestingSpotify(true);
+  setMessage("");
+
+  try {
+    const response = await fetch("/api/spotify/play", {
+      method: "POST",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke starte Spotify.",
+      );
+      return;
+    }
+
+    setMessage("Spotify-test startet.");
+  } catch {
+    setMessage("Noe gikk galt under Spotify-testen.");
+  } finally {
+    setIsTestingSpotify(false);
+  }
+}
 async function nextQuestion() {
   if (!session || isLoadingNext) return;
 
@@ -330,6 +357,25 @@ const interval = setInterval(() => {
     >
       Koble til Spotify
     </a>
+
+    <div>
+  <button
+    type="button"
+    onClick={testSpotify}
+    disabled={isTestingSpotify}
+    style={{
+      marginTop: 8,
+      padding: "10px 14px",
+      border: "1px solid #555",
+      borderRadius: 10,
+      background: "transparent",
+      cursor: isTestingSpotify ? "default" : "pointer",
+      fontWeight: 700,
+    }}
+  >
+    {isTestingSpotify ? "Tester..." : "Test Spotify"}
+  </button>
+</div>
 
     <div>
       <button
