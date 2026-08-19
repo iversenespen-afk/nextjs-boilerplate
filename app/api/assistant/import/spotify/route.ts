@@ -147,7 +147,7 @@ export async function POST(request: Request) {
   );
 
 const spotifyIds = basicTracks
-  .map((track) => track?.id)
+  .map((track: { id?: string | null }) => track.id)
   .filter((id): id is string => Boolean(id));
 
 const tracksResponse = await fetch(
