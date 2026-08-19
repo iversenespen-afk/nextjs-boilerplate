@@ -7,6 +7,17 @@ type ImportTrack = {
   spotify_id: string;
   artist: string;
   title: string;
+  spotify_artist_id?: string | null;
+  spotify_album_id?: string | null;
+  album_name?: string | null;
+  release_date?: string | null;
+  release_year?: number | null;
+  decade?: number | null;
+  duration_ms?: number | null;
+  explicit?: boolean | null;
+  isrc?: string | null;
+  album_type?: string | null;
+  cover_url?: string | null;
 };
 
 type ImportRequest = {
@@ -83,10 +94,21 @@ export async function POST(request: Request) {
         await supabaseAdmin
           .from("songs")
           .insert({
-            spotify_id: track.spotify_id,
-            artist: track.artist,
-            title: track.title,
-          })
+  spotify_id: track.spotify_id,
+  artist: track.artist,
+  title: track.title,
+  spotify_artist_id: track.spotify_artist_id ?? null,
+  spotify_album_id: track.spotify_album_id ?? null,
+  album_name: track.album_name ?? null,
+  release_date: track.release_date ?? null,
+  release_year: track.release_year ?? null,
+  decade: track.decade ?? null,
+  duration_ms: track.duration_ms ?? null,
+  explicit: track.explicit ?? null,
+  isrc: track.isrc ?? null,
+  album_type: track.album_type ?? null,
+  cover_url: track.cover_url ?? null,
+})
           .select("id")
           .single();
 
