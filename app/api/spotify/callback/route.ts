@@ -22,6 +22,16 @@ export async function GET(request: Request) {
     .map((part) => part.trim())
     .find((part) => part.startsWith("spotify_oauth_state="))
     ?.split("=")[1];
+  const returnToCookie = cookieHeader
+  .split(";")
+  .map((part) => part.trim())
+  .find((part) => part.startsWith("spotify_return_to="))
+  ?.split("=")[1];
+
+const returnTo =
+  returnToCookie === "/host"
+    ? "/host"
+    : "/admin/assistant/import";
 
   if (error) {
     return NextResponse.redirect(
@@ -100,12 +110,14 @@ export async function GET(request: Request) {
     );
   }
 
-  const response = NextResponse.redirect(
-    new URL(
-      "/admin/assistant/import?spotify_connected=1",
-      request.url,
-    ),
-  );
+  const separator = returnTo.includes("?") ? "&" : "?";
+
+const response = NextResponse.redirect(
+  new URL(
+    `${returnTo}${separator}spotify_connected=1`,
+    request.url,
+  ),
+);
 
   response.cookies.set(
     "spotify_access_token",
@@ -140,6 +152,14 @@ export async function GET(request: Request) {
     path: "/",
     maxAge: 0,
   });
+
+  response.cookies.set("spotify_return_to", "", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax",
+  path: "/",
+  maxAge: 0,
+});
 
   return response;
 }
