@@ -23,6 +23,7 @@ type QuizQuestion = {
   songMatchId: number;
   themeId: string;
   themeName: string;
+  showSongInfo: boolean;
   song: {
     id: number;
     title: string;
@@ -310,30 +311,34 @@ if (joinedName && sessionStatus === "finished") {
       }}
     >
       <div style={{ opacity: 0.7 }}>
-        {question.themeName}
-      </div>
+  {question.themeName}
+</div>
 
-      <h1 style={{ marginBottom: 4 }}>
-        {question.song.artist}
-      </h1>
+{question.showSongInfo && (
+  <>
+    <h1 style={{ marginBottom: 4 }}>
+      {question.song.artist}
+    </h1>
 
-      <div
-        style={{
-          fontSize: 20,
-          marginBottom: 24,
-        }}
-      >
-        {question.song.title}
-      </div>
+    <div
+      style={{
+        fontSize: 20,
+        marginBottom: 24,
+      }}
+    >
+      {question.song.title}
+    </div>
+  </>
+)}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(140px, 1fr))",
-          gap: 12,
-        }}
-      >
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(140px, 1fr))",
+    gap: 12,
+  }}
+>
         {question.options.map((option) => (
           <button
             key={option.id}
