@@ -393,6 +393,9 @@ useEffect(() => {
         padding: "10px 12px",
         borderRadius: 8,
         fontSize: 16,
+        background: "#111",
+        color: "#fff",
+        border: "1px solid #555",
       }}
     >
       <option value={10}>10 spørsmål</option>
@@ -401,12 +404,11 @@ useEffect(() => {
     </select>
     <label
       style={{
-      padding: "10px 12px",
-      borderRadius: 8,
-      fontSize: 16,
-      background: "#111",
-      color: "#fff",
-      border: "1px solid #555",
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 16,
+      width: "fit-content",
     }}
 >
   <input
@@ -422,11 +424,11 @@ useEffect(() => {
         {spotifyConnected && spotifyProfile ? (
   <div
   style={{
-    display: "inline-flex",
+    display: "flex",
+    marginTop: 16,
     alignItems: "baseline",
     gap: 10,
     width: "fit-content",
-    marginTop: 16,
     padding: "10px 14px",
     border: "1px solid #555",
     borderRadius: 10,
