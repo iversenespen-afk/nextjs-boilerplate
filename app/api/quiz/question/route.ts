@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     await supabaseAdmin
       .from("quiz_sessions")
       .select(
-        "id, status, current_song_match_id, current_options",
+        "id, status, current_song_match_id, current_options, show_song_info",
       )
       .eq("id", numericSessionId)
       .maybeSingle();
@@ -152,6 +152,7 @@ export async function GET(request: Request) {
       songMatchId: match.id,
       themeId: match.theme_id,
       themeName: theme?.name ?? match.theme_id,
+      showSongInfo: session.show_song_info ?? false,
       song: match.songs,
       options,
     },
