@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 type StartRequest = {
   sessionId?: number;
   questionCount?: number;
+  showSongInfo?: boolean;
 };
 
 export async function POST(request: Request) {
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
 
   const sessionId = body.sessionId;
   const questionCount = body.questionCount ?? 10;
+  const showSongInfo = body.showSongInfo ?? false;
 
   if (!Number.isInteger(sessionId) || !sessionId || sessionId <= 0) {
     return NextResponse.json(
@@ -232,7 +234,8 @@ const currentOptions = [
   current_question_started_at: new Date().toISOString(),
   current_song_match_id: randomMatch.id,
   current_options: currentOptions,
-  question_count: questionCount,      
+  question_count: questionCount,
+  show_song_info: showSongInfo,
 })
       .eq("id", sessionId)
       .eq("status", "lobby")
