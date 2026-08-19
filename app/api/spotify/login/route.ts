@@ -3,7 +3,14 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const returnTo = url.searchParams.get("returnTo");
+  
+  const spotifyReturnTo =
+    returnTo === "host"
+      ? "/host"
+      : "/admin/assistant/import";
   const clientId = process.env.SPOTIFY_CLIENT_ID;
 
   const redirectUri =
@@ -48,6 +55,13 @@ export async function GET() {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 10,
+  });
+  response.cookies.set("spotify_return_to", spotifyReturnTo, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 60 * 10,
+    path: "/",
   });
 
   return response;
