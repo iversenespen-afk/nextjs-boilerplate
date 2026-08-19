@@ -22,9 +22,13 @@ export async function GET() {
   const state = randomUUID();
 
   const scopes = [
-    "playlist-read-private",
-    "playlist-read-collaborative",
-  ].join(" ");
+  "playlist-read-private",
+  "playlist-read-collaborative",
+  "user-read-private",
+  "user-read-playback-state",
+  "user-modify-playback-state",
+  "streaming",
+].join(" ");
 
   const params = new URLSearchParams({
     client_id: clientId,
