@@ -421,24 +421,25 @@ useEffect(() => {
 </label>
         {spotifyConnected && spotifyProfile ? (
   <div
-    style={{
-      marginTop: 16,
-      padding: "10px 14px",
-      border: "1px solid #555",
-      borderRadius: 10,
-      fontWeight: 700,
-    }}
-  >
+  style={{
+    display: "inline-flex",
+    alignItems: "baseline",
+    gap: 10,
+    width: "fit-content",
+    marginTop: 16,
+    padding: "10px 14px",
+    border: "1px solid #555",
+    borderRadius: 10,
+    fontWeight: 700,
+  }}
+>
     Spotify tilkoblet ✓
     <div
       style={{
-        display: "inline-block",
-        marginTop: 16,
-        padding: "10px 14px",
-        border: "1px solid #555",
-        borderRadius: 10,
-        fontWeight: 700,
-      }}
+  fontSize: 14,
+  fontWeight: 400,
+  opacity: 0.7,
+}}
     >
       {spotifyProfile.displayName ?? "Spotify-bruker"}
       {spotifyProfile.product
