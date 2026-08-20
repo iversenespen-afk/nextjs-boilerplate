@@ -126,6 +126,59 @@ export async function POST(request: Request) {
       }
 
       songId = insertedSong.id;
+      if (accessToken) {
+  const spotifyResponse = await fetch(
+    `https://api.spotify.com/v1/tracks/${track.spotify_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (spotifyResponse.ok) {
+    const spotifyTrack = await spotifyResponse.json();
+
+    const releaseDate =
+      spotifyTrack.album?.release_date ?? null;
+
+    const releaseYear =
+      releaseDate && /^\d{4}/.test(releaseDate)
+        ? Number(releaseDate.slice(0, 4))
+        : null;
+
+    const decade =
+      releaseYear !== null
+        ? Math.floor(releaseYear / 10) * 10
+        : null;
+
+    await supabaseAdmin
+      .from("songs")
+      .update({
+        spotify_artist_id:
+          spotifyTrack.artists?.[0]?.id ?? null,
+        spotify_album_id:
+          spotifyTrack.album?.id ?? null,
+        album_name:
+          spotifyTrack.album?.name ?? null,
+        release_date: releaseDate,
+        release_year: releaseYear,
+        decade,
+        duration_ms:
+          spotifyTrack.duration_ms ?? null,
+        explicit:
+          spotifyTrack.explicit ?? null,
+        isrc:
+          spotifyTrack.external_ids?.isrc ?? null,
+        album_type:
+          spotifyTrack.album?.album_type ?? null,
+        cover_url:
+          spotifyTrack.album?.images?.[0]?.url ?? null,
+      })
+      .eq("id", insertedSong.id);
+  }
+}
       songsInserted += 1;
     }
 
