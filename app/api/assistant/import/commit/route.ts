@@ -28,6 +28,15 @@ type ImportRequest = {
 };
 
 export async function POST(request: Request) {
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  
+  const accessToken = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) =>
+      part.startsWith("spotify_access_token="),
+    )
+    ?.slice("spotify_access_token=".length);
   let body: ImportRequest;
 
   try {
