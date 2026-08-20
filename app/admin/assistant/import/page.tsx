@@ -153,6 +153,21 @@ const [isLoading, setIsLoading] = useState(false);
         Importer sanger fra en Spotify-spilleliste til
         review-køen.
       </p>
+      <a
+  href="/api/spotify/login?returnTo=import"
+  style={{
+    display: "inline-block",
+    marginTop: "12px",
+    padding: "10px 14px",
+    border: "1px solid #555",
+    borderRadius: "10px",
+    color: "#fff",
+    textDecoration: "none",
+    fontWeight: 700,
+  }}
+>
+  Koble til Spotify
+</a>
 
       <div
         style={{
