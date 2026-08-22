@@ -260,6 +260,77 @@ if (isCorrect && session.current_question_started_at) {
       { status: 500 },
     );
   }
+  const { data: difficultyMatch, error: difficultyMatchError } =
+  await supabaseAdmin
+    .from("song_matches")
+    .select(
+      "difficulty_answers, difficulty_correct, difficulty_base",
+    )
+    .eq("id", match.id)
+    .maybeSingle();
+
+if (difficultyMatchError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: difficultyMatchError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if (difficultyMatch) {
+  const previousAnswers =
+    difficultyMatch.difficulty_answers ?? 0;
+
+  const previousCorrect =
+    difficultyMatch.difficulty_correct ?? 0;
+
+  const difficultyBase =
+    difficultyMatch.difficulty_base ?? 50;
+
+  const newAnswers = previousAnswers + 1;
+
+  const newCorrect =
+    previousCorrect + (isCorrect ? 1 : 0);
+
+  const priorAnswers = 10;
+
+  const priorCorrect =
+    priorAnswers * (1 - difficultyBase / 100);
+
+  const weightedCorrectRate =
+    (newCorrect + priorCorrect) /
+    (newAnswers + priorAnswers);
+
+  const difficultyScore = Math.max(
+    1,
+    Math.min(
+      100,
+      Math.round(100 - weightedCorrectRate * 100),
+    ),
+  );
+
+  const { error: difficultyUpdateError } =
+    await supabaseAdmin
+      .from("song_matches")
+      .update({
+        difficulty_answers: newAnswers,
+        difficulty_correct: newCorrect,
+        difficulty_score: difficultyScore,
+      })
+      .eq("id", match.id);
+
+  if (difficultyUpdateError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: difficultyUpdateError.message,
+      },
+      { status: 500 },
+    );
+  }
+}
   if (pointsAwarded > 0) {
   const { error: scoreError } = await supabaseAdmin
     .from("quiz_participants")
