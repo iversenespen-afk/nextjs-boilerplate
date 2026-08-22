@@ -126,6 +126,42 @@ export async function POST(request: Request) {
       }
 
       songId = insertedSong.id;
+      if (track.spotify_artist_id) {
+  const { data: existingArtist, error: existingArtistError } =
+    await supabaseAdmin
+      .from("artists")
+      .select("id")
+      .eq("spotify_artist_id", track.spotify_artist_id)
+      .maybeSingle();
+
+  if (existingArtistError) {
+    throw new Error(existingArtistError.message);
+  }
+
+  if (!existingArtist) {
+    const primaryArtistName =
+      track.artist
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean)[0] ?? track.artist;
+
+    const { error: artistInsertError } =
+      await supabaseAdmin
+        .from("artists")
+        .insert({
+          spotify_artist_id: track.spotify_artist_id,
+          name: primaryArtistName,
+          metadata_source: "spotify",
+          verified: false,
+          spotify_name_synced: false,
+          country_type_synced: false,
+        });
+
+    if (artistInsertError) {
+      throw new Error(artistInsertError.message);
+    }
+  }
+}
       if (accessToken) {
   const spotifyResponse = await fetch(
     `https://api.spotify.com/v1/tracks/${track.spotify_id}`,
@@ -139,6 +175,42 @@ export async function POST(request: Request) {
 
   if (spotifyResponse.ok) {
     const spotifyTrack = await spotifyResponse.json();
+    const primarySpotifyArtistId =
+  spotifyTrack.artists?.[0]?.id ?? null;
+
+const primarySpotifyArtistName =
+  spotifyTrack.artists?.[0]?.name ?? track.artist;
+
+if (primarySpotifyArtistId) {
+  const { data: existingArtist, error: existingArtistError } =
+    await supabaseAdmin
+      .from("artists")
+      .select("id")
+      .eq("spotify_artist_id", primarySpotifyArtistId)
+      .maybeSingle();
+
+  if (existingArtistError) {
+    throw new Error(existingArtistError.message);
+  }
+
+  if (!existingArtist) {
+    const { error: artistInsertError } =
+      await supabaseAdmin
+        .from("artists")
+        .insert({
+          spotify_artist_id: primarySpotifyArtistId,
+          name: primarySpotifyArtistName,
+          metadata_source: "spotify",
+          verified: false,
+          spotify_name_synced: true,
+          country_type_synced: false,
+        });
+
+    if (artistInsertError) {
+      throw new Error(artistInsertError.message);
+    }
+  }
+}
 
     const releaseDate =
       spotifyTrack.album?.release_date ?? null;
