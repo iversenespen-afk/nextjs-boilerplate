@@ -159,6 +159,7 @@ export async function POST() {
             artist_type: normalizedType,
             metadata_source: "musicbrainz",
             country_type_synced: true,
+            match_score: score,
 
             // Ikke marker som verified automatisk ennå.
             verified: false,
