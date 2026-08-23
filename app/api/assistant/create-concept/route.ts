@@ -161,19 +161,48 @@ if (existingConceptError) {
     { status: 500 },
   );
 }
+const { data: suggestion, error: suggestionFetchError } =
+  await supabaseAdmin
+    .from("assistant_suggestions")
+    .select(
+      "label_no, label_en, label_da, label_sv, label_de, label_es",
+    )
+    .eq("queue_id", queueId)
+    .eq("concept_id", conceptId)
+    .eq("status", "pending")
+    .maybeSingle();
 
+if (suggestionFetchError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: suggestionFetchError.message,
+    },
+    { status: 500 },
+  );
+}
 // 4. Opprett concept hvis det ikke finnes
 if (!existingConcept) {
   const { error: conceptInsertError } = await supabaseAdmin
     .from("concepts")
     .insert({
-      id: conceptId,
-      label_no: displayName,
-      label_en: displayName,
-      is_proper_noun: true,
-      concept_class: conceptClass,
-      group_id: groupId,
-    });
+  id: conceptId,
+  label_no:
+    suggestion?.label_no?.trim() || displayName,
+  label_en:
+    suggestion?.label_en?.trim() || displayName,
+  label_da:
+    suggestion?.label_da?.trim() || null,
+  label_sv:
+    suggestion?.label_sv?.trim() || null,
+  label_de:
+    suggestion?.label_de?.trim() || null,
+  label_es:
+    suggestion?.label_es?.trim() || null,
+  is_proper_noun: true,
+  concept_class: conceptClass,
+  group_id: groupId,
+});
 
   if (conceptInsertError) {
     return NextResponse.json(
