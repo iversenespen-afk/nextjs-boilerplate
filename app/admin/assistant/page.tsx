@@ -209,7 +209,8 @@ async function analyzeNextBatch() {
 
     let completed = 0;
     let failed = 0;
-    const failures: string[] = [];
+
+    const batchResults: string[] = [];
 
     for (const batchItem of items) {
       setMessage(
@@ -231,6 +232,15 @@ async function analyzeNextBatch() {
           !conceptsResult.success
         ) {
           failed += 1;
+
+          batchResults.push(
+            `❌ ${batchItem.artist} – ${batchItem.title}: ` +
+              `${
+                conceptsResult.message ??
+                "Kunne ikke hente concepts"
+              }`,
+          );
+
           completed += 1;
           continue;
         }
@@ -261,38 +271,53 @@ async function analyzeNextBatch() {
           !analyzeResult.success
         ) {
           failed += 1;
-        
-          failures.push(
-            `${batchItem.artist} – ${batchItem.title}: ${
-              analyzeResult.message ?? "Ukjent feil"
-            }`,
+
+          batchResults.push(
+            `❌ ${batchItem.artist} – ${batchItem.title}: ` +
+              `${analyzeResult.message ?? "Analyse feilet"}`,
           );
+        } else {
+          const suggestionCount =
+            Array.isArray(analyzeResult.suggestions)
+              ? analyzeResult.suggestions.length
+              : Number(analyzeResult.count ?? 0);
+
+          if (suggestionCount > 0) {
+            batchResults.push(
+              `✅ ${batchItem.artist} – ${batchItem.title}: ` +
+                `${suggestionCount} ${
+                  suggestionCount === 1
+                    ? "forslag"
+                    : "forslag"
+                }`,
+            );
+          } else {
+            batchResults.push(
+              `○ ${batchItem.artist} – ${batchItem.title}: ingen treff`,
+            );
+          }
         }
       } catch (error) {
-  failed += 1;
+        failed += 1;
 
-  failures.push(
-    `${batchItem.artist} – ${batchItem.title}: ${
-      error instanceof Error
-        ? error.message
-        : "Ukjent feil"
-    }`,
-  );
-}
+        batchResults.push(
+          `❌ ${batchItem.artist} – ${batchItem.title}: ${
+            error instanceof Error
+              ? error.message
+              : "Ukjent feil"
+          }`,
+        );
+      }
 
       completed += 1;
     }
 
-    if (failed > 0) {
-      setMessage(
-        `Batch ferdig: ${completed - failed} analysert, ${failed} feilet.\n\n` +
-          failures.join("\n"),
+    const successful = completed - failed;
+
+    setMessage(
+      `Batch ferdig: ${successful} analysert, ${failed} feilet.\n\n` +
+        batchResults.join("\n"),
     );
-    } else {
-      setMessage(
-        `Batch ferdig: ${completed} av ${completed} analysert.`,
-      );
-    }
 
     await fetchNextItem();
     await fetchStats();
@@ -302,7 +327,7 @@ async function analyzeNextBatch() {
   } finally {
     setIsLoading(false);
   }
-} 
+}
 async function analyzeItem() {
   if (!item || isAnalyzing) return;
 
