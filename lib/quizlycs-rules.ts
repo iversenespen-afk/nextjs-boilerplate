@@ -89,4 +89,40 @@ Eksempler:
 - Eksempler:
   - Havana: norsk "Havanna", engelsk "Havana", spansk "La Habana".
   - Tokyo: norsk/engelsk/dansk/svensk "Tokyo", tysk/spansk "Tokio".
+
+13. ENTITY NORMALIZATION
+
+concept_id skal identifisere selve konseptet eller entiteten, ikke nødvendigvis hele matched_text.
+
+matched_text og concept_id har forskjellige roller:
+- matched_text = teksten som faktisk synges.
+- concept_id = den kanoniske entiteten teksten refererer til.
+
+Ikke opprett et nytt concept bare fordi sangteksten inneholder ekstra ord rundt et kjent egennavn.
+
+Eksempler:
+- "South Detroit" → matched_text "South Detroit", concept_id "detroit", display_name "Detroit".
+- "New York City" → matched_text "New York City", concept_id "new_york", display_name "New York".
+- "the streets of London" → matched_text kan være "London", concept_id "london".
+- "Moskva" → matched_text "Moskva", concept_id "moscow", display_name "Moscow".
+- "Tokio" → matched_text "Tokio", concept_id "tokyo", display_name "Tokyo".
+- "La Habana" → matched_text "La Habana", concept_id "havana", display_name "Havana".
+
+For geografiske concepts:
+- Bruk den etablerte engelske formen som grunnlag for concept_id.
+- Ikke bruk en lokal eller oversatt skrivemåte som concept_id når stedet har en etablert engelsk form.
+- Ikke inkluder retningsord, artikler, preposisjoner eller andre beskrivende ord i concept_id med mindre de faktisk er en del av stedets kanoniske navn.
+- Før et NYTT CONCEPT foreslås, vurder om teksten egentlig refererer til et eksisterende eller kanonisk kjent sted med et annet navn eller en annen språkform.
+
+Eksempler på feil:
+- south_detroit
+- moskva
+- tokio
+- la_habana
+
+Korrekte canonical IDs:
+- detroit
+- moscow
+- tokyo
+- havana
 `;
