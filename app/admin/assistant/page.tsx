@@ -558,10 +558,54 @@ if (remainingSuggestions.length > 0) {
   await fetchNextItem();
   await fetchStats();
 }
-  } catch {
+    } catch {
     setMessage("Noe gikk galt under avvisning.");
   }
 }
+
+async function rejectCurrentSong() {
+  if (!item || isLoading || isAnalyzing) return;
+
+  setIsLoading(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/assistant/reject-song",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          queueId: item.id,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke avvise sangen.",
+      );
+      return;
+    }
+
+    setSuggestions([]);
+    setItem(null);
+    setMessage("Sangen er avvist.");
+
+    await fetchNextItem();
+    await fetchStats();
+    await fetchImportStats();
+  } catch {
+    setMessage("Noe gikk galt ved avvisning av sangen.");
+  } finally {
+    setIsLoading(false);
+  }
+}
+
   return (
     <main
       style={{
@@ -764,6 +808,7 @@ if (remainingSuggestions.length > 0) {
             padding: 16,
             border: "1px solid #555",
             borderRadius: 10,
+            whiteSpace: "pre-line",
           }}
         >
           {message}
@@ -819,9 +864,31 @@ if (remainingSuggestions.length > 0) {
     fontSize: 16,
   }}
 >
-  {isAnalyzing
+    {isAnalyzing
     ? "Analyserer ..."
     : "Analyser med AI"}
+</button>
+
+<button
+  type="button"
+  onClick={rejectCurrentSong}
+  disabled={isLoading || isAnalyzing}
+  style={{
+    marginTop: 18,
+    marginLeft: 12,
+    padding: "12px 18px",
+    border: "1px solid #666",
+    borderRadius: 10,
+    background: "transparent",
+    color: "#fff",
+    cursor:
+      isLoading || isAnalyzing
+        ? "default"
+        : "pointer",
+    fontSize: 16,
+  }}
+>
+  Avvis sang
 </button>
         </section>
       )}
