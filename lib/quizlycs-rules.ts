@@ -54,4 +54,39 @@ QUIZLYCS-REGLER
 - 0.50-0.69: usikkert, men plausibelt treff som kan være interessant i review.
 - Under 0.50: skal normalt ikke foreslås.
 - Confidence skal uttrykke hvor sikker analysen er, ikke brukes til å skjule plausible treff.
+
+10. CANONICAL CONCEPT ID OG SPRÅKNORMALISERING
+
+- matched_text skal bevare ordet eller uttrykket slik det faktisk forekommer i sangteksten.
+- concept_id skal representere det kanoniske konseptet, ikke nødvendigvis språkformen som synges.
+- For geografiske egennavn skal concept_id som hovedregel baseres på kanonisk engelsk navn, lowercase og underscore ved behov.
+- display_name skal bruke det kanoniske navnet som bør vises i review.
+
+Eksempler:
+- "Tokio" i teksten → concept_id "tokyo", display_name "Tokyo", matched_text "Tokio".
+- "La Habana" i teksten → concept_id "havana", display_name "Havana", matched_text "La Habana".
+- Ikke opprett "tokio" dersom konseptet egentlig er Tokyo.
+- Ikke opprett "la_habana" dersom konseptet egentlig er Havana.
+
+11. GEOGRAFISK KLASSIFISERING
+
+- Ikke anta at alle stedsnavn i temaet Byer er byer.
+- Klassifiser hva stedet faktisk er.
+- En bydel, et strøk, en landsby eller et distrikt skal ikke beskrives som en by bare fordi review-itemets tema er Byer.
+- Eksempler:
+  - Tokyo → city/place.
+  - Havana → city/place.
+  - Kragerø → town/city/place.
+  - Romsås → neighborhood/place.
+  - Holmlia → neighborhood/place.
+- Quiztema og concept_class er separate ting. Et concept kan være spillbart under et bredt stedstema selv om concept_class ikke er city.
+
+12. SPRÅKLABELS
+
+- Nye concepts skal bruke korrekt kanonisk navn, ikke ukritisk kopiere matched_text til concept-navnet.
+- Når en etablert språkform er kjent, bruk den korrekte språkformen for norsk, engelsk, dansk, svensk, tysk og spansk.
+- Proper nouns kan være identiske mellom språk, men kjente lokale former skal beholdes.
+- Eksempler:
+  - Havana: norsk "Havanna", engelsk "Havana", spansk "La Habana".
+  - Tokyo: norsk/engelsk/dansk/svensk "Tokyo", tysk/spansk "Tokio".
 `;
