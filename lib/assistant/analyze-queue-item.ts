@@ -23,6 +23,12 @@ export type AssistantSuggestion = {
   concept_id: string;
   matched_text: string;
   display_name: string;
+  label_no: string;
+  label_en: string;
+  label_da: string;
+  label_sv: string;
+  label_de: string;
+  label_es: string;
   confidence: number;
   existing_concept: boolean;
   concept_class: string;
@@ -135,6 +141,12 @@ Returner maksimalt 10 forslag.
                       concept_id: { type: "string" },
                       matched_text: { type: "string" },
                       display_name: { type: "string" },
+                      label_no: { type: "string" },
+                      label_en: { type: "string" },
+                      label_da: { type: "string" },
+                      label_sv: { type: "string" },
+                      label_de: { type: "string" },
+                      label_es: { type: "string" },
                       confidence: {
                         type: "number",
                         minimum: 0,
@@ -148,6 +160,12 @@ Returner maksimalt 10 forslag.
                       "concept_id",
                       "matched_text",
                       "display_name",
+                      "label_no",
+                      "label_en",
+                      "label_da",
+                      "label_sv",
+                      "label_de",
+                      "label_es",
                       "confidence",
                       "existing_concept",
                       "concept_class",
@@ -295,6 +313,12 @@ const reviewableSuggestions =
         concept_id: suggestion.concept_id,
         matched_text: suggestion.matched_text,
         display_name: suggestion.display_name,
+        label_no: suggestion.label_no,
+        label_en: suggestion.label_en,
+        label_da: suggestion.label_da,
+        label_sv: suggestion.label_sv,
+        label_de: suggestion.label_de,
+        label_es: suggestion.label_es,
         confidence: suggestion.confidence,
         existing_concept: suggestion.existing_concept,
         concept_class: suggestion.concept_class ?? null,
