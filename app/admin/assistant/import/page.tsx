@@ -1,10 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AssistantImportPage() {
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [themeId, setThemeId] = useState("");
+  const [themes, setThemes] = useState<
+  Array<{ id: string; name: string }>
+>([]);
+  useEffect(() => {
+  async function fetchThemes() {
+    try {
+      const response = await fetch("/api/assistant/themes", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      const result = await response.json();
+
+      if (
+        response.ok &&
+        result.success &&
+        Array.isArray(result.themes)
+      ) {
+        setThemes(result.themes);
+      }
+    } catch {
+      // Dropdownen skal ikke krasje siden.
+    }
+  }
+
+  fetchThemes();
+}, []);
   const [message, setMessage] = useState("");
 const [tracks, setTracks] = useState<
   Array<{
@@ -75,23 +102,11 @@ const [isLoading, setIsLoading] = useState(false);
     return;
   }
 
-  const themeNames: Record<string, string> = {
-    artists: "Artister",
-    body_parts: "Kroppsdeler",
-    colors: "Farger",
-    elements: "Grunnstoffer",
-    furniture: "Møbler",
-    instruments: "Musikkinstrumenter",
-    names: "Guttenavn og jentenavn",
-    planets: "Planeter",
-    star_wars_planets: "Star Wars-planeter",
-    towns: "Byer",
-    transport: "Transportmidler",
-    tree_species: "Treslag",
-    car_brands: "Bilmerker",
-  };
+  const selectedTheme = themes.find(
+  (theme) => theme.id === themeId,
+);
 
-  const themeName = themeNames[themeId];
+const themeName = selectedTheme?.name;
 
   if (!themeName) {
     setMessage("Ukjent tema.");
@@ -217,50 +232,39 @@ const [isLoading, setIsLoading] = useState(false);
           <div style={{ marginBottom: "8px" }}>Tema</div>
 
           <select
-            value={themeId}
-            onChange={(event) =>
-              setThemeId(event.target.value)
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              fontSize: "16px",
-            }}
-          >
-            <option
-                value=""
-                style={{ background: "#17171f", color: "#fff" }}
-              >
-                Velg tema
-              </option>
-              
-              <option
-                value="artists"
-                style={{ background: "#17171f", color: "#fff" }}
-              >
-                Artister
-              </option>
-            <option value="body_parts">Kroppsdeler</option>
-            <option value="colors">Farger</option>
-            <option value="elements">Grunnstoffer</option>
-            <option value="furniture">Møbler</option>
-            <option value="instruments">
-              Musikkinstrumenter
-            </option>
-            <option value="names">
-              Guttenavn og jentenavn
-            </option>
-            <option value="planets">Planeter</option>
-            <option value="star_wars_planets">
-              Star Wars-planeter
-            </option>
-            <option value="towns">Byer</option>
-            <option value="transport">
-              Transportmidler
-            </option>
-            <option value="car_brands">Bilmerker</option>
-            <option value="tree_species">Treslag</option>
-          </select>
+  value={themeId}
+  onChange={(event) =>
+    setThemeId(event.target.value)
+  }
+  style={{
+    width: "100%",
+    padding: "12px",
+    fontSize: "16px",
+  }}
+>
+  <option
+    value=""
+    style={{
+      background: "#17171f",
+      color: "#fff",
+    }}
+  >
+    Velg tema
+  </option>
+
+  {themes.map((theme) => (
+    <option
+      key={theme.id}
+      value={theme.id}
+      style={{
+        background: "#17171f",
+        color: "#fff",
+      }}
+    >
+      {theme.name}
+    </option>
+  ))}
+</select>
         </label>
 
         <button
