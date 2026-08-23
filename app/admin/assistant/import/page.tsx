@@ -88,6 +88,7 @@ const [isLoading, setIsLoading] = useState(false);
     towns: "Byer",
     transport: "Transportmidler",
     tree_species: "Treslag",
+    car_brands: "Bilmerker",
   };
 
   const themeName = themeNames[themeId];
@@ -257,6 +258,7 @@ const [isLoading, setIsLoading] = useState(false);
             <option value="transport">
               Transportmidler
             </option>
+            <option value="car_brands">Bilmerker</option>
             <option value="tree_species">Treslag</option>
           </select>
         </label>
