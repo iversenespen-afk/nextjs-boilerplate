@@ -126,12 +126,32 @@ Important:
 export async function getLyrics(
   request: LyricsRequest,
 ): Promise<LyricsResult> {
-  const provider =
-    process.env.LYRICS_PROVIDER ?? "mock";
+  const provider = process.env.LYRICS_PROVIDER;
+
+  if (!provider) {
+    throw new Error(
+      "LYRICS_PROVIDER mangler. Sett den eksplisitt til 'web' eller 'mock'.",
+    );
+  }
 
   if (provider === "web") {
     return getWebLyricsEvidence(request);
   }
 
-  return getMockLyrics(request);
+  if (provider === "mock") {
+    if (
+      process.env.VERCEL_ENV === "production" ||
+      process.env.NODE_ENV === "production"
+    ) {
+      throw new Error(
+        "LYRICS_PROVIDER=mock er ikke tillatt i produksjon.",
+      );
+    }
+
+    return getMockLyrics(request);
+  }
+
+  throw new Error(
+    `Ukjent LYRICS_PROVIDER: ${provider}`,
+  );
 }
