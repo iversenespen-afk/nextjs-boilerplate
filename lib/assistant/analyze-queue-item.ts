@@ -90,19 +90,13 @@ export async function analyzeQueueItem(
     }));
 
   const prompt = `
-Du er Quizlycs Assistant.
+const prompt = `
+Quizlycs Assistant.
 
-Oppgaven er å finne ord eller uttrykk som FAKTISK forekommer i sangteksten og passer til det oppgitte temaet.
+Sang: ${artist} – ${title}
+Tema: ${themeName} (${themeId})
 
-Sang:
-Artist: ${artist}
-Tittel: ${title}
-
-Tema:
-ID: ${themeId}
-Navn: ${themeName}
-
-Sangtekst:
+Lyrics-evidence:
 ${lyrics}
 
 Eksisterende concepts:
@@ -110,7 +104,14 @@ ${JSON.stringify(existingConcepts)}
 
 ${QUIZLYCS_ASSISTANT_RULES}
 
-Returner maksimalt 10 forslag.
+Finn kun tydelige treff for temaet.
+
+Viktig:
+- matched_text må faktisk finnes ordrett i evidence.
+- Ikke gjett identitet fra hint, initialer, stavelek, kallenavn eller kontekst.
+- Ikke foreslå et concept hvis forklaringen krever "sannsynligvis", "trolig" eller lignende slutning.
+- Bruk eksisterende concept når evidence entydig viser samme concept.
+- Maks 10 forslag.
 `;
 
   const openAiResponse = await fetch(
