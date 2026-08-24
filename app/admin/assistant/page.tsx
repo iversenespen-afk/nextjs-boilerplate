@@ -443,7 +443,6 @@ const currentItem = item;
 
 const groupLabels: Record<string, string> = {
     artists: "Artister",
-    bands: "Band",
     male_names: "Guttenavn",
     female_names: "Jentenavn",
     unisex_names: "Unisex-navn",
