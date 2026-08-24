@@ -93,10 +93,23 @@ export async function POST(request: Request) {
     );
   }
 
+  const allItems: Array<{
+  item?: {
+    id?: string | null;
+    name?: string;
+    type?: string;
+    artists?: Array<{ name?: string }>;
+  };
+}> = [];
+
+let offset = 0;
+const limit = 50;
+
+while (true) {
   const spotifyResponse = await fetch(
     `https://api.spotify.com/v1/playlists/${encodeURIComponent(
       playlistId,
-    )}/items?limit=50`,
+    )}/items?limit=${limit}&offset=${offset}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -121,44 +134,44 @@ export async function POST(request: Request) {
     );
   }
 
-  const tracks = (spotifyData.items ?? [])
-    .map(
-      (item: {
-        item?: {
-          id?: string | null;
-          name?: string;
-          type?: string;
-          artists?: Array<{ name?: string }>;
-        };
-      }) => item.item,
-    )
-    .filter(
-      (
-        track: {
-          id?: string | null;
-          name?: string;
-          type?: string;
-          artists?: Array<{ name?: string }>;
-        } | undefined,
-      ) =>
-        track?.type === "track" &&
-        Boolean(track.id) &&
-        Boolean(track.name),
-    )
-    .map(
-      (track: {
-        id?: string | null;
-        name?: string;
-        artists?: Array<{ name?: string }>;
-      }) => ({
-        spotify_id: track.id,
-        artist: (track.artists ?? [])
-          .map((artist) => artist.name)
-          .filter(Boolean)
-          .join(", "),
-        title: track.name,
-      }),
-    );
+  const pageItems = spotifyData.items ?? [];
+
+  allItems.push(...pageItems);
+
+  if (pageItems.length < limit) {
+    break;
+  }
+
+  offset += limit;
+}
+
+const tracks = allItems
+  .map((item) => item.item)
+  .filter(
+    (
+      track:
+        | {
+            id?: string | null;
+            name?: string;
+            type?: string;
+            artists?: Array<{ name?: string }>;
+          }
+        | undefined,
+    ) =>
+      track?.type === "track" &&
+      Boolean(track.id) &&
+      Boolean(track.name),
+  )
+  .map(
+    (track) => ({
+      spotify_id: track!.id,
+      artist: (track!.artists ?? [])
+        .map((artist) => artist.name)
+        .filter(Boolean)
+        .join(", "),
+      title: track!.name,
+    }),
+  );
 
   return NextResponse.json({
     success: true,
