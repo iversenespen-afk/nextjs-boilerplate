@@ -439,54 +439,76 @@ if (remainingSuggestions.length > 0) {
 ) {
   if (!item) return;
 
-  let groupId: string | undefined;
+  const groupLabels: Record<string, string> = {
+    artists: "Artister",
+    bands: "Band",
+    male_names: "Guttenavn",
+    female_names: "Jentenavn",
+    unisex_names: "Unisex-navn",
+  };
 
-  if (item.theme_id === "names") {
-    const selectedGroup = window.prompt(
-      "Velg gruppe:\n\n" +
-        "1 = Guttenavn\n" +
-        "2 = Jentenavn\n" +
-        "3 = Unisex-navn",
-    );
-
-    if (!selectedGroup) {
-      return;
-    }
-
-    if (selectedGroup === "1") {
-      groupId = "male_names";
-    } else if (selectedGroup === "2") {
-      groupId = "female_names";
-    } else if (selectedGroup === "3") {
-      groupId = "unisex_names";
-    } else {
-      setMessage("Ugyldig gruppevalg.");
-      return;
-    }
+  async function sendCreate(groupId?: string) {
+    return fetch("/api/assistant/create-concept", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        queueId: item.id,
+        spotifyId: item.spotify_id,
+        themeId: item.theme_id,
+        conceptId: suggestion.concept_id,
+        displayName: suggestion.display_name,
+        conceptClass: suggestion.concept_class,
+        matchedText: suggestion.matched_text,
+        groupId,
+      }),
+    });
   }
 
   try {
-    const response = await fetch(
-      "/api/assistant/create-concept",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          queueId: item.id,
-          spotifyId: item.spotify_id,
-          themeId: item.theme_id,
-          conceptId: suggestion.concept_id,
-          displayName: suggestion.display_name,
-          conceptClass: suggestion.concept_class,
-          matchedText: suggestion.matched_text,
-          groupId,
-        }),
-      },
-    );
+    let response = await sendCreate();
+    let result = await response.json();
 
-    const result = await response.json();
+    if (
+      !response.ok &&
+      Array.isArray(result.groupIds) &&
+      result.groupIds.length > 1
+    ) {
+      const choices = result.groupIds
+        .map(
+          (groupId: string, index: number) =>
+            `${index + 1} = ${
+              groupLabels[groupId] ?? groupId
+            }`,
+        )
+        .join("\n");
+
+      const selected = window.prompt(
+        `Velg concept-gruppe for "${suggestion.display_name}":\n\n${choices}`,
+      );
+
+      if (!selected) {
+        return;
+      }
+
+      const selectedIndex = Number(selected) - 1;
+
+      if (
+        !Number.isInteger(selectedIndex) ||
+        selectedIndex < 0 ||
+        selectedIndex >= result.groupIds.length
+      ) {
+        setMessage("Ugyldig gruppevalg.");
+        return;
+      }
+
+      const selectedGroupId =
+        result.groupIds[selectedIndex];
+
+      response = await sendCreate(selectedGroupId);
+      result = await response.json();
+    }
 
     if (!response.ok || !result.success) {
       setMessage(
@@ -510,11 +532,15 @@ if (remainingSuggestions.length > 0) {
     } else {
       setSuggestions([]);
       setItem(null);
+
       await fetchNextItem();
       await fetchStats();
+      await fetchImportStats();
     }
   } catch {
-    setMessage("Noe gikk galt under oppretting av concept.");
+    setMessage(
+      "Noe gikk galt under oppretting av concept.",
+    );
   }
 }
   async function rejectSuggestion(
