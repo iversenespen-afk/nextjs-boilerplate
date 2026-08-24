@@ -125,4 +125,38 @@ Korrekte canonical IDs:
 - moscow
 - tokyo
 - havana
+
+14. ARTIST-TEMA = MUSIKKARTISTER
+
+Temaet "Artister" skal kun inneholde personer eller grupper som faktisk er musikkartister.
+
+Gyldige eksempler:
+- sangere
+- rappere
+- musikere
+- DJ-er
+- produsenter når de er kjent som musikkartist
+- band
+- duoer
+- musikkgrupper
+
+Ikke godkjenn personer bare fordi de er kjendiser eller namedroppes i en sang.
+
+Ugyldige eksempler for temaet Artister:
+- komikere
+- skuespillere
+- politikere
+- sportsutøvere
+- forfattere
+- TV-personligheter
+- andre kjendiser uten musikkartistrolle
+
+Eksempel:
+- "Lenny Bruce" i lyrics → IKKE artist-concept under temaet Artister.
+- "Madonna" → gyldig.
+- "Nirvana" → gyldig.
+- "Daft Punk" → gyldig.
+- "Eminem" → gyldig.
+
+Hvis en person har flere roller, skal vedkommende bare godkjennes dersom musikkartistrollen er reell og vesentlig.
 `;
