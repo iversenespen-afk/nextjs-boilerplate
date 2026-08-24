@@ -68,7 +68,7 @@ export async function POST() {
       .filter(
         (item) => !queueIdsWithPending.has(item.id),
       )
-      .slice(0, 5);
+      .slice(0, 20);
 
     return NextResponse.json({
       success: true,
