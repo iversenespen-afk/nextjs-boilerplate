@@ -2,6 +2,8 @@ export type LyricsRequest = {
   spotifyId: string;
   artist: string;
   title: string;
+  themeId: string;
+  themeName: string;
 };
 
 export type LyricsResult = {
@@ -56,35 +58,26 @@ async function getWebLyricsEvidence(
         tools: [
           {
             type: "web_search",
-            search_context_size: "medium",
+            search_context_size: "low",
           },
         ],
         tool_choice: "required",
         input: `
-Search the web for reliable information about the lyrics of this song:
+Find lyric evidence for this song.
 
 Artist: ${request.artist}
 Title: ${request.title}
+Quiz theme: ${request.themeName}
 
-The purpose is a music quiz.
+Return only words or very short phrases that:
+- actually occur in the lyrics
+- are relevant to the quiz theme
+- are supported by lyric evidence
 
-Do NOT reproduce the full lyrics.
-Do NOT return long lyric passages.
-
-Find ALL distinct candidate words, names, places, objects, and very short phrases
-that reliable web results indicate actually occur in the song lyrics.
-
-Important:
-- Do not stop after finding one strong candidate.
-- Search broadly enough to identify multiple distinct candidates when they exist.
-- Return every supported candidate you find.
-- Do not guess from the song title.
-- Do not guess from the artist name.
-- Do not infer words that are not actually supported by lyric/search evidence.
-- Prefer direct lyric evidence over summaries or commentary.
-- Keep each candidate short.
-- One candidate per line.
-- Keep the total response compact.
+Do not infer from the song title or artist name.
+Do not explain.
+One candidate per line.
+Maximum 15 candidates.
         `.trim(),
       }),
     },
