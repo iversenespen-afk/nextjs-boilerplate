@@ -71,10 +71,12 @@ export async function analyzeQueueItem(
   } = input;
 
   const lyricsResult = await getLyrics({
-    spotifyId,
-    artist,
-    title,
-  });
+  spotifyId,
+  artist,
+  title,
+  themeId,
+  themeName,
+});
 
   const lyrics = lyricsResult.lyrics;
 
