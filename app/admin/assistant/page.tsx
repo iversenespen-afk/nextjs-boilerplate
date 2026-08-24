@@ -439,7 +439,9 @@ if (remainingSuggestions.length > 0) {
 ) {
   if (!item) return;
 
-  const groupLabels: Record<string, string> = {
+const currentItem = item;
+
+const groupLabels: Record<string, string> = {
     artists: "Artister",
     bands: "Band",
     male_names: "Guttenavn",
@@ -454,9 +456,9 @@ if (remainingSuggestions.length > 0) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        queueId: item.id,
-        spotifyId: item.spotify_id,
-        themeId: item.theme_id,
+        queueId: currentItem.id,
+        spotifyId: currentItem.spotify_id,
+        themeId: currentItem.theme_id,
         conceptId: suggestion.concept_id,
         displayName: suggestion.display_name,
         conceptClass: suggestion.concept_class,
