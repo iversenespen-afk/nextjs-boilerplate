@@ -90,7 +90,6 @@ export async function analyzeQueueItem(
     }));
 
   const prompt = `
-const prompt = `
 Quizlycs Assistant.
 
 Sang: ${artist} – ${title}
@@ -254,7 +253,7 @@ Viktig:
         return false;
       }
 
-      if (confidence < 0.5) {
+      if (confidence < 0.8) {
         return false;
       }
 
