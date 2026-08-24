@@ -825,7 +825,7 @@ async function rejectCurrentSong() {
     fontWeight: 600,
   }}
 >
-  {isAnalyzing ? "Analyserer ..." : "Analyser neste 5"}
+  {isAnalyzing ? "Analyserer ..." : "Analyser neste 20"}
 </button>
 
       {message && (
