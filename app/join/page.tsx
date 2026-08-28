@@ -72,6 +72,26 @@ const [sessionId, setSessionId] = useState<number | null>(null);
 const [sessionStatus, setSessionStatus] = useState<string | null>(
   null,
   );
+  const themeColors: Record<string, string> = {
+  towns: "#ff3b30",
+  artists: "#ff2d95",
+  colors: "#ffcc00",
+  elements: "#00e5ff",
+  body_parts: "#ff6b6b",
+  animals: "#7cff00",
+  instruments: "#bf5af2",
+  planets: "#64d2ff",
+  star_wars_planets: "#ffd60a",
+  transport: "#ff9f0a",
+  tree_species: "#30d158",
+  sports: "#5e5ce6",
+  names: "#ff375f",
+};
+
+const themeColor =
+  question?.themeId
+    ? themeColors[question.themeId] ?? "#ffffff"
+    : "#ffffff";
 
   async function joinQuiz() {
     if (isJoining) return;
@@ -314,7 +334,7 @@ if (joinedName && sessionStatus === "finished") {
     minHeight: "100vh",
     width: "100%",
     background: "#000",
-    color: "#fff",
+    color: themeColor,
     fontFamily:
       '"Arial Narrow", "Roboto Condensed", Arial, sans-serif',
     overflowX: "hidden",
@@ -331,9 +351,9 @@ if (joinedName && sessionStatus === "finished") {
     background: "#0a0a0a",
     textAlign: "center",
     textTransform: "uppercase",
-    fontSize: "clamp(34px, 10vw, 72px)",
+    fontSize: "clamp(48px, 15vw, 82px)",
     fontWeight: 950,
-    letterSpacing: "-0.04em",
+    letterSpacing: "0.09em",
     lineHeight: 0.9,
   }}
 >
@@ -414,28 +434,20 @@ gap: 9,
       textAlign: "center",
     }}
   >
-    <div
-      style={{
-        fontSize: 24,
-        fontWeight: 800,
-      }}
-    >
-      {answerResult === "correct" ? "Riktig!" : "Feil."}
-    </div>
-
+  
     {pointsAwarded !== null && (
   <div
     style={{
       display: "flex",
       justifyContent: "center",
-      marginTop: 18,
-      marginBottom: 12,
+      marginTop: 22,
+      marginBottom: 14,
     }}
   >
     <div
       style={{
-        width: 190,
-        height: 125,
+        width: 170,
+        height: 110,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -443,16 +455,16 @@ gap: 9,
         background: "#ffe600",
         color: "#000",
         clipPath:
-          "polygon(50% 0%, 58% 18%, 72% 5%, 76% 25%, 96% 18%, 84% 38%, 100% 50%, 82% 58%, 94% 80%, 72% 74%, 66% 100%, 51% 82%, 35% 100%, 30% 76%, 7% 85%, 18% 61%, 0% 50%, 19% 40%, 5% 20%, 30% 26%, 35% 3%)",
+          "polygon(50% 0%, 57% 18%, 70% 8%, 74% 26%, 91% 20%, 82% 40%, 100% 50%, 82% 60%, 91% 80%, 72% 73%, 65% 94%, 51% 80%, 37% 94%, 31% 74%, 10% 81%, 19% 60%, 0% 50%, 19% 40%, 9% 20%, 30% 27%, 36% 7%)",
         transform: "rotate(-2deg)",
       }}
     >
       <div
         className={bangers.className}
         style={{
-          fontSize: 48,
-          lineHeight: 0.8,
-          letterSpacing: "0.03em",
+          fontSize: 46,
+          lineHeight: 0.78,
+          letterSpacing: "0.02em",
         }}
       >
         +{pointsAwarded}
@@ -462,9 +474,9 @@ gap: 9,
         className={bangers.className}
         style={{
           marginTop: 8,
-          fontSize: 25,
+          fontSize: 23,
           lineHeight: 1,
-          letterSpacing: "0.05em",
+          letterSpacing: "0.06em",
         }}
       >
         POENG!
