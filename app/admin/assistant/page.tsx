@@ -73,6 +73,7 @@ export default function AssistantPage() {
 >([]);
 
 const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAddingManual, setIsAddingManual] = useState(false);
 
   const [stats, setStats] = useState<AssistantStats | null>(
   null,
@@ -632,6 +633,94 @@ async function rejectCurrentSong() {
     setIsLoading(false);
   }
 }
+  async function addManualMatch() {
+  if (!item || isLoading || isAnalyzing) return;
+
+  const displayName = window.prompt(
+    `Hvilket treff vil du legge til manuelt for tema "${item.theme_name}"?`,
+  );
+
+  if (!displayName?.trim()) return;
+
+  const matchedText = window.prompt(
+    "Hva står faktisk i sangteksten?",
+    displayName.trim(),
+  );
+
+  if (!matchedText?.trim()) return;
+
+  const suggestedConceptId = displayName
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  const conceptId = window.prompt(
+    "Concept-ID:",
+    suggestedConceptId,
+  );
+
+  if (!conceptId?.trim()) return;
+
+  const conceptClass = window.prompt(
+    "Concept class:",
+    item.theme_id === "towns" ? "place" : "",
+  );
+
+  if (!conceptClass?.trim()) return;
+
+  setIsAddingManual(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/assistant/create-concept",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          queueId: item.id,
+          spotifyId: item.spotify_id,
+          themeId: item.theme_id,
+          conceptId: conceptId.trim(),
+          displayName: displayName.trim(),
+          conceptClass: conceptClass.trim(),
+          matchedText: matchedText.trim(),
+          manual: true,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke legge til treffet.",
+      );
+      return;
+    }
+
+    setSuggestions([]);
+    setItem(null);
+    setMessage(
+      result.message ?? "Treffet er lagt til manuelt.",
+    );
+
+    await fetchNextItem();
+    await fetchStats();
+    await fetchImportStats();
+  } catch {
+    setMessage(
+      "Noe gikk galt under manuell registrering.",
+    );
+  } finally {
+    setIsAddingManual(false);
+  }
+}
 
   return (
     <main
@@ -894,6 +983,27 @@ async function rejectCurrentSong() {
     {isAnalyzing
     ? "Analyserer ..."
     : "Analyser med AI"}
+</button>
+<button
+  type="button"
+  onClick={addManualMatch}
+  disabled={isLoading || isAnalyzing || isAddingManual}
+  style={{
+    marginTop: 18,
+    marginLeft: 12,
+    padding: "12px 18px",
+    border: "1px solid #16803a",
+    borderRadius: 10,
+    background: "#16803a",
+    color: "#fff",
+    cursor:
+      isLoading || isAnalyzing || isAddingManual
+        ? "default"
+        : "pointer",
+    fontSize: 16,
+  }}
+>
+  {isAddingManual ? "Legger til ..." : "Legg til manuelt"}
 </button>
 
 <button
