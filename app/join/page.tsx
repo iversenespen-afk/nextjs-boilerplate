@@ -304,16 +304,41 @@ if (joinedName && sessionStatus === "finished") {
 
   return (
     <main
-      style={{
-        padding: 24,
-        maxWidth: 720,
-        margin: "0 auto",
-      }}
-    >
-      <div style={{ opacity: 0.7 }}>
+  style={{
+    minHeight: "100vh",
+    width: "100%",
+    background: "#000",
+    color: "#fff",
+    fontFamily:
+      '"Arial Narrow", "Roboto Condensed", Arial, sans-serif',
+    overflowX: "hidden",
+  }}
+>
+      <div
+  style={{
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "22px 18px 20px",
+    borderTop: "3px solid #fff",
+    borderBottom: "3px solid #fff",
+    background: "#0a0a0a",
+    textAlign: "center",
+    textTransform: "uppercase",
+    fontSize: "clamp(34px, 10vw, 72px)",
+    fontWeight: 950,
+    letterSpacing: "-0.04em",
+    lineHeight: 0.9,
+  }}
+>
   {question.themeName}
 </div>
-
+<div
+  style={{
+    padding: "22px 16px 32px",
+    maxWidth: 720,
+    margin: "0 auto",
+  }}
+>
 {question.showSongInfo && (
   <>
     <h1 style={{ marginBottom: 4 }}>
@@ -335,8 +360,8 @@ if (joinedName && sessionStatus === "finished") {
   style={{
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fit, minmax(140px, 1fr))",
-    gap: 12,
+  "repeat(auto-fit, minmax(110px, 1fr))",
+gap: 9,
   }}
 >
         {question.options.map((option) => (
@@ -346,19 +371,21 @@ if (joinedName && sessionStatus === "finished") {
             onClick={() => submitAnswer(option.id)}
               disabled={isAnswering || answerResult !== null}
             style={{
-              padding: "16px 14px",
-              border: "1px solid #555",
-              borderRadius: 999,
-              fontSize: 16,
-              fontWeight: 700,
+              padding: "11px 12px",
+              border: "3px solid #8a8a8a",
+              borderRadius: 14,
+              fontSize: 15,
+              fontWeight: 900,
+              letterSpacing: "0.02em",
+              minHeight: 48,
               background:
                 selectedConceptId === option.id
                   ? answerResult === "correct"
                     ? "#15803d"
                     : answerResult === "wrong"
                       ? "#b91c1c"
-                      : undefined
-                  : undefined,
+                      : "#101010"
+                  : "#101010",
               color:
                 selectedConceptId === option.id && answerResult
                   ? "#ffffff"
@@ -411,7 +438,7 @@ if (joinedName && sessionStatus === "finished") {
     </div>
   </div>
 )}
-            
+   </div>         
     </main>
   );
 }
