@@ -1,4 +1,10 @@
 "use client";
+import { Bangers } from "next/font/google";
+
+const bangers = Bangers({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 import { useEffect, useRef, useState } from "react";
 
@@ -315,6 +321,7 @@ if (joinedName && sessionStatus === "finished") {
   }}
 >
       <div
+        className={bangers.className}
   style={{
     width: "100%",
     boxSizing: "border-box",
@@ -419,12 +426,50 @@ gap: 9,
     {pointsAwarded !== null && (
   <div
     style={{
-      marginTop: 6,
-      fontSize: 20,
-      fontWeight: 700,
+      display: "flex",
+      justifyContent: "center",
+      marginTop: 18,
+      marginBottom: 12,
     }}
   >
-    +{pointsAwarded} poeng
+    <div
+      style={{
+        width: 190,
+        height: 125,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#ffe600",
+        color: "#000",
+        clipPath:
+          "polygon(50% 0%, 58% 18%, 72% 5%, 76% 25%, 96% 18%, 84% 38%, 100% 50%, 82% 58%, 94% 80%, 72% 74%, 66% 100%, 51% 82%, 35% 100%, 30% 76%, 7% 85%, 18% 61%, 0% 50%, 19% 40%, 5% 20%, 30% 26%, 35% 3%)",
+        transform: "rotate(-2deg)",
+      }}
+    >
+      <div
+        className={bangers.className}
+        style={{
+          fontSize: 48,
+          lineHeight: 0.8,
+          letterSpacing: "0.03em",
+        }}
+      >
+        +{pointsAwarded}
+      </div>
+
+      <div
+        className={bangers.className}
+        style={{
+          marginTop: 8,
+          fontSize: 25,
+          lineHeight: 1,
+          letterSpacing: "0.05em",
+        }}
+      >
+        POENG!
+      </div>
+    </div>
   </div>
 )}
 
