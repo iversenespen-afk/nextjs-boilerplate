@@ -719,6 +719,48 @@ await fetchImportStats();
     setIsAddingManual(false);
   }
 }
+  async function finishCurrentSong() {
+  if (!item || isLoading || isAnalyzing || isAddingManual) return;
+
+  setIsLoading(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/assistant/finish-song",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          queueId: item.id,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke ferdigstille sangen.",
+      );
+      return;
+    }
+
+    setSuggestions([]);
+    setItem(null);
+    setMessage(result.message ?? "Sangen er ferdig.");
+
+    await fetchNextItem();
+    await fetchStats();
+    await fetchImportStats();
+  } catch {
+    setMessage("Noe gikk galt ved ferdigstilling av sangen.");
+  } finally {
+    setIsLoading(false);
+  }
+}
 
   return (
     <main
@@ -1003,7 +1045,27 @@ await fetchImportStats();
 >
   {isAddingManual ? "Legger til ..." : "Legg til manuelt"}
 </button>
-
+<button
+  type="button"
+  onClick={finishCurrentSong}
+  disabled={isLoading || isAnalyzing || isAddingManual}
+  style={{
+    marginTop: 18,
+    marginLeft: 12,
+    padding: "12px 18px",
+    border: "1px solid #666",
+    borderRadius: 10,
+    background: "#444",
+    color: "#fff",
+    cursor:
+      isLoading || isAnalyzing || isAddingManual
+        ? "default"
+        : "pointer",
+    fontSize: 16,
+  }}
+>
+  Ferdig med sang
+</button>
 <button
   type="button"
   onClick={rejectCurrentSong}
