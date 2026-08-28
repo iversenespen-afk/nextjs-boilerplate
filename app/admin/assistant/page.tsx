@@ -704,15 +704,13 @@ async function rejectCurrentSong() {
       return;
     }
 
-    setSuggestions([]);
-    setItem(null);
     setMessage(
-      result.message ?? "Treffet er lagt til manuelt.",
-    );
+  result.message ??
+    "Treffet er lagt til manuelt. Du kan legge til flere treff.",
+);
 
-    await fetchNextItem();
-    await fetchStats();
-    await fetchImportStats();
+await fetchStats();
+await fetchImportStats();
   } catch {
     setMessage(
       "Noe gikk galt under manuell registrering.",
