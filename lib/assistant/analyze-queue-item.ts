@@ -88,7 +88,27 @@ export async function analyzeQueueItem(
       label_en: concept.label_en ?? null,
       concept_class: concept.concept_class ?? null,
     }));
+const themeSpecificRules: Record<string, string> = {
+  towns: `
+For theme "Byer":
+- Only actual incorporated or commonly recognized cities/towns are valid.
+- The place itself must be a city or town.
+- Reject countries, states, provinces, counties, regions, neighborhoods,
+  boroughs, districts, islands, streets, landmarks, buildings and generic places.
+- Do not accept a place merely because it is geographically associated with a city.
+- Examples:
+  Vienna = valid
+  Cleveland = valid
+  St. Louis = valid
+  Cincinnati = valid
+  New York City = valid
+  New Jersey = invalid
+  Manhattan = invalid
+  Brooklyn = invalid
+`,
+};
 
+const themeSpecificRule = themeSpecificRules[themeId] ?? "";
   const prompt = `
 Quizlycs Assistant.
 
@@ -102,6 +122,7 @@ Eksisterende concepts:
 ${JSON.stringify(existingConcepts)}
 
 ${QUIZLYCS_ASSISTANT_RULES}
+${themeSpecificRule}
 
 Finn kun tydelige treff for temaet.
 
