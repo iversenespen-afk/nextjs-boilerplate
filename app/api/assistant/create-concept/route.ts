@@ -10,6 +10,7 @@ type CreateConceptRequest = {
   conceptClass?: string;
   matchedText?: string;
   groupId?: string;
+  manual?: boolean;
 };
 
 export async function POST(request: Request) {
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
   const conceptClass = body.conceptClass?.trim();
   const matchedText = body.matchedText?.trim();
   const requestedGroupId = body.groupId?.trim();
+  const manual = body.manual === true;
 
   if (
   !queueId ||
@@ -257,26 +259,56 @@ if (!existingMatch) {
     );
   }
 }
-const { error: suggestionError } = await supabaseAdmin
-  .from("assistant_suggestions")
-  .update({
-    status: "approved",
-    reviewed_at: new Date().toISOString(),
-  })
-  .eq("queue_id", queueId)
-  .eq("concept_id", conceptId)
-  .eq("status", "pending");
+if (!manual) {
+  const { error: suggestionError } = await supabaseAdmin
+    .from("assistant_suggestions")
+    .update({
+      status: "approved",
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("queue_id", queueId)
+    .eq("concept_id", conceptId)
+    .eq("status", "pending");
 
-if (suggestionError) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: suggestionError.message,
-    },
-    { status: 500 },
-  );
+  if (suggestionError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: suggestionError.message,
+      },
+      { status: 500 },
+    );
+  }
 }
+if (manual) {
+  const { error: queueError } = await supabaseAdmin
+    .from("match_review_queue")
+    .update({
+      concept_id: conceptId,
+      matched_text: matchedText,
+      verified: true,
+      review_status: "approved",
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq("id", queueId);
 
+  if (queueError) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: queueError.message,
+      },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    message: existingConcept
+      ? `Concept "${displayName}" fantes allerede. Treffet er lagt til manuelt.`
+      : `Concept "${displayName}" er opprettet og treffet er lagt til manuelt.`,
+  });
+}
 const { count: pendingCount, error: pendingError } =
   await supabaseAdmin
     .from("assistant_suggestions")
