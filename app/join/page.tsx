@@ -447,43 +447,67 @@ gap: 9,
       pointerEvents: "none",
     }}
   >
+    {/* Hvit ytterkant */}
     <div
       style={{
-        width: 180,
-        height: 120,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#ffe600",
-        color: "#000",
+        position: "relative",
+        width: 220,
+        height: 155,
+        background: "#ffffff",
         clipPath:
-          "polygon(50% 0%, 57% 18%, 70% 8%, 74% 26%, 91% 20%, 82% 40%, 100% 50%, 82% 60%, 91% 80%, 72% 73%, 65% 94%, 51% 80%, 37% 94%, 31% 74%, 10% 81%, 19% 60%, 0% 50%, 19% 40%, 9% 20%, 30% 27%, 36% 7%)",
-        transform: "rotate(-3deg)",
-        filter: "drop-shadow(0 8px 10px rgba(0,0,0,0.65))",
+          "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
+        transform: "rotate(-2deg)",
+        filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.8))",
       }}
     >
+      {/* Svart hovedkant */}
       <div
-        className={bangers.className}
         style={{
-          fontSize: 50,
-          lineHeight: 0.75,
-          letterSpacing: "0.03em",
+          position: "absolute",
+          inset: 5,
+          background: "#000000",
+          clipPath:
+            "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
         }}
       >
-        {pointsAwarded}
-      </div>
+        {/* Gul eksplosjon */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 7,
+            background: "#ffe600",
+            clipPath:
+              "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: '"Arial Black", Impact, sans-serif',
+              fontSize: 54,
+              fontWeight: 900,
+              lineHeight: 0.78,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {pointsAwarded}
+          </div>
 
-      <div
-        className={bangers.className}
-        style={{
-          marginTop: 9,
-          fontSize: 24,
-          lineHeight: 1,
-          letterSpacing: "0.08em",
-        }}
-      >
-        POENG!
+          <div
+            className={bangers.className}
+            style={{
+              marginTop: 10,
+              fontSize: 27,
+              lineHeight: 1,
+              letterSpacing: "0.07em",
+            }}
+          >
+            POENG!
+          </div>
+        </div>
       </div>
     </div>
   </div>
