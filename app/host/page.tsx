@@ -307,13 +307,13 @@ useEffect(() => {
   }}
 >
   <Image
-    src="/quizlycs-logo.png"
+    src="/quizlycs-logo-transparent.png"
     alt="Quizlycs"
-    width={220}
-    height={80}
+    width={320}
+    height={140}
     priority
     style={{
-      width: "min(220px, 70vw)",
+      width: "min(320px, 80vw)",
       height: "auto",
     }}
   />
