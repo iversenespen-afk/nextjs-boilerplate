@@ -225,9 +225,9 @@ if (isCorrect && session.current_question_started_at) {
   );
 
   pointsAwarded = Math.max(
-    50,
-    100 - Math.floor(elapsedSeconds / 2),
-  );
+  1,
+  100 - Math.max(0, elapsedSeconds - 2),
+);
 }
 
   const { error: answerError } = await supabaseAdmin
