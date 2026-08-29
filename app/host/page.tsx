@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -298,7 +299,25 @@ useEffect(() => {
 }, []);
       return (
     <main style={{ padding: 24 }}>
-      <h1>Quizlycs Host</h1>
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: 18,
+  }}
+>
+  <Image
+    src="/quizlycs-logo.png"
+    alt="Quizlycs"
+    width={220}
+    height={80}
+    priority
+    style={{
+      width: "min(220px, 70vw)",
+      height: "auto",
+    }}
+  />
+</div>
 
       {!session ? (
         <button
