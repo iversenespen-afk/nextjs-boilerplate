@@ -664,10 +664,16 @@ async function rejectCurrentSong() {
 
   if (!conceptId?.trim()) return;
 
-  const conceptClass = window.prompt(
-  "Concept class:",
-  item.theme_id === "towns" ? "place" : "",
-);
+  const defaultConceptClass =
+  item.theme_id === "towns"
+    ? "place"
+    : item.theme_id === "names"
+      ? "person"
+      : "";
+
+const conceptClass = defaultConceptClass
+  ? defaultConceptClass
+  : window.prompt("Concept class:", "");
 
 if (!conceptClass?.trim()) return;
 
