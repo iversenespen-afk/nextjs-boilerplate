@@ -447,50 +447,66 @@ gap: 9,
       pointerEvents: "none",
     }}
   >
-    {/* Hvit ytterkant */}
     <div
       style={{
         position: "relative",
-        width: 220,
-        height: 155,
-        background: "#ffffff",
-        clipPath:
-          "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
-        transform: "rotate(-2deg)",
-        filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.8))",
+        width: 250,
+        height: 190,
+        transform: "rotate(-4deg)",
+        filter:
+          "drop-shadow(0 10px 0 rgba(0,0,0,0.55)) drop-shadow(0 14px 18px rgba(0,0,0,0.8))",
       }}
     >
-      {/* Svart hovedkant */}
+      {/* Hvit ytterkant */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "#ffffff",
+          clipPath:
+            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+        }}
+      />
+
+      {/* Svart kant */}
       <div
         style={{
           position: "absolute",
           inset: 5,
           background: "#000000",
           clipPath:
-            "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
+            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+        }}
+      />
+
+      {/* Gul kjerne */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 11,
+          background: "#ffe600",
+          clipPath:
+            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* Gul eksplosjon */}
         <div
           style={{
-            position: "absolute",
-            inset: 7,
-            background: "#ffe600",
-            clipPath:
-              "polygon(50% 2%, 58% 19%, 71% 8%, 75% 26%, 94% 19%, 83% 40%, 98% 50%, 83% 60%, 94% 81%, 73% 74%, 65% 97%, 51% 80%, 36% 97%, 30% 75%, 7% 82%, 19% 60%, 2% 50%, 19% 40%, 7% 19%, 30% 27%, 36% 6%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            transform: "rotate(4deg)",
+            textAlign: "center",
+            color: "#000000",
           }}
         >
           <div
             style={{
               fontFamily: '"Arial Black", Impact, sans-serif',
-              fontSize: 54,
+              fontSize: 62,
               fontWeight: 900,
               lineHeight: 0.78,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.05em",
             }}
           >
             {pointsAwarded}
@@ -499,10 +515,10 @@ gap: 9,
           <div
             className={bangers.className}
             style={{
-              marginTop: 10,
-              fontSize: 27,
+              marginTop: 12,
+              fontSize: 30,
               lineHeight: 1,
-              letterSpacing: "0.07em",
+              letterSpacing: "0.08em",
             }}
           >
             POENG!
