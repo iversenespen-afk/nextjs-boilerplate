@@ -268,11 +268,40 @@ if (!correctConcepts || correctConcepts.length === 0) {
     { status: 409 },
   );
 }
-  const distractors = (candidateConcepts ?? [])
-    .filter(
-      (concept) => !correctConceptIds.includes(concept.id),
-    )
-    .sort(() => Math.random() - 0.5);
+  const correctLabels = new Set(
+  correctConcepts.map((concept) =>
+    concept.label_no.trim().toLowerCase(),
+  ),
+);
+
+const seenDistractorLabels = new Set<string>();
+
+const distractors = (candidateConcepts ?? [])
+  .filter((concept) => {
+    // Ikke bruk concepts som allerede er riktige svar
+    if (correctConceptIds.includes(concept.id)) {
+      return false;
+    }
+
+    const normalizedLabel = concept.label_no
+      .trim()
+      .toLowerCase();
+
+    // Ikke vis en distractor med samme synlige label
+    // som et riktig svar.
+    if (correctLabels.has(normalizedLabel)) {
+      return false;
+    }
+
+    // Ikke vis to distractors med samme synlige label.
+    if (seenDistractorLabels.has(normalizedLabel)) {
+      return false;
+    }
+
+    seenDistractorLabels.add(normalizedLabel);
+    return true;
+  })
+  .sort(() => Math.random() - 0.5);
 
   const answerOptionCount = 12;
 
