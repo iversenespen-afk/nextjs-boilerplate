@@ -248,15 +248,19 @@ if (currentQuestionNumber >= session.question_count) {
   );
 
   if (correctConcepts.length === 0) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Fant ingen riktige concepts blant temaets concepts.",
-      },
-      { status: 409 },
-    );
-  }
-
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        `Fant ingen riktige concepts blant temaets concepts. ` +
+        `song_id=${randomMatch.song_id}, ` +
+        `theme_id=${randomMatch.theme_id}, ` +
+        `correctConceptIds=${correctConceptIds.join(",")}, ` +
+        `allowedGroups=${groupIds.join(",")}`,
+    },
+    { status: 409 },
+  );
+}
   const distractors = (candidateConcepts ?? [])
     .filter(
       (concept) => !correctConceptIds.includes(concept.id),
