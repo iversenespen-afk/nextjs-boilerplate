@@ -665,13 +665,77 @@ async function rejectCurrentSong() {
   if (!conceptId?.trim()) return;
 
   const conceptClass = window.prompt(
-    "Concept class:",
-    item.theme_id === "towns" ? "place" : "",
+  "Concept class:",
+  item.theme_id === "towns" ? "place" : "",
+);
+
+if (!conceptClass?.trim()) return;
+
+let groupId: string | undefined;
+
+try {
+  const groupsResponse = await fetch(
+    `/api/assistant/theme-groups?themeId=${encodeURIComponent(
+      item.theme_id,
+    )}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    },
   );
 
-  if (!conceptClass?.trim()) return;
+  const groupsResult = await groupsResponse.json();
 
-  setIsAddingManual(true);
+  if (
+    groupsResponse.ok &&
+    groupsResult.success &&
+    Array.isArray(groupsResult.groupIds)
+  ) {
+    if (groupsResult.groupIds.length === 1) {
+      groupId = groupsResult.groupIds[0];
+    } else if (groupsResult.groupIds.length > 1) {
+      const groupLabels: Record<string, string> = {
+        artists: "Artister",
+        male_names: "Guttenavn",
+        female_names: "Jentenavn",
+        unisex_names: "Unisex-navn",
+      };
+
+      const choices = groupsResult.groupIds
+        .map(
+          (currentGroupId: string, index: number) =>
+            `${index + 1} = ${
+              groupLabels[currentGroupId] ?? currentGroupId
+            }`,
+        )
+        .join("\n");
+
+      const selected = window.prompt(
+        `Velg concept-gruppe:\n\n${choices}`,
+      );
+
+      if (!selected) return;
+
+      const selectedIndex = Number(selected) - 1;
+
+      if (
+        !Number.isInteger(selectedIndex) ||
+        selectedIndex < 0 ||
+        selectedIndex >= groupsResult.groupIds.length
+      ) {
+        setMessage("Ugyldig gruppevalg.");
+        return;
+      }
+
+      groupId = groupsResult.groupIds[selectedIndex];
+    }
+  }
+} catch {
+  setMessage("Kunne ikke hente concept-grupper.");
+  return;
+}
+
+setIsAddingManual(true);
   setMessage("");
 
   try {
@@ -683,15 +747,16 @@ async function rejectCurrentSong() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          queueId: item.id,
-          spotifyId: item.spotify_id,
-          themeId: item.theme_id,
-          conceptId: conceptId.trim(),
-          displayName: displayName.trim(),
-          conceptClass: conceptClass.trim(),
-          matchedText: matchedText.trim(),
-          manual: true,
-        }),
+        queueId: item.id,
+        spotifyId: item.spotify_id,
+        themeId: item.theme_id,
+        conceptId: conceptId.trim(),
+        displayName: displayName.trim(),
+        conceptClass: conceptClass.trim(),
+        matchedText: matchedText.trim(),
+        groupId,
+        manual: true,
+      }),
       },
     );
 
