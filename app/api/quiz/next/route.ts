@@ -243,20 +243,27 @@ if (currentQuestionNumber >= session.question_count) {
     );
   }
 
-  const correctConcepts = (candidateConcepts ?? []).filter(
-    (concept) => correctConceptIds.includes(concept.id),
-  );
+  const { data: correctConcepts, error: correctConceptsError } =
+  await supabaseAdmin
+    .from("concepts")
+    .select("id, label_no, group_id")
+    .in("id", correctConceptIds);
 
-  if (correctConcepts.length === 0) {
+if (correctConceptsError) {
   return NextResponse.json(
     {
       success: false,
-      message:
-        `Fant ingen riktige concepts blant temaets concepts. ` +
-        `song_id=${randomMatch.song_id}, ` +
-        `theme_id=${randomMatch.theme_id}, ` +
-        `correctConceptIds=${correctConceptIds.join(",")}, ` +
-        `allowedGroups=${groupIds.join(",")}`,
+      message: correctConceptsError.message,
+    },
+    { status: 500 },
+  );
+}
+
+if (!correctConcepts || correctConcepts.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Fant ikke concepts for de riktige svarene.",
     },
     { status: 409 },
   );
