@@ -68,6 +68,8 @@ const [correctConceptIds, setCorrectConceptIds] =
 >([]);
   const [resultView, setResultView] =
   useState<"score" | "info">("score");
+  const [showReportForm, setShowReportForm] =
+  useState(false);
 
 const [isAnswering, setIsAnswering] = useState(false);
   const [joinedName, setJoinedName] = useState<string | null>(
@@ -166,6 +168,7 @@ const themeColor =
   setCorrectAnswers([]);
   setPointsAwarded(null);
   setResultView("score");
+  setShowReportForm(false);
   setMessage("");
   currentQuestionIdRef.current = result.question.songMatchId;
 }
@@ -662,7 +665,63 @@ gap: 9,
     );
   })}
         </div>
+<button
+  type="button"
+  onClick={(event) => {
+    event.stopPropagation();
+    setShowReportForm(true);
+  }}
+  style={{
+    marginTop: 28,
+    padding: "10px 16px",
+    border: "2px solid #ffffff",
+    borderRadius: 10,
+    background: "#b91c1c",
+    color: "#ffffff",
+    fontWeight: 900,
+    cursor: "pointer",
+  }}
+>
+  ⚠ VARSLE FEIL
+</button>
+        {showReportForm && (
+  <div
+    onClick={(event) => event.stopPropagation()}
+    style={{
+      marginTop: 16,
+      padding: 16,
+      border: "2px solid #555",
+      borderRadius: 12,
+      textAlign: "left",
+    }}
+  >
+    <div
+      style={{
+        fontWeight: 900,
+        marginBottom: 12,
+      }}
+    >
+      Hva er feil?
+    </div>
 
+    {[
+      "Feil svaralternativ",
+      "Mangler riktig svar",
+      "Feil teksttreff",
+      "Feil artist/låt",
+      "Annet",
+    ].map((label) => (
+      <div
+        key={label}
+        style={{
+          marginTop: 8,
+        }}
+      >
+        {label}
+      </div>
+    ))}
+  </div>
+)}
         <div
           style={{
             marginTop: 28,
