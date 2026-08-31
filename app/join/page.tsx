@@ -58,6 +58,8 @@ export default function JoinPage() {
 
 const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
+const [correctConceptIds, setCorrectConceptIds] =
+  useState<string[]>([]);
 
 const [isAnswering, setIsAnswering] = useState(false);
   const [joinedName, setJoinedName] = useState<string | null>(
@@ -152,6 +154,7 @@ const themeColor =
 ) {
   setSelectedConceptId(null);
   setAnswerResult(null);
+  setCorrectConceptIds([]);
   setPointsAwarded(null);
   setMessage("");
   currentQuestionIdRef.current = result.question.songMatchId;
@@ -235,6 +238,7 @@ async function fetchFinalResult(currentSessionId: number) {
     setAnswerResult(
       result.result.isCorrect ? "correct" : "wrong",
     );
+    setCorrectConceptIds(result.result.correctConceptIds ?? []);
     setPointsAwarded(result.result.pointsAwarded ?? 0);
   } catch {
     setMessage("Noe gikk galt da svaret skulle registreres.");
@@ -406,16 +410,21 @@ gap: 9,
               letterSpacing: "0.02em",
               minHeight: 48,
               background:
-                selectedConceptId === option.id
-                  ? answerResult === "correct"
-                    ? "#15803d"
-                    : answerResult === "wrong"
-                      ? "#b91c1c"
-                      : "#101010"
+                background:
+              selectedConceptId === option.id
+                ? answerResult === "correct"
+                  ? "#15803d"
+                  : answerResult === "wrong"
+                    ? "#b91c1c"
+                    : "#101010"
+                : answerResult && correctConceptIds.includes(option.id)
+                  ? "#86efac"
                   : "#101010",
               color:
-                selectedConceptId === option.id && answerResult
-                  ? "#ffffff"
+              selectedConceptId === option.id && answerResult
+                ? "#ffffff"
+                : answerResult && correctConceptIds.includes(option.id)
+                  ? "#000000"
                   : undefined,
               cursor:
                 isAnswering || answerResult
