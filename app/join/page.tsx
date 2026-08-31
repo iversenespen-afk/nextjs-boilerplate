@@ -409,7 +409,7 @@ gap: 9,
               fontWeight: 900,
               letterSpacing: "0.02em",
               minHeight: 48,
-              background:
+          
                 background:
               selectedConceptId === option.id
                 ? answerResult === "correct"
