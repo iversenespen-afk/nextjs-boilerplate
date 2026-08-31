@@ -60,6 +60,12 @@ const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
 const [correctConceptIds, setCorrectConceptIds] =
   useState<string[]>([]);
+  const [correctAnswers, setCorrectAnswers] = useState<
+  {
+    conceptId: string;
+    matchedText: string;
+  }[]
+>([]);
   const [resultView, setResultView] =
   useState<"score" | "info">("score");
 
@@ -157,6 +163,7 @@ const themeColor =
   setSelectedConceptId(null);
   setAnswerResult(null);
   setCorrectConceptIds([]);
+  setCorrectAnswers([]);
   setPointsAwarded(null);
   setResultView("score");
   setMessage("");
@@ -242,6 +249,7 @@ async function fetchFinalResult(currentSessionId: number) {
       result.result.isCorrect ? "correct" : "wrong",
     );
     setCorrectConceptIds(result.result.correctConceptIds ?? []);
+    setCorrectAnswers(result.result.correctAnswers ?? []);
     setPointsAwarded(result.result.pointsAwarded ?? 0);
   } catch {
     setMessage("Noe gikk galt da svaret skulle registreres.");
@@ -608,23 +616,51 @@ gap: 9,
           }}
         >
           {question.options
-            .filter((option) =>
-              correctConceptIds.includes(option.id),
-            )
-            .map((option) => (
-              <div
-                key={option.id}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: 10,
-                  background: "#86efac",
-                  color: "#000000",
-                  fontWeight: 900,
-                }}
-              >
-                {option.label}
-              </div>
-            ))}
+  .filter((option) =>
+    correctConceptIds.includes(option.id),
+  )
+  .map((option) => {
+    const answer = correctAnswers.find(
+      (item) => item.conceptId === option.id,
+    );
+
+    return (
+      <div
+        key={option.id}
+        style={{
+          minWidth: 160,
+          padding: "10px 12px",
+          borderRadius: 10,
+          background: "#86efac",
+          color: "#000000",
+          textAlign: "left",
+        }}
+      >
+        <div
+          style={{
+            fontWeight: 900,
+            fontSize: 17,
+          }}
+        >
+          {option.label}
+        </div>
+
+        {answer?.matchedText && (
+          <div
+            style={{
+              marginTop: 5,
+              fontSize: 13,
+              fontWeight: 600,
+              opacity: 0.75,
+              fontStyle: "italic",
+            }}
+          >
+            “{answer.matchedText}”
+          </div>
+        )}
+      </div>
+    );
+  })}
         </div>
 
         <div
