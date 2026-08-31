@@ -60,6 +60,8 @@ const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
 const [correctConceptIds, setCorrectConceptIds] =
   useState<string[]>([]);
+  const [resultView, setResultView] =
+  useState<"score" | "info">("score");
 
 const [isAnswering, setIsAnswering] = useState(false);
   const [joinedName, setJoinedName] = useState<string | null>(
@@ -156,6 +158,7 @@ const themeColor =
   setAnswerResult(null);
   setCorrectConceptIds([]);
   setPointsAwarded(null);
+  setResultView("score");
   setMessage("");
   currentQuestionIdRef.current = result.question.songMatchId;
 }
@@ -438,114 +441,203 @@ gap: 9,
       </div>
       {answerResult && (
   <div
+    onClick={() =>
+      setResultView((current) =>
+        current === "score" ? "info" : "score",
+      )
+    }
     style={{
       marginTop: 24,
       textAlign: "center",
+      cursor: "pointer",
     }}
   >
-  
-    {pointsAwarded !== null && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      zIndex: 1000,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      pointerEvents: "none",
-    }}
-  >
-    <div
-      style={{
-        position: "relative",
-        width: 250,
-        height: 190,
-        transform: "rotate(-4deg)",
-        filter:
-          "drop-shadow(0 10px 0 rgba(0,0,0,0.55)) drop-shadow(0 14px 18px rgba(0,0,0,0.8))",
-      }}
-    >
-      {/* Hvit ytterkant */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "#ffffff",
-          clipPath:
-            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
-        }}
-      />
+    {resultView === "score" ? (
+      <>
+        {pointsAwarded !== null && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 1000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                width: 250,
+                height: 190,
+                transform: "rotate(-4deg)",
+                filter:
+                  "drop-shadow(0 10px 0 rgba(0,0,0,0.55)) drop-shadow(0 14px 18px rgba(0,0,0,0.8))",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "#ffffff",
+                  clipPath:
+                    "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+                }}
+              />
 
-      {/* Svart kant */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 5,
-          background: "#000000",
-          clipPath:
-            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
-        }}
-      />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 5,
+                  background: "#000000",
+                  clipPath:
+                    "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+                }}
+              />
 
-      {/* Gul kjerne */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 11,
+                  background: "#ffe600",
+                  clipPath:
+                    "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    transform: "rotate(4deg)",
+                    textAlign: "center",
+                    color: "#000000",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily:
+                        '"Arial Black", Impact, sans-serif',
+                      fontSize: 62,
+                      fontWeight: 900,
+                      lineHeight: 0.78,
+                      letterSpacing: "-0.05em",
+                    }}
+                  >
+                    {pointsAwarded}
+                  </div>
+
+                  <div
+                    className={bangers.className}
+                    style={{
+                      marginTop: 12,
+                      fontSize: 30,
+                      lineHeight: 1,
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    POENG!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div
+          style={{
+            marginTop: 8,
+            opacity: 0.7,
+          }}
+        >
+          Trykk på skjermen for låtinfo
+        </div>
+      </>
+    ) : (
       <div
         style={{
-          position: "absolute",
-          inset: 11,
-          background: "#ffe600",
-          clipPath:
-            "polygon(50% 0%, 57% 20%, 69% 5%, 72% 27%, 91% 15%, 80% 38%, 100% 45%, 81% 54%, 96% 70%, 74% 68%, 76% 94%, 58% 78%, 49% 100%, 40% 79%, 20% 95%, 27% 70%, 4% 76%, 19% 57%, 0% 47%, 21% 39%, 5% 20%, 29% 28%, 31% 4%, 43% 21%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          marginTop: 10,
+          padding: "24px 20px",
+          border: "3px solid #ffffff",
+          borderRadius: 18,
+          background: "#0a0a0a",
+          color: "#ffffff",
         }}
       >
         <div
+          className={bangers.className}
           style={{
-            transform: "rotate(4deg)",
-            textAlign: "center",
-            color: "#000000",
+            fontSize: 34,
+            letterSpacing: "0.05em",
           }}
         >
-          <div
-            style={{
-              fontFamily: '"Arial Black", Impact, sans-serif',
-              fontSize: 62,
-              fontWeight: 900,
-              lineHeight: 0.78,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            {pointsAwarded}
-          </div>
+          {question.song.artist}
+        </div>
 
-          <div
-            className={bangers.className}
-            style={{
-              marginTop: 12,
-              fontSize: 30,
-              lineHeight: 1,
-              letterSpacing: "0.08em",
-            }}
-          >
-            POENG!
-          </div>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 22,
+            fontWeight: 800,
+          }}
+        >
+          {question.song.title}
+        </div>
+
+        <div
+          style={{
+            marginTop: 26,
+            fontSize: 14,
+            opacity: 0.6,
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Riktige svar
+        </div>
+
+        <div
+          style={{
+            marginTop: 12,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 8,
+          }}
+        >
+          {question.options
+            .filter((option) =>
+              correctConceptIds.includes(option.id),
+            )
+            .map((option) => (
+              <div
+                key={option.id}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: 10,
+                  background: "#86efac",
+                  color: "#000000",
+                  fontWeight: 900,
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: 28,
+            opacity: 0.6,
+            fontSize: 13,
+          }}
+        >
+          Trykk for å gå tilbake
         </div>
       </div>
-    </div>
-  </div>
-)}
-
-    <div
-      style={{
-        marginTop: 8,
-        opacity: 0.7,
-      }}
-    >
-      Venter på neste spørsmål...
-    </div>
+    )}
   </div>
 )}
    </div>         
