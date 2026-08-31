@@ -55,6 +55,10 @@ export default function JoinPage() {
   const [pointsAwarded, setPointsAwarded] = useState<number | null>(null);
   const [finalScore, setFinalScore] = useState<number | null>(null);
   const [finalRank, setFinalRank] = useState<number | null>(null);
+  const [reportType, setReportType] = useState("");
+  const [reportComment, setReportComment] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
 const [answerResult, setAnswerResult] =
   useState<"correct" | "wrong" | null>(null);
@@ -169,6 +173,10 @@ const themeColor =
   setPointsAwarded(null);
   setResultView("score");
   setShowReportForm(false);
+  setReportType("");
+  setReportComment("");
+  setReportMessage("");
+  setIsReporting(false);
   setMessage("");
   currentQuestionIdRef.current = result.question.songMatchId;
 }
@@ -260,7 +268,51 @@ async function fetchFinalResult(currentSessionId: number) {
     setIsAnswering(false);
   }
 }
+async function submitReport() {
+  if (
+    !sessionId ||
+    !participantId ||
+    !question ||
+    !reportType ||
+    isReporting
+  ) {
+    return;
+  }
 
+  setIsReporting(true);
+  setReportMessage("");
+
+  try {
+    const response = await fetch("/api/quiz/report", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId,
+        participantId,
+        songMatchId: question.songMatchId,
+        reportType,
+        comment: reportComment,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setReportMessage(
+        result.message ?? "Kunne ikke sende feilrapport.",
+      );
+      return;
+    }
+
+    setReportMessage("Takk! Feilen er varslet.");
+  } catch {
+    setReportMessage("Kunne ikke sende feilrapport.");
+  } finally {
+    setIsReporting(false);
+  }
+}
   useEffect(() => {
   if (!sessionId) return;
   
@@ -711,15 +763,76 @@ gap: 9,
       "Feil artist/låt",
       "Annet",
     ].map((label) => (
-      <div
+      <label
         key={label}
         style={{
+          display: "block",
           marginTop: 8,
+          cursor: "pointer",
         }}
       >
+        <input
+          type="radio"
+          name="reportType"
+          value={label}
+          checked={reportType === label}
+          onChange={() => setReportType(label)}
+          style={{
+            marginRight: 8,
+          }}
+        />
         {label}
-      </div>
+      </label>
     ))}
+
+    <textarea
+      value={reportComment}
+      onChange={(event) =>
+        setReportComment(event.target.value)
+      }
+      placeholder="Kommentar (valgfritt)"
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        marginTop: 16,
+        minHeight: 80,
+        padding: 10,
+        borderRadius: 8,
+        border: "1px solid #777",
+        background: "#111",
+        color: "#fff",
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={submitReport}
+      disabled={!reportType || isReporting}
+      style={{
+        marginTop: 12,
+        padding: "10px 16px",
+        border: 0,
+        borderRadius: 8,
+        fontWeight: 900,
+        cursor:
+          !reportType || isReporting
+            ? "default"
+            : "pointer",
+      }}
+    >
+      {isReporting ? "Sender..." : "Send feilrapport"}
+    </button>
+
+    {reportMessage && (
+      <div
+        style={{
+          marginTop: 12,
+          fontWeight: 700,
+        }}
+      >
+        {reportMessage}
+      </div>
+    )}
   </div>
 )}
         <div
