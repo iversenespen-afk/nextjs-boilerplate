@@ -163,7 +163,7 @@ export async function POST(request: Request) {
   const { data: correctMatches, error: correctMatchesError } =
   await supabaseAdmin
     .from("song_matches")
-    .select("concept_id")
+    .select("concept_id, matched_text")
     .eq("song_id", match.song_id)
     .eq("theme_id", match.theme_id)
     .eq("verified", true);
@@ -181,6 +181,10 @@ if (correctMatchesError) {
 const correctConceptIds = new Set(
   (correctMatches ?? []).map((row) => row.concept_id),
 );
+  const correctAnswers = (correctMatches ?? []).map((row) => ({
+  conceptId: row.concept_id,
+  matchedText: row.matched_text,
+}));
 
   const { data: selectedConcept, error: conceptError } =
     await supabaseAdmin
@@ -356,6 +360,7 @@ if (difficultyMatch) {
     isCorrect,
     pointsAwarded,
     correctConceptIds: Array.from(correctConceptIds),
+    correctAnswers,
   },
 });
 }
