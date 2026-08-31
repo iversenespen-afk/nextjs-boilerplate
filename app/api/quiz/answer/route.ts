@@ -351,10 +351,11 @@ if (difficultyMatch) {
 }
 
   return NextResponse.json({
-    success: true,
-    result: {
-      isCorrect,
-      pointsAwarded,
-    },
-  });
+  success: true,
+  result: {
+    isCorrect,
+    pointsAwarded,
+    correctConceptIds: Array.from(correctConceptIds),
+  },
+});
 }
