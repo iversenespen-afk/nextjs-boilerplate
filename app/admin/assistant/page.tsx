@@ -68,6 +68,7 @@ export default function AssistantPage() {
   const [item, setItem] = useState<QueueItem | null>(null);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [batchThemeId, setBatchThemeId] = useState("");
   const [suggestions, setSuggestions] = useState<
   AssistantSuggestion[]
 >([]);
@@ -189,8 +190,14 @@ async function analyzeNextBatch() {
 
   try {
     const batchResponse = await fetch("/api/assistant/batch", {
-      method: "POST",
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    themeId: batchThemeId || null,
+  }),
+});
 
     const batchResult = await batchResponse.json();
 
@@ -1008,6 +1015,35 @@ await fetchImportStats();
       >
         {isLoading ? "Henter ..." : "Hent neste sang"}
       </button>
+
+      <select
+  value={batchThemeId}
+  onChange={(event) =>
+    setBatchThemeId(event.target.value)
+  }
+  disabled={isLoading || isAnalyzing}
+  style={{
+    marginLeft: 12,
+    padding: "12px 14px",
+    border: "1px solid #666",
+    borderRadius: 10,
+    background: "#111",
+    color: "#fff",
+    fontSize: 16,
+  }}
+>
+  <option value="">Alle temaer</option>
+
+  {importStats?.themes.map((theme) => (
+    <option
+      key={theme.themeId}
+      value={theme.themeId}
+    >
+      {theme.themeName} ({theme.toReview})
+    </option>
+  ))}
+</select>
+      
       <button
   type="button"
   onClick={analyzeNextBatch}
