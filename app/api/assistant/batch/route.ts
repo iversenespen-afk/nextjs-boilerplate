@@ -14,17 +14,28 @@ type QueueItem = {
   source_playlist: string | null;
 };
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
-    const { data: items, error: itemsError } =
-      await supabaseAdmin
-        .from("match_review_queue")
-        .select(
-          "id, spotify_id, artist, title, theme_id, theme_name, source_playlist",
-        )
-        .eq("review_status", "to_review")
-        .order("id", { ascending: true })
-        .limit(25);
+    const body = await request.json().catch(() => ({}));
+
+const themeId =
+  typeof body.themeId === "string" && body.themeId.trim()
+    ? body.themeId.trim()
+    : null;
+    let query = supabaseAdmin
+  .from("match_review_queue")
+  .select(
+    "id, spotify_id, artist, title, theme_id, theme_name, source_playlist",
+  )
+  .eq("review_status", "to_review")
+  .order("id", { ascending: true });
+
+if (themeId) {
+  query = query.eq("theme_id", themeId);
+}
+
+const { data: items, error: itemsError } =
+  await query.limit(25);
 
     if (itemsError) {
       throw new Error(itemsError.message);
