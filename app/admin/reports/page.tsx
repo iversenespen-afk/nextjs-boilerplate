@@ -44,6 +44,39 @@ export default function ReportsPage() {
       setMessage("Kunne ikke hente feilrapporter.");
     }
   }
+  async function updateReportStatus(
+  reportId: number,
+  status: "approved" | "rejected",
+) {
+  try {
+    const response = await fetch(
+      "/api/admin/reports/status",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reportId,
+          status,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      setMessage(
+        result.message ?? "Kunne ikke oppdatere rapporten.",
+      );
+      return;
+    }
+
+    await fetchReports();
+  } catch {
+    setMessage("Kunne ikke oppdatere rapporten.");
+  }
+}
 
   useEffect(() => {
     fetchReports();
@@ -114,6 +147,52 @@ export default function ReportsPage() {
             <div>
               <strong>Status:</strong> {report.status}
             </div>
+
+            {report.status === "pending" && (
+  <div
+    style={{
+      marginTop: 16,
+      display: "flex",
+      gap: 10,
+    }}
+  >
+    <button
+      type="button"
+      onClick={() =>
+        updateReportStatus(report.id, "approved")
+      }
+      style={{
+        padding: "9px 14px",
+        border: 0,
+        borderRadius: 8,
+        background: "#15803d",
+        color: "#fff",
+        fontWeight: 800,
+        cursor: "pointer",
+      }}
+    >
+      Godkjenn feil
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        updateReportStatus(report.id, "rejected")
+      }
+      style={{
+        padding: "9px 14px",
+        border: 0,
+        borderRadius: 8,
+        background: "#b91c1c",
+        color: "#fff",
+        fontWeight: 800,
+        cursor: "pointer",
+      }}
+    >
+      Avvis rapport
+    </button>
+  </div>
+)}
 
             <div
               style={{
