@@ -35,7 +35,7 @@ if (themeId) {
 }
 
 const { data: items, error: itemsError } =
-  await query.limit(25);
+  await query.limit(100);
 
     if (itemsError) {
       throw new Error(itemsError.message);
