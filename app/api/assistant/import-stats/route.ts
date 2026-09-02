@@ -50,14 +50,33 @@ export async function GET() {
       );
     }
 
-    const { data: themeRows, error: themeError } =
-      await supabaseAdmin
-        .from("match_review_queue")
-        .select("theme_id, theme_name, review_status");
+    const themeRows: {
+  theme_id: string;
+  theme_name: string;
+  review_status: string;
+}[] = [];
 
-    if (themeError) {
-      throw new Error(themeError.message);
-    }
+const pageSize = 1000;
+let from = 0;
+
+while (true) {
+  const { data, error } = await supabaseAdmin
+    .from("match_review_queue")
+    .select("theme_id, theme_name, review_status")
+    .range(from, from + pageSize - 1);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  themeRows.push(...(data ?? []));
+
+  if (!data || data.length < pageSize) {
+    break;
+  }
+
+  from += pageSize;
+}
 
     const themeStats = new Map<
       string,
