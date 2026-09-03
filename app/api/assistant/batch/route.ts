@@ -28,6 +28,7 @@ const themeId =
     "id, spotify_id, artist, title, theme_id, theme_name, source_playlist",
   )
   .eq("review_status", "to_review")
+  .eq("ai_analyzed", false)
   .order("id", { ascending: true });
 
 if (themeId) {
