@@ -720,7 +720,33 @@ async function rejectCurrentSong() {
   weapons: "weapon",
   years: "year",
 };
-
+const conceptClassChoicesByGroup: Record<string, string[]> = {
+  artists: ["person", "band"],
+  berries: ["berry", "fruit"],
+  neighborhoods: ["neighborhood", "borough"],
+  plants: ["plant", "flower"],
+  sports: ["sport", "team_sport", "athletics_event"],
+  supernatural: [
+    "deity",
+    "magic",
+    "mythical_creature",
+    "religion",
+    "religious",
+    "religious_expression",
+    "religious_figure",
+    "supernatural",
+    "supernatural_ability",
+    "supernatural_artifact",
+    "supernatural_being",
+    "supernatural_concept",
+    "supernatural_entity",
+    "supernatural_event",
+    "supernatural_group",
+    "supernatural_phenomenon",
+    "supernatural_place",
+    "supernatural_ritual",
+  ],
+};
 let groupId: string | undefined;
 
 try {
@@ -823,7 +849,6 @@ if (!conceptClass) {
   conceptClass = choices[selectedIndex];
 }
 
-setIsAddingManual(true);
 setIsAddingManual(true);
   setMessage("");
 
