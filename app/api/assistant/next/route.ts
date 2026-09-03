@@ -73,7 +73,9 @@ export async function GET() {
     }
   }
 
-  // 3. Ingen pending forslag: hent vanlig neste sang
+    // 3. Ingen pending forslag:
+  // prioriter sanger AI allerede har analysert,
+  // men som fortsatt trenger manuell behandling.
   const { data: item, error } = await supabaseAdmin
     .from("match_review_queue")
     .select(`
@@ -92,6 +94,7 @@ export async function GET() {
       created_at
     `)
     .eq("review_status", "to_review")
+    .eq("ai_analyzed", true)
     .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
