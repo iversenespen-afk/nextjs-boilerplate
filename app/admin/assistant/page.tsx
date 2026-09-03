@@ -592,6 +592,7 @@ if (remainingSuggestions.length > 0) {
   setItem(null);
   await fetchNextItem();
   await fetchStats();
+  await fetchImportStats();
 }
     } catch {
     setMessage("Noe gikk galt under avvisning.");
@@ -671,18 +672,36 @@ async function rejectCurrentSong() {
 
   if (!conceptId?.trim()) return;
 
-  const defaultConceptClass =
-  item.theme_id === "towns"
-    ? "place"
-    : item.theme_id === "names"
-      ? "person"
-      : "";
-
-const conceptClass = defaultConceptClass
-  ? defaultConceptClass
-  : window.prompt("Concept class:", "");
-
-if (!conceptClass?.trim()) return;
+  const conceptClassByGroup: Record<string, string> = {
+  animals: "animal",
+  body_parts: "body_part",
+  car_brands: "car_brand",
+  car_models: "car_model",
+  cities: "place",
+  colors: "color",
+  countries: "country",
+  drugs: "drug",
+  elements: "chemical_element",
+  female_names: "person",
+  fruits: "fruit",
+  furniture: "furniture",
+  instruments: "instrument",
+  male_names: "person",
+  months: "month",
+  moons: "moon",
+  neighborhoods: "neighborhood",
+  nuts: "nut",
+  planets: "planet",
+  plants: "plant",
+  rivers: "river",
+  star_wars_planets: "fictional_planet",
+  transport: "vehicle",
+  tree_species: "tree",
+  unisex_names: "person",
+  us_states: "place",
+  vegetables: "vegetable",
+  years: "year",
+};
 
 let groupId: string | undefined;
 
@@ -747,7 +766,21 @@ try {
   setMessage("Kunne ikke hente concept-grupper.");
   return;
 }
+if (!groupId) {
+  setMessage("Fant ingen concept-gruppe for dette temaet.");
+  return;
+}
 
+const conceptClass = conceptClassByGroup[groupId];
+
+if (!conceptClass) {
+  setMessage(
+    `Mangler definert concept_class for gruppen "${groupId}".`,
+  );
+  return;
+}
+
+setIsAddingManual(true);
 setIsAddingManual(true);
   setMessage("");
 
