@@ -1,4 +1,5 @@
 import { analyzeQueueItem } from "@/lib/assistant/analyze-queue-item";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -57,19 +58,32 @@ export async function POST(request: Request) {
   }
     try {
     const suggestions = await analyzeQueueItem({
-      queueId,
-      spotifyId: body.spotifyId ?? "",
-      artist,
-      title,
-      themeId,
-      themeName,
-      concepts: body.concepts ?? [],
-    });
+  queueId,
+  spotifyId: body.spotifyId ?? "",
+  artist,
+  title,
+  themeId,
+  themeName,
+  concepts: body.concepts ?? [],
+});
 
-    return NextResponse.json({
-      success: true,
-      suggestions,
-    });
+const { error: updateError } = await supabaseAdmin
+  .from("match_review_queue")
+  .update({
+    ai_analyzed: true,
+  })
+  .eq("id", queueId);
+
+if (updateError) {
+  throw new Error(
+    `Kunne ikke markere AI-analysen som ferdig: ${updateError.message}`,
+  );
+}
+
+return NextResponse.json({
+  success: true,
+  suggestions,
+});
   } catch (error) {
     console.error("Assistant analyze error:", error);
 
