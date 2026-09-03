@@ -673,34 +673,51 @@ async function rejectCurrentSong() {
   if (!conceptId?.trim()) return;
 
   const conceptClassByGroup: Record<string, string> = {
+  actors: "person",
   animals: "animal",
+  athletes: "person",
+  birds: "bird",
   body_parts: "body_part",
+  capitals: "place",
   car_brands: "car_brand",
   car_models: "car_model",
+  cartoons: "cartoon_character",
   cities: "place",
+  clothing: "clothing",
   colors: "color",
   countries: "country",
+  dance_styles: "dance_style",
+  days: "day",
+  dishes: "dish",
+  drinks: "drink",
   drugs: "drug",
   elements: "chemical_element",
+  extraterrestrial: "extraterrestrial",
   female_names: "person",
+  fish: "fish",
   fruits: "fruit",
   furniture: "furniture",
   instruments: "instrument",
+  islands: "place",
   male_names: "person",
   months: "month",
   moons: "moon",
-  neighborhoods: "neighborhood",
+  mountain_peaks: "place",
+  mountains: "place",
   nuts: "nut",
   planets: "planet",
-  plants: "plant",
+  politicians: "person",
+  professions: "profession",
   rivers: "river",
+  scientists: "person",
   star_wars_planets: "fictional_planet",
-  sports: "sport",
   transport: "vehicle",
   tree_species: "tree",
   unisex_names: "person",
   us_states: "place",
   vegetables: "vegetable",
+  visual_artists: "person",
+  weapons: "weapon",
   years: "year",
 };
 
@@ -772,13 +789,38 @@ if (!groupId) {
   return;
 }
 
-const conceptClass = conceptClassByGroup[groupId];
+let conceptClass = conceptClassByGroup[groupId];
 
 if (!conceptClass) {
-  setMessage(
-    `Mangler definert concept_class for gruppen "${groupId}".`,
+  const choices = conceptClassChoicesByGroup[groupId];
+
+  if (!choices?.length) {
+    setMessage(
+      `Mangler definert concept_class for gruppen "${groupId}".`,
+    );
+    return;
+  }
+
+  const selected = window.prompt(
+    `Velg concept_class:\n\n${choices
+      .map((value, index) => `${index + 1} = ${value}`)
+      .join("\n")}`,
   );
-  return;
+
+  if (!selected) return;
+
+  const selectedIndex = Number(selected) - 1;
+
+  if (
+    !Number.isInteger(selectedIndex) ||
+    selectedIndex < 0 ||
+    selectedIndex >= choices.length
+  ) {
+    setMessage("Ugyldig concept_class-valg.");
+    return;
+  }
+
+  conceptClass = choices[selectedIndex];
 }
 
 setIsAddingManual(true);
