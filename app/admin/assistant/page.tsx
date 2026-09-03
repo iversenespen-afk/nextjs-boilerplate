@@ -695,6 +695,7 @@ async function rejectCurrentSong() {
   plants: "plant",
   rivers: "river",
   star_wars_planets: "fictional_planet",
+  sports: "sport",
   transport: "vehicle",
   tree_species: "tree",
   unisex_names: "person",
