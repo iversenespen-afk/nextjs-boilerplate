@@ -425,9 +425,43 @@ if (joinedName && sessionStatus === "finished") {
     fontWeight: 950,
     letterSpacing: "0.09em",
     lineHeight: 0.9,
+    whiteSpace: "nowrap",
   }}
 >
-  {question.themeName}
+  {(() => {
+  const slashParts = question.themeName.split("/");
+
+  if (slashParts.length > 1) {
+    return slashParts.map((part, index) => (
+      <span
+        key={`${part}-${index}`}
+        style={{ display: "block" }}
+      >
+        {part}
+        {index < slashParts.length - 1 ? "/" : ""}
+      </span>
+    ));
+  }
+
+  const words = question.themeName.split(" ");
+
+  if (words.length > 1) {
+    const middle = Math.ceil(words.length / 2);
+
+    return (
+      <>
+        <span style={{ display: "block" }}>
+          {words.slice(0, middle).join(" ")}
+        </span>
+        <span style={{ display: "block" }}>
+          {words.slice(middle).join(" ")}
+        </span>
+      </>
+    );
+  }
+
+  return question.themeName;
+})()}
 </div>
 <div
   style={{
