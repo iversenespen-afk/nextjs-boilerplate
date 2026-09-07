@@ -53,6 +53,9 @@ export default function JoinPage() {
   useState<string | null>(null);
   const currentQuestionIdRef = useRef<number | null>(null);
   const [pointsAwarded, setPointsAwarded] = useState<number | null>(null);
+  const [currentScore, setCurrentScore] = useState<number | null>(null);
+  const [currentRank, setCurrentRank] = useState<number | null>(null);
+  const [leaderScore, setLeaderScore] = useState<number | null>(null);
   const [finalScore, setFinalScore] = useState<number | null>(null);
   const [finalRank, setFinalRank] = useState<number | null>(null);
   const [reportType, setReportType] = useState("");
@@ -186,6 +189,41 @@ setQuestion(result.question);
     // Spørsmålshenting skal ikke krasje spillersiden.
   }
 }
+async function fetchCurrentStanding(currentSessionId: number) {
+  if (!participantId) return;
+
+  try {
+    const response = await fetch(
+      `/api/quiz/participants?sessionId=${currentSessionId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    const sortedParticipants = [...(result.participants ?? [])].sort(
+      (a, b) => b.score - a.score,
+    );
+
+    const participantIndex = sortedParticipants.findIndex(
+      (participant) => participant.id === participantId,
+    );
+
+    if (participantIndex === -1) return;
+
+    setCurrentScore(sortedParticipants[participantIndex].score);
+    setCurrentRank(participantIndex + 1);
+    setLeaderScore(sortedParticipants[0]?.score ?? null);
+  } catch {
+    // Stillingen skal ikke krasje spillersiden.
+  }
+}
 async function fetchFinalResult(currentSessionId: number) {
   if (!participantId) return;
 
@@ -262,6 +300,7 @@ async function fetchFinalResult(currentSessionId: number) {
     setCorrectConceptIds(result.result.correctConceptIds ?? []);
     setCorrectAnswers(result.result.correctAnswers ?? []);
     setPointsAwarded(result.result.pointsAwarded ?? 0);
+    await fetchCurrentStanding(sessionId);
   } catch {
     setMessage("Noe gikk galt da svaret skulle registreres.");
   } finally {
@@ -341,6 +380,10 @@ async function submitReport() {
 
 if (result.session.status === "playing") {
   await fetchQuestion(currentSessionId);
+
+  if (answerResult) {
+    await fetchCurrentStanding(currentSessionId);
+  }
 }
     } catch {
       // Status-polling skal ikke krasje spillersiden.
@@ -654,6 +697,62 @@ gap: 9,
             opacity: 0.7,
           }}
         >
+          {currentScore !== null && currentRank !== null && (
+  <div
+    style={{
+      marginTop: 18,
+      marginBottom: 14,
+      textAlign: "center",
+    }}
+  >
+    <div
+      className={bangers.className}
+      style={{
+        fontSize: 34,
+        letterSpacing: "0.05em",
+      }}
+    >
+      TOTALT: {currentScore} POENG
+    </div>
+
+    <div
+      style={{
+        marginTop: 6,
+        fontSize: 22,
+        fontWeight: 900,
+      }}
+    >
+      {currentRank}. PLASS
+    </div>
+
+    {leaderScore !== null &&
+      currentRank > 1 &&
+      leaderScore > currentScore && (
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 15,
+            opacity: 0.7,
+          }}
+        >
+          {leaderScore - currentScore} poeng bak lederen
+        </div>
+      )}
+
+    <div
+      style={{
+        marginTop: 14,
+        fontSize: 14,
+        fontWeight: 800,
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+        opacity: 0.7,
+      }}
+    >
+      Venter på de andre...
+    </div>
+  </div>
+)}
           Trykk på skjermen for låtinfo
         </div>
       </>
