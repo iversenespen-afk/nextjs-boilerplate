@@ -292,6 +292,25 @@ if (
   questionResult.success &&
   questionResult.question?.song?.spotify_id
 ) {
+  const playResponse = await fetch("/api/spotify/play", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      spotifyId: questionResult.question.song.spotify_id,
+    }),
+  });
+
+  const playResult = await playResponse.json();
+
+  if (!playResponse.ok || !playResult.success) {
+    setMessage(
+      playResult.message ??
+        "Spotify klarte ikke å starte avspillingen.",
+    );
+  }
+}
   await fetch("/api/spotify/play", {
     method: "POST",
     headers: {
