@@ -120,8 +120,28 @@ if (!matchRows || matchRows.length === 0) {
   );
 }
 
-const randomMatch =
-  matchRows[Math.floor(Math.random() * matchRows.length)];
+let randomMatch;
+
+if (session.quiz_type === "mixed") {
+  const themeIds = [
+    ...new Set(matchRows.map((match) => match.theme_id)),
+  ];
+
+  const randomThemeId =
+    themeIds[Math.floor(Math.random() * themeIds.length)];
+
+  const themeMatches = matchRows.filter(
+    (match) => match.theme_id === randomThemeId,
+  );
+
+  randomMatch =
+    themeMatches[
+      Math.floor(Math.random() * themeMatches.length)
+    ];
+} else {
+  randomMatch =
+    matchRows[Math.floor(Math.random() * matchRows.length)];
+}
   const { data: correctMatches, error: correctMatchesError } =
   await supabaseAdmin
     .from("song_matches")
