@@ -421,7 +421,12 @@ if (joinedName && sessionStatus === "finished") {
     background: "#0a0a0a",
     textAlign: "center",
     textTransform: "uppercase",
-    fontSize: "clamp(48px, 15vw, 82px)",
+    fontSize:
+      !question.themeName.includes("/") &&
+      !question.themeName.includes(" ") &&
+      question.themeName.length > 11
+        ? "clamp(30px, 8.5vw, 56px)"
+        : "clamp(48px, 15vw, 82px)",
     fontWeight: 950,
     letterSpacing: "0.09em",
     lineHeight: 0.9,
