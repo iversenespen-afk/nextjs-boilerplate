@@ -18,6 +18,8 @@ type QuizParticipant = {
   joined_at: string;
 };
 
+type QuizType = "mixed" | "theme";
+
 export default function HostPage() {
   const [session, setSession] = useState<QuizSession | null>(
     null,
@@ -33,6 +35,9 @@ const [participants, setParticipants] = useState<
   const [showSongInfo, setShowSongInfo] = useState(false);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
+  const [quizType, setQuizType] = useState<QuizType>("mixed");
+  const [selectedThemeId, setSelectedThemeId] = useState("");
+  
   const [answerStatus, setAnswerStatus] = useState({
   answered: 0,
   total: 0,
@@ -320,21 +325,124 @@ useEffect(() => {
 </div>
 
       {!session ? (
+  <>
+    <div style={{ marginBottom: 24 }}>
+      <h2>Hva vil du spille?</h2>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 12,
+          marginTop: 12,
+        }}
+      >
         <button
           type="button"
-          onClick={createSession}
-          disabled={isCreating}
+          onClick={() => {
+            setQuizType("mixed");
+            setSelectedThemeId("");
+          }}
           style={{
-            padding: "12px 18px",
-            border: 0,
-            borderRadius: 10,
-            cursor: isCreating ? "default" : "pointer",
-            fontWeight: 700,
+            padding: 20,
+            textAlign: "left",
+            borderRadius: 12,
+            border:
+              quizType === "mixed"
+                ? "2px solid #22c55e"
+                : "1px solid #444",
+            background:
+              quizType === "mixed" ? "#16351f" : "#1c1c1c",
+            color: "white",
+            cursor: "pointer",
           }}
         >
-          {isCreating ? "Oppretter..." : "Opprett quizrom"}
+          <strong>🎲 Blandet</strong>
+          <div style={{ marginTop: 6, opacity: 0.75 }}>
+            Spørsmål fra alle tilgjengelige temaer
+          </div>
         </button>
-      ) : (
+
+        <button
+          type="button"
+          onClick={() => setQuizType("theme")}
+          style={{
+            padding: 20,
+            textAlign: "left",
+            borderRadius: 12,
+            border:
+              quizType === "theme"
+                ? "2px solid #22c55e"
+                : "1px solid #444",
+            background:
+              quizType === "theme" ? "#16351f" : "#1c1c1c",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          <strong>🎯 Ett tema</strong>
+          <div style={{ marginTop: 6, opacity: 0.75 }}>
+            Spill med spørsmål fra ett bestemt tema
+          </div>
+        </button>
+      </div>
+
+      {quizType === "theme" && (
+        <div style={{ marginTop: 16 }}>
+          <label>
+            <strong>Velg tema</strong>
+          </label>
+
+          <select
+            value={selectedThemeId}
+            onChange={(event) =>
+              setSelectedThemeId(event.target.value)
+            }
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 8,
+              padding: 12,
+              borderRadius: 8,
+              background: "#111",
+              color: "#fff",
+              border: "1px solid #555",
+            }}
+          >
+            <option value="">Velg tema...</option>
+            <option value="colors">Farger</option>
+            <option value="animals">Dyr</option>
+            <option value="cities">Byer</option>
+            <option value="body">Kroppen</option>
+            <option value="days">Ukedager</option>
+          </select>
+        </div>
+      )}
+    </div>
+
+    <button
+      type="button"
+      onClick={createSession}
+      disabled={
+        isCreating ||
+        (quizType === "theme" && !selectedThemeId)
+      }
+      style={{
+        padding: "12px 18px",
+        border: 0,
+        borderRadius: 10,
+        cursor:
+          isCreating ||
+          (quizType === "theme" && !selectedThemeId)
+            ? "default"
+            : "pointer",
+        fontWeight: 700,
+      }}
+    >
+      {isCreating ? "Oppretter..." : "Opprett quizrom"}
+    </button>
+  </>
+) : (
         <>
           <section>
             <div>Romkode</div>
