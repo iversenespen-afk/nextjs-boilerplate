@@ -151,15 +151,30 @@ if (session.quiz_type === "theme") {
 const { data: matchRows, error: matchError } =
   await matchQuery;
 
-  if (matchError) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: matchError.message,
-      },
-      { status: 500 },
-    );
-  }
+if (matchError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: matchError.message,
+    },
+    { status: 500 },
+  );
+}
+
+const { data: themeRows, error: themeError } =
+  await supabaseAdmin
+    .from("themes")
+    .select("id, quick_play_weight");
+
+if (themeError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: themeError.message,
+    },
+    { status: 500 },
+  );
+}
 
   const availableMatches = (matchRows ?? []).filter((match) => {
   const questionKey = `${match.song_id}|${match.theme_id}`;
@@ -170,6 +185,13 @@ const { data: matchRows, error: matchError } =
   let balancedMatches = availableMatches;
 
 if (session.quiz_type === "mixed") {
+  const themeWeightMap = new Map(
+    (themeRows ?? []).map((theme) => [
+      theme.id,
+      theme.quick_play_weight,
+    ]),
+  );
+
   const themeUsage = new Map<string, number>();
 
   for (const row of historyRows ?? []) {
@@ -185,20 +207,44 @@ if (session.quiz_type === "mixed") {
     ),
   ];
 
+  const quickPlayThemeIds = availableThemeIds.filter(
+    (themeId) =>
+      (themeWeightMap.get(themeId) ?? 0) > 0,
+  );
+
+  if (quickPlayThemeIds.length === 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Fant ingen flere temaer tilgjengelig for Quick Play.",
+      },
+      { status: 409 },
+    );
+  }
+
   const minUsage = Math.min(
-    ...availableThemeIds.map(
+    ...quickPlayThemeIds.map(
       (themeId) => themeUsage.get(themeId) ?? 0,
     ),
   );
 
-  const leastUsedThemeIds = availableThemeIds.filter(
+  const leastUsedThemeIds = quickPlayThemeIds.filter(
     (themeId) =>
       (themeUsage.get(themeId) ?? 0) === minUsage,
   );
 
+  const weightedThemeIds = leastUsedThemeIds.flatMap(
+    (themeId) => {
+      const weight =
+        themeWeightMap.get(themeId) ?? 0;
+
+      return Array(weight).fill(themeId);
+    },
+  );
+
   const selectedThemeId =
-    leastUsedThemeIds[
-      Math.floor(Math.random() * leastUsedThemeIds.length)
+    weightedThemeIds[
+      Math.floor(Math.random() * weightedThemeIds.length)
     ];
 
   balancedMatches = availableMatches.filter(
