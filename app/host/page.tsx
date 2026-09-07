@@ -311,16 +311,7 @@ if (
     );
   }
 }
-  await fetch("/api/spotify/play", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      spotifyId: questionResult.question.song.spotify_id,
-    }),
-  });
-}
+ 
 setMessage("Neste spørsmål er klart.");
   } catch {
     setMessage("Noe gikk galt da neste spørsmål skulle hentes.");
