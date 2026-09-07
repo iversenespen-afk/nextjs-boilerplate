@@ -59,25 +59,37 @@ export async function POST(request: Request) {
   );
 
   if (!spotifyResponse.ok) {
-    let spotifyError = null;
+  let spotifyError = null;
 
-    try {
-      spotifyError = await spotifyResponse.json();
-    } catch {
-      // Spotify returnerer ikke alltid JSON.
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          spotifyError?.error?.message ??
-          "Kunne ikke starte Spotify-avspilling.",
-        spotifyStatus: spotifyResponse.status,
-      },
-      { status: spotifyResponse.status },
-    );
+  try {
+    spotifyError = await spotifyResponse.json();
+  } catch {
+    // Spotify returnerer ikke alltid JSON.
   }
+
+  const spotifyMessage =
+    spotifyError?.error?.message ?? "";
+
+  const noActiveDevice =
+    spotifyResponse.status === 404 ||
+    spotifyMessage.toLowerCase().includes("not found") ||
+    spotifyMessage.toLowerCase().includes("device");
+
+  return NextResponse.json(
+    {
+      success: false,
+      message: noActiveDevice
+        ? "Ingen aktiv Spotify-enhet funnet. Åpne Spotify, start eller aktiver avspilling der, og prøv igjen."
+        : spotifyMessage ||
+          "Kunne ikke starte Spotify-avspilling.",
+      spotifyStatus: spotifyResponse.status,
+      errorCode: noActiveDevice
+        ? "NO_ACTIVE_DEVICE"
+        : "SPOTIFY_PLAYBACK_ERROR",
+    },
+    { status: spotifyResponse.status },
+  );
+}
 
   return NextResponse.json({
     success: true,
