@@ -395,7 +395,7 @@ if (result.session.status === "playing") {
   const interval = setInterval(fetchSessionStatus, 2000);
 
   return () => clearInterval(interval);
-}, [sessionId]);
+}, [sessionId, answerResult]);
 if (joinedName && sessionStatus === "finished") {
   return (
     <main
