@@ -18,6 +18,11 @@ type QuizParticipant = {
   joined_at: string;
 };
 
+type QuizTheme = {
+  id: string;
+  name: string;
+};
+
 type QuizType = "mixed" | "theme";
 
 export default function HostPage() {
@@ -37,6 +42,7 @@ const [participants, setParticipants] = useState<
   const [questionCount, setQuestionCount] = useState(10);
   const [quizType, setQuizType] = useState<QuizType>("mixed");
   const [selectedThemeId, setSelectedThemeId] = useState("");
+  const [themes, setThemes] = useState<QuizTheme[]>([]);
   
   const [answerStatus, setAnswerStatus] = useState({
   answered: 0,
@@ -59,8 +65,18 @@ const [spotifyProfile, setSpotifyProfile] = useState<{
 
     try {
       const response = await fetch("/api/quiz/sessions", {
-        method: "POST",
-      });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    quizType,
+    themeId:
+      quizType === "theme"
+        ? selectedThemeId
+        : null,
+  }),
+});
 
       const result = await response.json();
 
@@ -285,6 +301,25 @@ setMessage("Neste spørsmål er klart.");
     setIsLoadingNext(false);
   }
 }
+
+  async function fetchThemes() {
+  try {
+    const response = await fetch("/api/quiz/themes", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return;
+    }
+
+    setThemes(result.themes ?? []);
+  } catch {
+    // Temalista skal ikke krasje host-siden.
+  }
+}
   
   useEffect(() => {
   if (!session) return;
@@ -301,6 +336,7 @@ const interval = setInterval(() => {
 }, [session]);
 useEffect(() => {
   fetchSpotifyStatus();
+  fetchThemes();
 }, []);
       return (
     <main style={{ padding: 24 }}>
@@ -409,12 +445,11 @@ useEffect(() => {
               border: "1px solid #555",
             }}
           >
-            <option value="">Velg tema...</option>
-            <option value="colors">Farger</option>
-            <option value="animals">Dyr</option>
-            <option value="cities">Byer</option>
-            <option value="body">Kroppen</option>
-            <option value="days">Ukedager</option>
+            {themes.map((theme) => (
+  <option key={theme.id} value={theme.id}>
+    {theme.name}
+  </option>
+))}
           </select>
         </div>
       )}
