@@ -43,20 +43,50 @@ export async function POST(request: Request) {
   ? `spotify:track:${spotifyId}`
   : "spotify:track:4iV5W9uYEdYUVa79Axb7Rh";
 
-  const spotifyResponse = await fetch(
-    "https://api.spotify.com/v1/me/player/play",
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uris: [spotifyUri],
-        position_ms: 0,
-      }),
+  const devicesResponse = await fetch(
+  "https://api.spotify.com/v1/me/player/devices",
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
     },
-  );
+  },
+);
+
+let selectedDeviceId: string | null = null;
+
+if (devicesResponse.ok) {
+  const devicesResult = await devicesResponse.json();
+
+  const devices = devicesResult.devices ?? [];
+
+  const selectedDevice =
+    devices.find(
+      (device: { is_active: boolean; is_restricted: boolean }) =>
+        device.is_active && !device.is_restricted,
+    ) ??
+    devices.find(
+      (device: { is_restricted: boolean }) =>
+        !device.is_restricted,
+    );
+
+  selectedDeviceId = selectedDevice?.id ?? null;
+}
+
+const playUrl = selectedDeviceId
+  ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(selectedDeviceId)}`
+  : "https://api.spotify.com/v1/me/player/play";
+
+const spotifyResponse = await fetch(playUrl, {
+  method: "PUT",
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    uris: [spotifyUri],
+    position_ms: 0,
+  }),
+});
 
   if (!spotifyResponse.ok) {
   let spotifyError = null;
