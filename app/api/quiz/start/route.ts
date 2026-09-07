@@ -120,15 +120,53 @@ if (!matchRows || matchRows.length === 0) {
   );
 }
 
+const { data: themeRows, error: themeError } =
+  await supabaseAdmin
+    .from("themes")
+    .select("id, quick_play_weight");
+
+if (themeError) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: themeError.message,
+    },
+    { status: 500 },
+  );
+}
+
 let randomMatch;
 
 if (session.quiz_type === "mixed") {
-  const themeIds = [
+  const themeWeightMap = new Map(
+    (themeRows ?? []).map((theme) => [
+      theme.id,
+      theme.quick_play_weight,
+    ]),
+  );
+
+  const weightedThemeIds = [
     ...new Set(matchRows.map((match) => match.theme_id)),
-  ];
+  ].flatMap((themeId) => {
+    const weight = themeWeightMap.get(themeId) ?? 0;
+
+    return Array(Math.max(0, weight)).fill(themeId);
+  });
+
+  if (weightedThemeIds.length === 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Fant ingen temaer tilgjengelig for Quick Play.",
+      },
+      { status: 409 },
+    );
+  }
 
   const randomThemeId =
-    themeIds[Math.floor(Math.random() * themeIds.length)];
+    weightedThemeIds[
+      Math.floor(Math.random() * weightedThemeIds.length)
+    ];
 
   const themeMatches = matchRows.filter(
     (match) => match.theme_id === randomThemeId,
