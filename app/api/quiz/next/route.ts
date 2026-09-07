@@ -167,6 +167,45 @@ const { data: matchRows, error: matchError } =
   return !usedQuestionKeys.has(questionKey);
 });
 
+  let balancedMatches = availableMatches;
+
+if (session.quiz_type === "mixed") {
+  const themeUsage = new Map<string, number>();
+
+  for (const row of historyRows ?? []) {
+    themeUsage.set(
+      row.theme_id,
+      (themeUsage.get(row.theme_id) ?? 0) + 1,
+    );
+  }
+
+  const availableThemeIds = [
+    ...new Set(
+      availableMatches.map((match) => match.theme_id),
+    ),
+  ];
+
+  const minUsage = Math.min(
+    ...availableThemeIds.map(
+      (themeId) => themeUsage.get(themeId) ?? 0,
+    ),
+  );
+
+  const leastUsedThemeIds = availableThemeIds.filter(
+    (themeId) =>
+      (themeUsage.get(themeId) ?? 0) === minUsage,
+  );
+
+  const selectedThemeId =
+    leastUsedThemeIds[
+      Math.floor(Math.random() * leastUsedThemeIds.length)
+    ];
+
+  balancedMatches = availableMatches.filter(
+    (match) => match.theme_id === selectedThemeId,
+  );
+}
+
   if (availableMatches.length === 0) {
     return NextResponse.json(
       {
@@ -178,9 +217,9 @@ const { data: matchRows, error: matchError } =
   }
 
   const randomMatch =
-    availableMatches[
-      Math.floor(Math.random() * availableMatches.length)
-    ];
+  balancedMatches[
+    Math.floor(Math.random() * balancedMatches.length)
+  ];
   const nextQuestionNumber =
   (historyRows?.length ?? 0) + 1;
 
