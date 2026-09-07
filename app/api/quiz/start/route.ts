@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   const { data: session, error: sessionError } =
     await supabaseAdmin
       .from("quiz_sessions")
-      .select("id, status")
+      .select("id, status, quiz_type, theme_id")
       .eq("id", sessionId)
       .maybeSingle();
 
@@ -75,11 +75,30 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: matchRows, error: matchError } =
-  await supabaseAdmin
-    .from("song_matches")
-    .select("id, song_id, theme_id")
-    .eq("verified", true);
+  let matchQuery = supabaseAdmin
+  .from("song_matches")
+  .select("id, song_id, theme_id")
+  .eq("verified", true);
+
+if (session.quiz_type === "theme") {
+  if (!session.theme_id) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Quizrommet mangler valgt tema.",
+      },
+      { status: 409 },
+    );
+  }
+
+  matchQuery = matchQuery.eq(
+    "theme_id",
+    session.theme_id,
+  );
+}
+
+const { data: matchRows, error: matchError } =
+  await matchQuery;
 
 if (matchError) {
   return NextResponse.json(
