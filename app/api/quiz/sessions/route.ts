@@ -7,7 +7,41 @@ function createJoinCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  let body: {
+    quizType?: string;
+    themeId?: string | null;
+  } = {};
+
+  try {
+    body = await request.json();
+  } catch {
+    // Tillat tom body og bruk standardverdier.
+  }
+
+  const quizType = body.quizType ?? "mixed";
+  const themeId = body.themeId ?? null;
+
+  if (quizType !== "mixed" && quizType !== "theme") {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Ugyldig quiztype.",
+      },
+      { status: 400 },
+    );
+  }
+
+  if (quizType === "theme" && !themeId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Tema mangler.",
+      },
+      { status: 400 },
+    );
+  }
+
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const joinCode = createJoinCode();
 
@@ -16,8 +50,12 @@ export async function POST() {
       .insert({
         join_code: joinCode,
         status: "lobby",
+        quiz_type: quizType,
+        theme_id: quizType === "theme" ? themeId : null,
       })
-      .select("id, join_code, status, created_at")
+      .select(
+        "id, join_code, status, quiz_type, theme_id, created_at",
+      )
       .single();
 
     if (!error) {
