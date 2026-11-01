@@ -510,6 +510,31 @@ useEffect(() => {
             >
               {session.join_code}
             </strong>
+            
+<div style={{ marginTop: 16 }}>
+  <a
+    href="/join"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: "inline-block",
+      padding: "12px 18px",
+      borderRadius: 10,
+      background: "#22c55e",
+      color: "#111",
+      fontWeight: 700,
+      textDecoration: "none",
+    }}
+  >
+    🎮 Bli med som spiller
+  </a>
+
+  <p style={{ fontSize: 14, opacity: 0.7 }}>
+    Åpner deltakerpåmelding i en ny fane.
+    Bruk romkoden som vises over.
+  </p>
+</div>
+
           </section>
 
           {session.status !== "finished" && (
