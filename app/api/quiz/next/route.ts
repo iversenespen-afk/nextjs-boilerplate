@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   const { data: historyRows, error: historyError } =
   await supabaseAdmin
     .from("quiz_session_questions")
-    .select("song_id, theme_id, question_number")
+    .select("song_id, theme_id, question_number, started_at")
     .eq("session_id", sessionId)
     .order("question_number", { ascending: true });
 
@@ -94,7 +94,10 @@ const usedQuestionKeys = new Set(
     (row) => `${row.song_id}|${row.theme_id}`,
   ),
 );
-  const currentQuestionNumber = historyRows?.length ?? 0;
+  const currentQuestionNumber =
+  (historyRows ?? []).filter(
+    (row) => row.started_at !== null,
+  ).length;
 
 if (currentQuestionNumber >= session.question_count) {
   const { data: finishedSession, error: finishError } =
