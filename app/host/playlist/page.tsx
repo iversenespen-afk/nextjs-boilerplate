@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type Track = {
@@ -12,7 +12,7 @@ type Track = {
   spotifyUrl: string | null;
 };
 
-export default function HostPlaylistPage() {
+  function HostPlaylistContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
 
@@ -132,3 +132,12 @@ export default function HostPlaylistPage() {
     </main>
   );
 }
+
+export default function HostPlaylistPage() {
+  return (
+    <Suspense fallback={<p>Laster spilleliste...</p>}>
+      <HostPlaylistContent />
+    </Suspense>
+  );
+}
+
