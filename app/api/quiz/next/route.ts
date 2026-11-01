@@ -99,6 +99,23 @@ const usedQuestionKeys = new Set(
     (row) => row.started_at !== null,
   ).length;
 
+  
+const nextPlannedQuestion = (historyRows ?? [])
+  .filter((row) => row.started_at === null)
+  .sort((a, b) => a.question_number - b.question_number)[0];
+
+if (nextPlannedQuestion) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "Planlagte spørsmål finnes, men aktivering er ikke implementert ennå.",
+    },
+    { status: 409 },
+  );
+}
+
+
 if (currentQuestionNumber >= session.question_count) {
   const { data: finishedSession, error: finishError } =
     await supabaseAdmin
