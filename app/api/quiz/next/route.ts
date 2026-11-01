@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   const { data: historyRows, error: historyError } =
   await supabaseAdmin
     .from("quiz_session_questions")
-    .select("song_id, theme_id, question_number, started_at")
+    .select("id, song_match_id, song_id, theme_id, question_number, started_at")
     .eq("session_id", sessionId)
     .order("question_number", { ascending: true });
 
@@ -100,20 +100,13 @@ const usedQuestionKeys = new Set(
   ).length;
 
   
+
 const nextPlannedQuestion = (historyRows ?? [])
   .filter((row) => row.started_at === null)
   .sort((a, b) => a.question_number - b.question_number)[0];
 
-if (nextPlannedQuestion) {
-  return NextResponse.json(
-    {
-      success: false,
-      message:
-        "Planlagte spørsmål finnes, men aktivering er ikke implementert ennå.",
-    },
-    { status: 409 },
-  );
-}
+
+
 
 
 if (currentQuestionNumber >= session.question_count) {
@@ -146,6 +139,23 @@ if (currentQuestionNumber >= session.question_count) {
   });
 }
 
+  let selectedMatch: { id: number; song_id: number; theme_id: string };
+  let selectedQuestionNumber: number;
+
+  if (nextPlannedQuestion) {
+    if (nextPlannedQuestion.question_number !== currentQuestionNumber + 1) {
+      return NextResponse.json(
+        { success: false, message: "Ugyldig rekkefølge på planlagte spørsmål." },
+        { status: 409 },
+      );
+    }
+    selectedMatch = {
+      id: nextPlannedQuestion.song_match_id,
+      song_id: nextPlannedQuestion.song_id,
+      theme_id: nextPlannedQuestion.theme_id,
+    };
+    selectedQuestionNumber = nextPlannedQuestion.question_number;
+  } else {
   let matchQuery = supabaseAdmin
   .from("song_matches")
   .select("id, song_id, theme_id")
@@ -286,10 +296,12 @@ if (session.quiz_type === "mixed") {
   balancedMatches[
     Math.floor(Math.random() * balancedMatches.length)
   ];
-  const nextQuestionNumber =
-  (historyRows?.length ?? 0) + 1;
+  selectedMatch = randomMatch;
+  selectedQuestionNumber = currentQuestionNumber + 1;
 
-  const { data: correctMatches, error: correctMatchesError } =
+    }
+  const randomMatch = selectedMatch;
+const { data: correctMatches, error: correctMatchesError } =
     await supabaseAdmin
       .from("song_matches")
       .select("concept_id")
@@ -476,27 +488,43 @@ const distractors = (candidateConcepts ?? [])
       { status: 500 },
     );
   }
-const { error: questionHistoryError } =
-  await supabaseAdmin
-    .from("quiz_session_questions")
-    .insert({
-      session_id: sessionId,
-      song_id: randomMatch.song_id,
-      theme_id: randomMatch.theme_id,
-      song_match_id: randomMatch.id,
-      question_number: nextQuestionNumber,
-      started_at: new Date().toISOString(),
-    });
+const startedAt = new Date().toISOString();
+  if (nextPlannedQuestion) {
+    const { data: activatedQuestion, error: questionHistoryError } =
+      await supabaseAdmin
+        .from("quiz_session_questions")
+        .update({ started_at: startedAt })
+        .eq("id", nextPlannedQuestion.id)
+        .is("started_at", null)
+        .select("id")
+        .maybeSingle();
 
-if (questionHistoryError) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: questionHistoryError.message,
-    },
-    { status: 500 },
-  );
-}
+    if (questionHistoryError || !activatedQuestion) {
+      return NextResponse.json(
+        { success: false, message: questionHistoryError?.message ?? "Spørsmålet er allerede aktivert." },
+        { status: 409 },
+      );
+    }
+  } else {
+    const { error: questionHistoryError } = await supabaseAdmin
+      .from("quiz_session_questions")
+      .insert({
+        session_id: sessionId,
+        song_id: randomMatch.song_id,
+        theme_id: randomMatch.theme_id,
+        song_match_id: randomMatch.id,
+        question_number: selectedQuestionNumber,
+        started_at: startedAt,
+      });
+
+    if (questionHistoryError) {
+      return NextResponse.json(
+        { success: false, message: questionHistoryError.message },
+        { status: 500 },
+      );
+    }
+  }
+
   return NextResponse.json({
     success: true,
     session: updatedSession,
